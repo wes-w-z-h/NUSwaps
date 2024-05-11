@@ -1,2 +1,2 @@
-# /backend/.env # uncommnet this 
+/backend/.env 
 /backend/node_modules/
