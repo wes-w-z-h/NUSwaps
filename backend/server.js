@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 const app = express();
 
-// middleware
+// Middleware
 app.use(express.json());
 // to check the req routes
 app.use((req, res, next) => {
@@ -13,13 +13,14 @@ app.use((req, res, next) => {
   next();
 });
 
-// routes
+// Routes
 app.use("/api/tutorials", tutRouter);
 
-// connect db
-// TODO: add the uri
-// mongoose.connect(uri)
-// .then(() => app.listen(process.env.PORT, () => {
-// console.log("listening on port", process.env.PORT);
-// });)
-// .catch((error) => console.log(error)); add env variable for uri
+// Connect to db
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log("listening on port", process.env.PORT);
+    }
+  )})
+  .catch((error) => console.log(error));
