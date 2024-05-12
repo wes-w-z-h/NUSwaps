@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { tutRouter } from "./routes/tutorialRoute.js";
+import { userRouter } from "./routes/userRoute.js";
 import mongoose from "mongoose";
 
 const app = express();
@@ -15,6 +16,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/api/tutorials", tutRouter);
+app.use("/api/users", userRouter);
 
 // Connect to db
 mongoose.connect(process.env.MONGO_URI)
