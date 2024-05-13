@@ -10,13 +10,9 @@ const swapSchema = new Schema(
     },
     userID: {
       type: Number,
-      required: true
-    },
-    courseID: {
-      type: String,
       required: true,
     },
-    lessonType: {
+    courseID: {
       type: String,
       required: true,
     },
@@ -26,10 +22,6 @@ const swapSchema = new Schema(
     },
     request: {
       type: slotSchema,
-      required: true,
-    },
-    userID: {
-      type: Number,
       required: true,
     },
     status: {

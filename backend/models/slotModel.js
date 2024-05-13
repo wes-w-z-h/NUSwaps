@@ -11,6 +11,10 @@ const slotSchema = new Schema(
       type: String,
       required: true,
     },
+    lessonType: {
+      type: String,
+      required: true,
+    },
     timing: {
       type: Date,
       required: true,
