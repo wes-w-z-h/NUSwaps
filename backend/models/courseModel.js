@@ -20,4 +20,5 @@ const courseSchema = new Schema(
   { timestamps: true } // createdAt option
 );
 
-export const Course = mongoose.model("Course", courseSchema);
+const Course = mongoose.model("Course", courseSchema);
+export { Course, courseSchema };

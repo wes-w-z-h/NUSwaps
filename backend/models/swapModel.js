@@ -8,6 +8,10 @@ const swapSchema = new Schema(
       type: Number,
       required: true,
     },
+    userID: {
+      type: Number,
+      required: true
+    },
     courseID: {
       type: String,
       required: true,

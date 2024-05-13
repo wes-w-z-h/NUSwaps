@@ -25,4 +25,5 @@ const userSchema = new Schema(
   { timestamps: true } // createdAt option
 );
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export { User, userSchema };
