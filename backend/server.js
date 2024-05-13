@@ -13,7 +13,7 @@ app.use(express.json());
 // to check the req routes
 app.use((req, res, next) => {
   console.log(req.path, req.method);
-  // next();
+  next();
 });
 
 // Routes

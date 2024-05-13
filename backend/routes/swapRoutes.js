@@ -1,33 +1,23 @@
 import express from "express";
 import { Swap } from "../models/swapModel.js";
+import { getHandler, postHandler } from "../controllers/requestHandlers.js";
 
 const swapRouter = express.Router();
 
-swapRouter.get("/", (req, res) => {
-  res.json({ message: "hello worlds" });
-});
+swapRouter.get("/", getHandler(Swap));
 
 swapRouter.get("/:id", (req, res) => {
   res.json({ message: "hello world" });
 });
 
-swapRouter.post("/", async (req, res) => {
-  const { swapID, courseID, lessonType, current, request, userID, status } = req.body;
-  try {
-    const swap = await Swap.create({
-      swapID,
-      courseID,
-      lessonType,
-      current,
-      request,
-      userID,
-      status,
-    });
-    res.status(200).json(swap);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+swapRouter.post(
+  "/",
+  postHandler(Swap, (field) => {
+    return field.current.lessonType === field.request.lessonType
+      ? [true, ""]
+      : [false, `Invalid slot types: ${field.current.lessonType} & ${field.request.lessonType}`];
+  })
+);
 
 swapRouter.delete("/", (req, res) => {});
 
