@@ -3,7 +3,7 @@
 ## Overview
 This directory contains the types for the application.
 
-## Impprtant Types
+## Important Types
 
 1. modules
     * RawLesson
