@@ -1,5 +1,5 @@
 /**
- * Taken from NUSMods 
+ * Taken from NUSMods
  * https://github.com/nusmodifications/nusmods/blob/master/scrapers/
  * nus-v2/src/types/venues.ts
  */

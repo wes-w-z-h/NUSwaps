@@ -1,5 +1,5 @@
 /**
- * Taken from NUSMods 
+ * Taken from NUSMods
  * https://github.com/nusmodifications/nusmods/blob/master/scrapers/
  * nus-v2/src/types/modules.ts
  */
@@ -154,8 +154,8 @@ export type ModuleCondensed = Readonly<{
 
 // This format is returned from the module information endpoint
 export type SemesterDataCondensed = Readonly<
-  // The full timetable is omitted to save space
-  Omit<SemesterData, 'timetable'>
+// The full timetable is omitted to save space
+Omit<SemesterData, 'timetable'>
 >;
 
 export type ModuleInformation = Readonly<{

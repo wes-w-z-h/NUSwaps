@@ -1,6 +1,6 @@
-import express, { NextFunction, Request, Response } from "express";
-import userRouter from "./routes/userRoute";
-import swapRouter from "./routes/swapRoute";
+import express, { NextFunction, Request, Response } from 'express';
+import userRouter from './routes/userRoute';
+import swapRouter from './routes/swapRoute';
 
 const app = express();
 
@@ -12,13 +12,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/users", userRouter);
-app.use("/api/swaps", swapRouter);
+app.use('/api/users', userRouter);
+app.use('/api/swaps', swapRouter);
 
 // error handler
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   console.log(error);
-  let errorMsg: string = "Unknown error occured!";
+  let errorMsg: string = 'Unknown error occured!';
   if (error instanceof Error) errorMsg = error.message;
   res.status(400).json({ error: errorMsg });
 });

@@ -1,5 +1,5 @@
-import { Types } from "mongoose";
-import { ModuleCode, RawLesson } from "./modules";
+import { Types } from 'mongoose';
+import { ModuleCode, RawLesson } from './modules';
 
 export type User = {
   readonly _id: Types.ObjectId;

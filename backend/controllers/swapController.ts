@@ -1,5 +1,5 @@
-import { RequestHandler } from "express";
-import { SwapModel } from "../models/swapModel";
+import { RequestHandler } from 'express';
+import { SwapModel } from '../models/swapModel';
 
 export const getSwaps: RequestHandler = async (_req, res, next) => {
   try {
@@ -12,9 +12,11 @@ export const getSwaps: RequestHandler = async (_req, res, next) => {
 };
 
 export const createSwap: RequestHandler = async (req, res, next) => {
-  const { userId, courseId, lessonType, current, request, status } = req.body;
+  const {
+    userId, courseId, lessonType, current, request, status,
+  } = req.body;
   try {
-    if (current.lessonType == request.lessonType) {
+    if (current.lessonType === request.lessonType) {
       const data = await SwapModel.create({
         userId,
         courseId,
@@ -25,7 +27,7 @@ export const createSwap: RequestHandler = async (req, res, next) => {
       });
       res.status(201).json(data);
     } else {
-      res.status(400).json({ error: "Invalid lesson types" });
+      res.status(400).json({ error: 'Invalid lesson types' });
     }
   } catch (error) {
     next(error);

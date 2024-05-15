@@ -1,8 +1,8 @@
-import { Types, model, Schema } from "mongoose";
-import { RawLesson, ModuleCode } from "../types/modules.js";
+import { Types, model, Schema } from 'mongoose';
+import { RawLesson, ModuleCode } from '../types/modules.js';
 
 function courseSetter(lesson: RawLesson): string {
-  return lesson.lessonType + "-" + lesson.classNo;
+  return `${lesson.lessonType}-${lesson.classNo}`;
 }
 
 const swapSchema = new Schema(
@@ -40,8 +40,8 @@ const swapSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true, toJSON: { getters: true } } // createdAt option
+  { timestamps: true, toJSON: { getters: true } }, // createdAt option
 );
 
-const SwapModel = model("Swap", swapSchema);
+const SwapModel = model('Swap', swapSchema);
 export { SwapModel, swapSchema };
