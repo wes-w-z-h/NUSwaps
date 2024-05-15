@@ -12,25 +12,22 @@ const swapSchema = new Schema(
       required: true,
       immutable: true,
     },
+    courseId: {
+      type: String,
+      required: true,
+      get: (v: string): ModuleCode => v as ModuleCode,
+    },
     lessonType: {
       type: String,
       required: true,
     },
-    courseId: {
-      type: String,
-      required: true,
-      immutable: true,
-      get: (v: string): ModuleCode => v as ModuleCode,
-    },
     current: {
       type: String,
-      immutable: true,
       required: true,
       set: courseSetter,
     },
     request: {
       type: String,
-      immutable: true,
       required: true,
       set: courseSetter,
     },

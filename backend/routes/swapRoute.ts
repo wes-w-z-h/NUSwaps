@@ -5,10 +5,12 @@ const swapRouter = express.Router();
 
 swapRouter.get('/', SwapController.getSwaps);
 
-// swapRouter.get("/:id", (_req, res) => {});
+swapRouter.get('/:id', SwapController.getSwap);
 
 swapRouter.post('/', SwapController.createSwap);
 
-// swapRouter.delete("/", (req, res) => {});
+swapRouter.delete('/:id', SwapController.deleteSwap);
+
+swapRouter.patch('/:id', SwapController.updateSwap);
 
 export default swapRouter;
