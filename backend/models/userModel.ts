@@ -10,7 +10,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: false,
-      get: (_v: string): string => '*******',
+      get: (): string => '*******',
       // default: "",
     },
     swapRequests: {
@@ -18,7 +18,7 @@ const userSchema = new Schema(
       required: false,
     },
   },
-  { timestamps: true, toJSON: { getters: true } }, // createdAt option
+  { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
 type User = InferSchemaType<typeof userSchema>;

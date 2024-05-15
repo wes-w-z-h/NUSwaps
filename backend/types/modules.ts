@@ -66,7 +66,12 @@ export const TimesOfDay: Time[] = ['Morning', 'Afternoon', 'Evening'];
 export type ModuleLevel = 1 | 2 | 3 | 4 | 5 | 6 | 8;
 export const Semesters = [1, 2, 3, 4];
 
-export type WorkloadComponent = 'Lecture' | 'Tutorial' | 'Laboratory' | 'Project' | 'Preparation';
+export type WorkloadComponent =
+  | 'Lecture'
+  | 'Tutorial'
+  | 'Laboratory'
+  | 'Project'
+  | 'Preparation';
 
 // RawLesson is a lesson time slot obtained from the API.
 // Usually ModuleCode and ModuleTitle has to be injected in before using in the timetable.
@@ -154,8 +159,8 @@ export type ModuleCondensed = Readonly<{
 
 // This format is returned from the module information endpoint
 export type SemesterDataCondensed = Readonly<
-// The full timetable is omitted to save space
-Omit<SemesterData, 'timetable'>
+  // The full timetable is omitted to save space
+  Omit<SemesterData, 'timetable'>
 >;
 
 export type ModuleInformation = Readonly<{

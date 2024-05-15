@@ -1,7 +1,7 @@
+import mongoose from 'mongoose';
 import app from './app';
 import 'dotenv/config';
 import env from './util/validEnv';
-import mongoose from 'mongoose';
 
 const { PORT } = env;
 

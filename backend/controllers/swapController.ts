@@ -12,9 +12,7 @@ export const getSwaps: RequestHandler = async (_req, res, next) => {
 };
 
 export const createSwap: RequestHandler = async (req, res, next) => {
-  const {
-    userId, courseId, lessonType, current, request, status,
-  } = req.body;
+  const { userId, courseId, lessonType, current, request, status } = req.body;
   try {
     if (current.lessonType === request.lessonType) {
       const data = await SwapModel.create({

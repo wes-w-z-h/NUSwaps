@@ -40,7 +40,7 @@ const swapSchema = new Schema(
       default: false,
     },
   },
-  { timestamps: true, toJSON: { getters: true } }, // createdAt option
+  { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
 const SwapModel = model('Swap', swapSchema);

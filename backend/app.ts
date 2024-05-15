@@ -16,6 +16,7 @@ app.use('/api/users', userRouter);
 app.use('/api/swaps', swapRouter);
 
 // error handler
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   console.log(error);
   let errorMsg: string = 'Unknown error occured!';
