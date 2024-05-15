@@ -1,12 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "dist/server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "tsx watch --clear-screen=false server.ts",
+    "lint": "eslint **/*.ts *.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +15,17 @@
   "description": "",
   "dependencies": {
     "dotenv": "^16.4.5",
+    "envalid": "^8.0.0",
     "express": "^4.19.2",
-    "mongoose": "^8.3.4",
-    "nodemon": "^3.1.0"
+    "mongoose": "^8.3.4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "@types/express": "^4.17.21",
+    "eslint": "^8.57.0",
+    "globals": "^15.2.0",
+    "tsx": "^4.10.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.9.0"
   }
 }
