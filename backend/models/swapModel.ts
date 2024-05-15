@@ -12,6 +12,10 @@ const swapSchema = new Schema(
       required: true,
       immutable: true,
     },
+    lessonType: {
+      type: String,
+      required: true,
+    },
     courseId: {
       type: String,
       required: true,

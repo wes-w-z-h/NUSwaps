@@ -12,10 +12,17 @@ export const getSwaps: RequestHandler = async (_req, res, next) => {
 };
 
 export const createSwap: RequestHandler = async (req, res, next) => {
-  const { userId, courseId, current, request, status } = req.body;
+  const { userId, courseId, lessonType, current, request, status } = req.body;
   try {
     if (current.lessonType == request.lessonType) {
-      const data = await SwapModel.create({ userId, courseId, current, request, status });
+      const data = await SwapModel.create({
+        userId,
+        courseId,
+        lessonType,
+        current,
+        request,
+        status,
+      });
       res.status(201).json(data);
     } else {
       res.status(400).json({ error: "Invalid lesson types" });
