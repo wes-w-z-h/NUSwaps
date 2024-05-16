@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import userRouter from './routes/userRoute';
 import swapRouter from './routes/swapRoute';
+import matchRouter from './routes/matchRoute';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use((req, res, next) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/swaps', swapRouter);
+app.use('/api/matches', matchRouter);
 
 // error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
