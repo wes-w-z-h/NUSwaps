@@ -3,6 +3,7 @@ import { SwapModel } from '../models/swapModel';
 
 // Finds all matches for the swap request
 export const getMatch: RequestHandler = async (req, res, next) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { userId, courseId, lessonType, current, request, status } = req.body;
   try {
     let matches = await SwapModel.find({});

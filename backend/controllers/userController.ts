@@ -36,20 +36,12 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 
 export const updateUser: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
-  const { username, password, swapRequests } = req.body;
+
   try {
-    await UserModel.findByIdAndUpdate(id, {
-      username,
-      password,
-      swapRequests,
-    })
+    const data = await UserModel.findByIdAndUpdate(id, req.body, { new: true })
       .select('-password')
       .exec();
-    res.status(200).json({
-      username,
-      swapRequests,
-      id,
-    });
+    res.status(200).json(data);
   } catch (error) {
     next(error);
   }

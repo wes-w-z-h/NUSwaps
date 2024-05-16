@@ -36,17 +36,19 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
   const { userId, courseId, lessonType, current, request, status } = req.body;
   try {
     if (current.lessonType === request.lessonType) {
-      await SwapModel.findByIdAndUpdate(id, {
-        userId,
-        courseId,
-        lessonType,
-        current,
-        request,
-        status,
-      });
-      res
-        .status(200)
-        .json({ id, userId, courseId, lessonType, current, request, status });
+      const data = await SwapModel.findByIdAndUpdate(
+        id,
+        {
+          userId,
+          courseId,
+          lessonType,
+          current,
+          request,
+          status,
+        },
+        { new: true }
+      );
+      res.status(200).json(data);
     } else {
       res.status(400).json({ error: 'Incompatible lessons to be swapped.' });
     }
