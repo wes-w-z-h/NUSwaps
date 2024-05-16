@@ -46,9 +46,9 @@ export const updateUser: RequestHandler = async (req, res, next) => {
       .select('-password')
       .exec();
     res.status(200).json({
-      id,
       username,
       swapRequests,
+      id,
     });
   } catch (error) {
     next(error);
@@ -59,9 +59,9 @@ export const createUser: RequestHandler = async (req, res, next) => {
   try {
     const data = await UserModel.create(req.body);
     res.status(201).json({
-      userId: data.id,
       username: data.username,
       swapRequests: data.swapRequests,
+      id: data.id,
     });
   } catch (error) {
     next(error);
