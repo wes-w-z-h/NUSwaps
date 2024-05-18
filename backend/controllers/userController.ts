@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { RequestHandler } from 'express';
 import UserModel from '../models/userModel';
 
@@ -51,8 +52,12 @@ export const createUser: RequestHandler = async (req, res, next) => {
   try {
     const data = await UserModel.create(req.body);
     res.status(201).json({
+      _id: data._id,
       username: data.username,
       swapRequests: data.swapRequests,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      __v: data.__v,
       id: data.id,
     });
   } catch (error) {
