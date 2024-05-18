@@ -1,20 +1,27 @@
 import { Types } from 'mongoose';
-import { ModuleCode, RawLesson } from './modules';
+import { ModuleCode } from './modules';
 
 export type User = {
   readonly _id: Types.ObjectId;
   username: string;
   password: string;
   swapRequests: Swap[];
-  timestamps: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: string;
+  readonly id: Types.ObjectId;
 };
 
 export type Swap = Readonly<{
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   courseId: ModuleCode;
-  current: RawLesson;
-  request: RawLesson;
+  lessonType: string;
+  current: string;
+  request: string;
   status: boolean;
-  timestamps: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: string;
+  id: Types.ObjectId;
 }>;
