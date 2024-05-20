@@ -1,7 +1,9 @@
-import { Schema, model, InferSchemaType } from 'mongoose';
+/* eslint-disable no-underscore-dangle */
+import { Schema, model } from 'mongoose';
+import { IUser, IUserMethods, User } from '../types/api.js';
 import { swapSchema } from './swapModel.js';
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser, User, IUserMethods>(
   {
     username: {
       type: String,
@@ -9,7 +11,7 @@ const userSchema = new Schema(
     },
     password: {
       type: String,
-      required: false,
+      required: true,
       get: (): string => '*******',
       // default: "",
     },
@@ -21,7 +23,13 @@ const userSchema = new Schema(
   { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
-type User = InferSchemaType<typeof userSchema>;
+userSchema.method('createResponse', function createReponse() {
+  return {
+    id: this._id,
+    username: this.username,
+    swapRequests: this.swapRequests,
+  };
+});
 
-const UserModel = model<User>('User', userSchema);
+const UserModel = model<IUser, User>('User', userSchema);
 export default UserModel;

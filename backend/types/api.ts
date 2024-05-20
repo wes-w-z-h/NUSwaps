@@ -1,18 +1,23 @@
-import { Types } from 'mongoose';
+import { Types, Document, Model } from 'mongoose';
 import { ModuleCode } from './modules.js';
 
-export type User = {
-  readonly _id: Types.ObjectId;
+export interface IUser extends Document {
+  _id: Types.ObjectId;
   username: string;
   password: string;
-  swapRequests: Swap[];
+  swapRequests?: [ISwap];
   createdAt: Date;
   updatedAt: Date;
   __v: string;
-  readonly id: Types.ObjectId;
-};
+}
 
-export type Swap = Readonly<{
+export interface IUserMethods {
+  createResponse(): JSON;
+}
+
+export type User = Model<IUser, {}, IUserMethods>;
+
+export interface ISwap extends Document {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   courseId: ModuleCode;
@@ -24,4 +29,4 @@ export type Swap = Readonly<{
   updatedAt: Date;
   __v: string;
   id: Types.ObjectId;
-}>;
+}
