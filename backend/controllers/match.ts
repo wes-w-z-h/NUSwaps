@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { SwapModel } from '../models/swapModel';
+import { SwapModel } from '../models/swapModel.js';
 
 // Finds all matches for the swap request
 export const getMatch: RequestHandler = async (req, res, next) => {

@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
-import userRouter from './routes/userRoute';
-import swapRouter from './routes/swapRoute';
-import matchRouter from './routes/matchRoute';
+import userRouter from './routes/userRoute.js';
+import swapRouter from './routes/swapRoute.js';
+import matchRouter from './routes/matchRoute.js';
 
 const app = express();
 

@@ -4,7 +4,7 @@
  * nus-v2/src/types/venues.ts
  */
 
-import { DayText, ModuleCode, RawLesson } from './modules';
+import { DayText, ModuleCode, RawLesson } from './modules.js';
 
 export type Venue = string;
 export type VenueList = Venue[];

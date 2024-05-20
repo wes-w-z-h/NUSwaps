@@ -1,5 +1,5 @@
 import express from 'express';
-import * as SwapController from '../controllers/swapController';
+import * as SwapController from '../controllers/swapController.js';
 
 const swapRouter = express.Router();
 

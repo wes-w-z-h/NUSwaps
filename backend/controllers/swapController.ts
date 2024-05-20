@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { SwapModel } from '../models/swapModel';
+import { SwapModel } from '../models/swapModel.js';
 
 export const getSwaps: RequestHandler = async (req, res, next) => {
   try {

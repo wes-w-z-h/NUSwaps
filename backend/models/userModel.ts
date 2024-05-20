@@ -1,5 +1,5 @@
 import { Schema, model, InferSchemaType } from 'mongoose';
-import { swapSchema } from './swapModel';
+import { swapSchema } from './swapModel.js';
 
 const userSchema = new Schema(
   {

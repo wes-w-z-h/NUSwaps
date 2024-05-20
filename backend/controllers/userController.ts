@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { RequestHandler } from 'express';
-import UserModel from '../models/userModel';
+import UserModel from '../models/userModel.js';
 
 export const getUsers: RequestHandler = async (_req, res, next) => {
   try {

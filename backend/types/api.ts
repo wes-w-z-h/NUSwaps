@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { ModuleCode } from './modules';
+import { ModuleCode } from './modules.js';
 
 export type User = {
   readonly _id: Types.ObjectId;
