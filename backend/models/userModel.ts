@@ -8,6 +8,7 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
     username: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
@@ -22,6 +23,8 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
   },
   { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
+
+userSchema.index({ username: 1 }, { unique: true });
 
 userSchema.method('createResponse', function createReponse() {
   return {
