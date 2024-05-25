@@ -1,14 +1,16 @@
-import { Types, model, Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 import { RawLesson, ModuleCode } from '../types/modules.js';
+import { ISwap, ISwapMethods, Swap } from '../types/api.js';
 
 function courseSetter(lesson: RawLesson): string {
   return `${lesson.lessonType}-${lesson.classNo}`;
 }
 
-const swapSchema = new Schema(
+const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
   {
     userId: {
-      type: Types.ObjectId,
+      type: Schema.Types.ObjectId,
+      ref: 'User',
       required: true,
       immutable: true,
     },
@@ -40,5 +42,18 @@ const swapSchema = new Schema(
   { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
-const SwapModel = model('Swap', swapSchema);
+swapSchema.method('createResponse', function createReponse() {
+  return {
+    // eslint-disable-next-line no-underscore-dangle
+    id: this._id,
+    userId: this.userId,
+    courseId: this.courseId,
+    lessonType: this.lessonType,
+    current: this.current,
+    request: this.request,
+    status: this.status,
+  };
+});
+
+const SwapModel = model<ISwap, Swap>('Swap', swapSchema);
 export { SwapModel, swapSchema };

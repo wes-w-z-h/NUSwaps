@@ -1,7 +1,7 @@
-import { Types, Document, Model } from 'mongoose';
+import { Types, Model } from 'mongoose';
 import { ModuleCode } from './modules.js';
 
-export interface IUser extends Document {
+export interface IUser {
   _id: Types.ObjectId;
   username: string;
   password: string;
@@ -17,7 +17,7 @@ export interface IUserMethods {
 
 export type User = Model<IUser, {}, IUserMethods>;
 
-export interface ISwap extends Document {
+export interface ISwap {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
   courseId: ModuleCode;
@@ -30,3 +30,9 @@ export interface ISwap extends Document {
   __v: string;
   id: Types.ObjectId;
 }
+
+export interface ISwapMethods {
+  createResponse(): JSON;
+}
+
+export type Swap = Model<ISwap, {}, ISwapMethods>;
