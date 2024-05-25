@@ -354,7 +354,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "6646163c653bc018ba11896f"
+                      "value": "665005d85a5207fad5744534"
                     }
                   ]
                 },
@@ -876,7 +876,7 @@
                   "variable": [
                     {
                       "key": "id",
-                      "value": "6646163c653bc018ba11896f"
+                      "value": "6650044609c950a2c640de41"
                     }
                   ]
                 },
@@ -1035,7 +1035,7 @@
                       "  body: {",
                       "    mode: 'raw',",
                       "    raw: JSON.stringify({",
-                      "      'username': 'deleter',",
+                      "      'username': 'RNAODMOUSER',",
                       "      'password': 'pewpew',",
                       "      'swapRequests': []",
                       "    })",
@@ -1048,6 +1048,7 @@
                       "  if (err) {",
                       "    console.log(err);",
                       "  } else {",
+                      "    console.log(data);",
                       "    pm.environment.set('delete_user_id', data.id);",
                       "  }",
                       "})"
