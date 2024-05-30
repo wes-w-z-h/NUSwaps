@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { RequestHandler } from 'express';
+import createHttpError from 'http-errors';
 import UserModel from '../models/userModel.js';
 
 export const getUsers: RequestHandler = async (_req, res, next) => {
@@ -8,7 +9,7 @@ export const getUsers: RequestHandler = async (_req, res, next) => {
     .then((data) => {
       res.status(200).json(data.map((user) => user.createResponse()));
     })
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
 export const getUser: RequestHandler = async (req, res, next) => {
@@ -20,7 +21,7 @@ export const getUser: RequestHandler = async (req, res, next) => {
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'User not found' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
 export const deleteUser: RequestHandler = async (req, res, next) => {
@@ -32,7 +33,7 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'User not found' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
 export const updateUser: RequestHandler = async (req, res, next) => {
@@ -47,7 +48,7 @@ export const updateUser: RequestHandler = async (req, res, next) => {
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'User not found' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
 export const changePassword: RequestHandler = async (req, res, next) => {
@@ -67,7 +68,7 @@ export const changePassword: RequestHandler = async (req, res, next) => {
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'User not found' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
 export const changeUsername: RequestHandler = async (req, res, next) => {
@@ -87,10 +88,9 @@ export const changeUsername: RequestHandler = async (req, res, next) => {
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'User not found' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
 
-// FIXME: Create defualt user with no swaps
 export const createUser: RequestHandler = async (req, res, next) => {
   await UserModel.create(req.body)
     .then((data) =>
@@ -98,5 +98,5 @@ export const createUser: RequestHandler = async (req, res, next) => {
         ? res.status(201).json(data.createResponse())
         : res.status(400).json({ msg: 'Cannot create user' })
     )
-    .catch((error) => next(error));
+    .catch((error) => next(createHttpError(400, error.message)));
 };
