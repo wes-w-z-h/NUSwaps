@@ -1,10 +1,17 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
+import cors from 'cors';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
 
 const app = express();
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 
 // accepts json body
 app.use(express.json());
