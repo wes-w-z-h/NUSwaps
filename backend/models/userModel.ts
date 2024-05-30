@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Schema, model } from 'mongoose';
 import { IUser, IUserMethods, User } from '../types/api.js';
 import { swapSchema } from './swapModel.js';
@@ -13,7 +12,6 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
     password: {
       type: String,
       required: true,
-      get: (): string => '*******',
       // default: "",
     },
     swapRequests: {
@@ -21,16 +19,18 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
       required: false,
     },
   },
-  { timestamps: true, toJSON: { getters: true } } // createdAt option
+  { timestamps: true } // createdAt option
 );
 
 userSchema.index({ username: 1 }, { unique: true });
 
-userSchema.method('createResponse', function createReponse() {
+userSchema.method('createResponse', function createReponse(token?: string) {
   return {
+    /* eslint-disable no-underscore-dangle */
     id: this._id,
     username: this.username,
     swapRequests: this.swapRequests,
+    token,
   };
 });
 

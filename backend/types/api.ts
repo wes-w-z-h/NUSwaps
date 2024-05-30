@@ -12,7 +12,7 @@ export interface IUser {
 }
 
 export interface IUserMethods {
-  createResponse(): JSON;
+  createResponse(token?: string): JSON;
 }
 
 export type User = Model<IUser, {}, IUserMethods>;
