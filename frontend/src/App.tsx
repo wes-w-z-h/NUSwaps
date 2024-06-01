@@ -1,6 +1,6 @@
-import Home from './views/Home.tsx';
-import Login from './views/auth/Login.tsx';
-import SignUp from './views/auth/SignUp.tsx';
+import Home from './pages/Home.tsx';
+import Login from './pages/Login.tsx';
+import SignUp from './pages/SignUp.tsx';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 
 const App = () => {
