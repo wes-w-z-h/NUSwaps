@@ -6,7 +6,6 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -20,25 +19,17 @@ const settings = ['Profile', 'Login'];
 // TODO: Add conditional render of the items signin/ logout
 const Navbar = () => {
   const navigate = useNavigate();
-  const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
   };
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-  const handleSettingAction = (action: string) => {
+  const handleNavigate = (action: string) => {
     switch (action) {
       case 'Profile':
         // TODO: add a view for the profile to edit user profile
@@ -51,6 +42,7 @@ const Navbar = () => {
 
       default:
         handleCloseUserMenu();
+        navigate('/');
         break;
     }
   };
@@ -59,7 +51,14 @@ const Navbar = () => {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          {/* TODO: extract the icon styles into css keep them consistent */}
+          <IconButton
+            color="inherit"
+            size="large"
+            onClick={() => navigate('/')}
+          >
+            <AdbIcon />
+          </IconButton>
           <Typography
             variant="h6"
             noWrap
@@ -77,7 +76,7 @@ const Navbar = () => {
             NUSwaps
           </Typography>
 
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          {/* <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -107,12 +106,13 @@ const Navbar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
+                <MenuItem key={page} onClick={() => handleNavigate(page)}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
+          </Box> */}
+
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
@@ -134,8 +134,9 @@ const Navbar = () => {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
+                color="inherit"
                 key={page}
-                onClick={handleCloseNavMenu}
+                onClick={() => handleNavigate(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
@@ -166,10 +167,7 @@ const Navbar = () => {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem
-                  key={setting}
-                  onClick={() => handleSettingAction(setting)}
-                >
+                <MenuItem key={setting} onClick={() => handleNavigate(setting)}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
