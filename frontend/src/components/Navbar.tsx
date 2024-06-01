@@ -16,6 +16,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 const pages = ['Home', 'Find'];
 const settings = ['Profile', 'Logout'];
 
+// TODO: Add link to other routes
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null

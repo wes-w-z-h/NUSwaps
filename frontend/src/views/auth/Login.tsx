@@ -11,10 +11,10 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
-import Copyright from '../components/Copyright.tsx';
+import Copyright from '../../components/auth/Copyright';
 
 const Login = () => {
-  // TODO: Handle sign in
+  // TODO: Handle sign in using axios post request
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
