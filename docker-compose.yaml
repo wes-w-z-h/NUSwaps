@@ -5,8 +5,8 @@ services:
     env_file:
       - backend/.env
     ports:
-      - 3000:3000
-    image: 'server:v1'
+      - 4000:4000
+    image: 'server'
 
   api-tester:
     build: backend/tests/.
@@ -17,4 +17,13 @@ services:
       - host.docker.internal:host-gateway
     depends_on:
       - server
-    image: 'api-tester:v1'
+    image: 'api-tester'
+
+  client-dev:
+    build: frontend/.
+    container_name: client-dev
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+    image: 'client-dev'

@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         MONGO_URI=credentials('MONGO_URI')
-        PORT=3000
+        PORT=4000
     }
 
     stages {
