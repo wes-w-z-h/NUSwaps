@@ -1,4 +1,10 @@
-import { Dispatch, ReactNode, createContext, useReducer } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  createContext,
+  useReducer,
+  useEffect,
+} from 'react';
 import { User } from '../types/User';
 
 type AuthState = {
@@ -31,6 +37,19 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
   const [state, dispatch] = useReducer(authReducer, {
     user: null,
   });
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+
+    if (user !== null) {
+      dispatch({
+        type: 'LOGIN',
+        payload: JSON.parse(user),
+      });
+    }
+  }, []);
+
+  console.log(state);
 
   return (
     <AuthContext.Provider value={{ state, dispatch }}>

@@ -9,9 +9,10 @@ const App = () => {
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" Component={Home} />
-        <Route path="/login" Component={Login} />
-        <Route path="/signup" Component={SignUp} />
+        <Route path="/" element={<Home />} />
+        {/* FIXME: user able to access the bottom two routes even if logged in */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
       </Routes>
     </Router>
   );

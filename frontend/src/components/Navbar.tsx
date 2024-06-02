@@ -13,13 +13,17 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import { useLogout } from '../hooks/useLogout';
+import { useAuthContext } from '../hooks/useAuthContext';
 
-const pages = ['Home', 'Find'];
-const settings = ['Profile', 'Login'];
-
-// TODO: Add conditional render of the items signin/ logout
 const Navbar = () => {
+  const pages = ['Home', 'Find'];
+  const loggedOutSettings = ['Login', 'Signup'];
+  const loggedInSettings = ['Profile', 'Logout'];
+  const { state } = useAuthContext();
+
   const navigate = useNavigate();
+  const { logout } = useLogout();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -38,15 +42,24 @@ const Navbar = () => {
     setAnchorElUser(null);
   };
 
-  const handleNavigate = (action: string) => {
+  const handleSetting = (action: string) => {
     switch (action) {
       case 'Profile':
-        // TODO: add a view for the profile to edit user profile
+        // TODO: add a view for the profile to edit user profile change the path
         navigate('/');
         break;
 
       case 'Login':
         navigate('/login');
+        break;
+
+      case 'Logout':
+        logout();
+        navigate('/');
+        break;
+
+      case 'Signup':
+        navigate('/signup');
         break;
 
       default:
@@ -115,7 +128,7 @@ const Navbar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleNavigate(page)}>
+                <MenuItem key={page} onClick={() => handleSetting(page)}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
@@ -145,7 +158,7 @@ const Navbar = () => {
               <Button
                 color="inherit"
                 key={page}
-                onClick={() => handleNavigate(page)}
+                onClick={() => handleSetting(page)}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 {page}
@@ -175,11 +188,24 @@ const Navbar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={() => handleNavigate(setting)}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
+              {!state.user &&
+                loggedOutSettings.map((setting) => (
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleSetting(setting)}
+                  >
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              {state.user &&
+                loggedInSettings.map((setting) => (
+                  <MenuItem
+                    key={setting}
+                    onClick={() => handleSetting(setting)}
+                  >
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
             </Menu>
           </Box>
         </Toolbar>
