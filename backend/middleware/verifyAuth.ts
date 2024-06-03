@@ -20,7 +20,8 @@ const verifyAuth: RequestHandler = async (req, res, next) => {
 
   try {
     const { id } = jwt.verify(token, JWT_KEY) as JwtPayload;
-    req.body = await UserModel.findById(id).select('_id').exec();
+    // can be used to grab a used using the id in the swap routes
+    req.userId = await UserModel.findById(id).select('_id').exec();
     next();
   } catch (error) {
     next(createHttpError(401, 'Unauthorised: invalid token'));
