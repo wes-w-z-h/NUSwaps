@@ -5,13 +5,13 @@ import {
   useReducer,
   useEffect,
 } from 'react';
-import { User } from '../types/User';
+import { UserToken } from '../types/User';
 
 type AuthState = {
-  user: User | null;
+  user: UserToken | null;
 };
 
-type AuthAction = { type: 'LOGIN'; payload: User } | { type: 'LOGOUT' };
+type AuthAction = { type: 'LOGIN'; payload: UserToken } | { type: 'LOGOUT' };
 
 type AuthContextType = { state: AuthState; dispatch: Dispatch<AuthAction> };
 

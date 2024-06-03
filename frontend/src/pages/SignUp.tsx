@@ -14,7 +14,6 @@ import Alert from '@mui/material/Alert';
 import Copyright from '../components/auth/Copyright.tsx';
 import { ErrorResponse } from '../types/ErrorResponse.tsx';
 import { useSignup } from '../hooks/useSignup.tsx';
-import './signUp.css';
 
 const SignUp = () => {
   const [username, setUsername] = useState<string>('');
