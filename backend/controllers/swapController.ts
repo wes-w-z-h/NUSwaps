@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 
+// FIXME: get swaps belonging to a user not all swaps
 export const getSwaps: RequestHandler = async (req, res, next) => {
   await SwapModel.find({})
     .exec()
