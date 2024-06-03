@@ -83,7 +83,7 @@ npm run dev
 
 ```console
 cd tests
-./run_api_tests.sh
+./run_api_tests.sh local
 ```
 
 ## Navigating the code
@@ -113,11 +113,11 @@ This is the folder structure for the backend
 
 ### COMPLETED
 
-1.  Database, Models and Schemas
+1. [x] Database, Models and Schemas
 
-2.  Routes for Users and Swaps
+2. [x] Routes for Users and Swaps
 
-3.  User Login and Registration
+3. [x] User Login and Registration
 
 ### IN PROGRESS
 
@@ -131,11 +131,11 @@ This is the folder structure for the backend
 
 ### TODO
 
-1. [x] Matching algorithm to optimise matches
+1. [ ] Matching algorithm to optimise matches
 
-2. [x] In-app Chat
+2. [ ] In-app Chat
 
-3. [x] Unit tests using Jest
+3. [ ] Unit tests using Jest
 
 ## Acknowledgements
 
