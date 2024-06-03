@@ -14,14 +14,57 @@ import Alert from '@mui/material/Alert';
 import Copyright from '../components/auth/Copyright.tsx';
 import { ErrorResponse } from '../types/ErrorResponse.tsx';
 import { useSignup } from '../hooks/useSignup.tsx';
+import './signUp.css';
 
 const SignUp = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [cfmPassword, setCfmPassword] = useState<string>('');
+  const [formError, setFormError] = useState({
+    username: '',
+    password: '',
+    confirmPassword: '',
+  });
+
   const { signup, loading, error } = useSignup();
+
+  const validateFormInput = () => {
+    // Initialise object to track errors
+    const inputErrors = {
+      username: '',
+      password: '',
+      confirmPassword: '',
+    };
+
+    // Check empty username or password
+    if (!username) {
+      inputErrors.username = 'Username should not be empty';
+    }
+    if (!password) {
+      inputErrors.password = 'Password should not be empty';
+    }
+    // Check matching passwords
+    if (password !== cfmPassword) {
+      inputErrors.confirmPassword =
+        'Password and Confirm Password should be the same';
+    }
+
+    return inputErrors;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const inputErrors = validateFormInput();
+    setFormError(inputErrors);
+
+    if (
+      inputErrors.username !== '' ||
+      inputErrors.password !== '' ||
+      inputErrors.confirmPassword !== ''
+    ) {
+      return;
+    }
+
     await signup(username, password);
   };
 
@@ -70,6 +113,9 @@ const SignUp = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                 />
+                <Typography className="error-message">
+                  {formError.username}
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -83,6 +129,11 @@ const SignUp = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <Typography className="error-message">
+                  {formError.password}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
@@ -91,7 +142,12 @@ const SignUp = () => {
                   label="Confirm Password"
                   type="password"
                   id="confirm-password"
+                  value={cfmPassword}
+                  onChange={(e) => setCfmPassword(e.target.value)}
                 />
+                <Typography className="error-message">
+                  {formError.confirmPassword}
+                </Typography>
               </Grid>
             </Grid>
             <Button
