@@ -5,8 +5,8 @@
 - [Overview](#overview)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Acknowledgements](#acknowledgements)
 - [Roadmap](#roadmap)
+- [Acknowledgements](#acknowledgements)
 
 # Overview
 
@@ -17,6 +17,10 @@ This project aims to make the tutorial swapping process within nus more efficien
 Refer to [backend/README.md](https://github.com/wes-w-z-h/NUSwaps/blob/main/backend/README.md) to view instructions to start the server.
 
 Refer to [frontend/README.md](https://github.com/wes-w-z-h/NUSwaps/blob/main/frontend/README.md) to view instructions to start the client.
+
+## Usage (docker)
+
+View the docker docs on how to start all services in the docker-compose file [here](https://docs.docker.com/compose/gettingstarted/).
 
 ## Roadmap
 
