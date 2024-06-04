@@ -7,13 +7,13 @@ const swapRouter = express.Router();
 // verify auth for all routes below
 swapRouter.use(verifyAuth);
 
+swapRouter.get('/userswaps', SwapController.getUserSwaps);
+
 swapRouter.get('/', SwapController.getSwaps);
 
-swapRouter.get('/:id', SwapController.getSwap);
-
-swapRouter.get('/userswaps/:id', SwapController.getUserSwaps);
-
 swapRouter.post('/', SwapController.createSwap);
+
+swapRouter.get('/:id', SwapController.getSwap);
 
 swapRouter.delete('/:id', SwapController.deleteSwap);
 

@@ -24,8 +24,8 @@ export const getSwap: RequestHandler = async (req, res, next) => {
 };
 
 export const getUserSwaps: RequestHandler = async (req, res, next) => {
-  const { id } = req.params;
-  await SwapModel.find({ userId: id })
+  // eslint-disable-next-line no-underscore-dangle
+  await SwapModel.find({ userId: req.userId._id })
     .exec()
     .then((data) =>
       res.status(200).json(data.map((swap) => swap.createResponse()))
