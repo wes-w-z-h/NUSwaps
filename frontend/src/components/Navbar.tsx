@@ -166,30 +166,30 @@ const Navbar = () => {
             ))}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="User Profile" src="" />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {!state.user &&
-                loggedOutSettings.map((setting) => (
+          {state.user && (
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="User Profile" src="" />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {loggedInSettings.map((setting) => (
                   <MenuItem
                     key={setting}
                     onClick={() => handleSetting(setting)}
@@ -197,17 +197,15 @@ const Navbar = () => {
                     <Typography textAlign="center">{setting}</Typography>
                   </MenuItem>
                 ))}
-              {state.user &&
-                loggedInSettings.map((setting) => (
-                  <MenuItem
-                    key={setting}
-                    onClick={() => handleSetting(setting)}
-                  >
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
-                ))}
-            </Menu>
-          </Box>
+              </Menu>
+            </Box>
+          )}
+          {!state.user &&
+            loggedOutSettings.map((setting) => (
+              <MenuItem key={setting} onClick={() => handleSetting(setting)}>
+                <Typography textAlign="center">{setting}</Typography>
+              </MenuItem>
+            ))}
         </Toolbar>
       </Container>
     </AppBar>
