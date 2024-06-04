@@ -11,6 +11,8 @@ swapRouter.get('/', SwapController.getSwaps);
 
 swapRouter.get('/:id', SwapController.getSwap);
 
+swapRouter.get('/userswaps/:id', SwapController.getUserSwaps);
+
 swapRouter.post('/', SwapController.createSwap);
 
 swapRouter.delete('/:id', SwapController.deleteSwap);

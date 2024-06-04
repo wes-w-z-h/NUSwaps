@@ -2,7 +2,6 @@ import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 
-// FIXME: get swaps belonging to a user not all swaps
 export const getSwaps: RequestHandler = async (req, res, next) => {
   await SwapModel.find({})
     .exec()
@@ -20,6 +19,16 @@ export const getSwap: RequestHandler = async (req, res, next) => {
       data
         ? res.status(200).json(data.createResponse())
         : res.status(404).json({ msg: 'Swap not found' })
+    )
+    .catch((error) => next(createHttpError(400, error.message)));
+};
+
+export const getUserSwaps: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+  await SwapModel.find({ userId: id })
+    .exec()
+    .then((data) =>
+      res.status(200).json(data.map((swap) => swap.createResponse()))
     )
     .catch((error) => next(createHttpError(400, error.message)));
 };
