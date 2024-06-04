@@ -43,6 +43,9 @@ const Navbar = () => {
   };
 
   const handleSetting = (action: string) => {
+    handleCloseNavMenu();
+    handleCloseUserMenu();
+
     switch (action) {
       case 'Profile':
         // TODO: add a view for the profile to edit user profile change the path
