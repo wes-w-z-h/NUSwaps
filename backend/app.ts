@@ -5,6 +5,7 @@ import createHttpError, { isHttpError } from 'http-errors';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
+import authRouter from './routes/authRoute.js';
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 
 app.use(morgan('dev'));
 
+app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/swaps', swapRouter);
 app.use('/api/matches', matchRouter);
