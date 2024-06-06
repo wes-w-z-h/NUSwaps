@@ -40,7 +40,6 @@ export const login: RequestHandler = async (req, res, next) => {
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email, password);
   try {
     if (!email || !password) {
       throw createHttpError(400, 'Invalid request: missing field(s)');
@@ -65,7 +64,6 @@ export const signup: RequestHandler = async (req, res, next) => {
 
     res.status(201).json({ message: 'Verification email sent' });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -90,7 +88,6 @@ export const verifyUser: RequestHandler = async (req, res) => {
 
     res.status(200).json(data.createResponse(authToken));
   } catch (error) {
-    console.log(error);
     res.status(400).json({ message: 'Invalid or expired token' });
   }
 };
