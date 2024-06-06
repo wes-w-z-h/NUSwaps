@@ -10,21 +10,25 @@ import 'dotenv/config';
 const createToken = (dataid: any): string =>
   jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: '30m' });
 
+const validateEmail = (val: string): boolean => {
+  return val.endsWith('@u.nus.edu');
+};
+
 export const login: RequestHandler = async (req, res, next) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   try {
-    if (!username || !password) {
+    if (!email || !password) {
       throw createHttpError(400, 'Invalid request: missing field(s)');
     }
 
-    const data = await UserModel.findOne({ username }).exec();
+    const data = await UserModel.findOne({ email }).exec();
     if (!data) {
       throw createHttpError(404, 'User not found');
     }
 
     const valid = await bcrypt.compare(password, data.password);
     if (!valid) {
-      throw createHttpError(401, 'Unauthorised: check username & password');
+      throw createHttpError(401, 'Unauthorised: check email & password');
     }
 
     const token = createToken(data.id);
@@ -36,7 +40,7 @@ export const login: RequestHandler = async (req, res, next) => {
 
 export const signup: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body;
-
+  console.log(email, password);
   try {
     if (!email || !password) {
       throw createHttpError(400, 'Invalid request: missing field(s)');
@@ -50,10 +54,18 @@ export const signup: RequestHandler = async (req, res, next) => {
 
     const passwordHash = await bcrypt.hash(password, 11);
 
+    if (!validateEmail(email)) {
+      throw createHttpError(
+        400,
+        'Invalid email address: needs to end with @u.nus.edu'
+      );
+    }
+
     await sendVerification(email, createToken({ email, passwordHash }));
 
     res.status(201).json({ message: 'Verification email sent' });
   } catch (error) {
+    console.log(error);
     next(error);
   }
 };
@@ -63,9 +75,9 @@ export const verifyUser: RequestHandler = async (req, res) => {
 
   try {
     const decoded = (jwt.verify(token, env.JWT_KEY) as JwtPayload).id;
-    const { username, passwordHash } = decoded;
+    const { email, passwordHash } = decoded;
 
-    const data = await UserModel.create({ username, password: passwordHash });
+    const data = await UserModel.create({ email, password: passwordHash });
 
     if (!data) {
       res
@@ -78,7 +90,7 @@ export const verifyUser: RequestHandler = async (req, res) => {
 
     res.status(200).json(data.createResponse(authToken));
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     res.status(400).json({ message: 'Invalid or expired token' });
   }
 };
