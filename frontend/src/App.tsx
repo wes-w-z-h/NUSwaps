@@ -9,6 +9,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { useAuthContext } from './hooks/useAuthContext.tsx';
+import Verification from './pages/Verification.tsx';
 
 const App = () => {
   const { state } = useAuthContext();
@@ -17,6 +18,7 @@ const App = () => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/verify/:token" element={<Verification />} />
         <Route
           path="/login"
           element={state.user ? <Navigate to="/" /> : <Login />}
