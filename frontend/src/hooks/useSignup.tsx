@@ -15,7 +15,7 @@ export const useSignup = () => {
     };
 
     await axios
-      .post('http://localhost:4000/api/users/signup', data)
+      .post('http://localhost:4000/api/auth/signup', data)
       .catch((err) => {
         console.error(err);
         setError(err);
