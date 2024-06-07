@@ -3,7 +3,7 @@ import { ModuleCode } from './modules.js';
 
 export interface IUser {
   _id: Types.ObjectId;
-  username: string;
+  email: string;
   password: string;
   swapRequests?: [ISwap];
   createdAt: Date;

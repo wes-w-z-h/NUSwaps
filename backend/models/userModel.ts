@@ -4,10 +4,17 @@ import { swapSchema } from './swapModel.js';
 
 const userSchema = new Schema<IUser, User, IUserMethods>(
   {
-    username: {
+    email: {
       type: String,
       required: true,
       unique: true,
+      // validation is also done in the controller
+      validate: {
+        validator(val: string): boolean {
+          return val.endsWith('@u.nus.edu');
+        },
+        message: 'Invalid domain name must be: @u.nus.edu',
+      },
     },
     password: {
       type: String,
@@ -22,13 +29,13 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
   { timestamps: true } // createdAt option
 );
 
-userSchema.index({ username: 1 }, { unique: true });
+userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.method('createResponse', function createReponse(token?: string) {
   return {
     /* eslint-disable no-underscore-dangle */
     id: this._id,
-    username: this.username,
+    email: this.email,
     swapRequests: this.swapRequests,
     token,
   };

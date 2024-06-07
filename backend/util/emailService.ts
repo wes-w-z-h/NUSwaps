@@ -15,7 +15,7 @@ const sendVerification = (to: string, token: string) => {
     from: 'NUSwaps',
     to,
     subject: 'Account Verification',
-    html: `<p>Click <a href="http://localhost:4000/api/auth/verify/${token}">here</a> to verify your account.</p>`,
+    html: `<p>Click <a href="http://localhost:3000/verify/${token}">here</a> to verify your account. Link expires in 5 minutes</p>`,
   };
 
   return transporter.sendMail(mailOptions);
