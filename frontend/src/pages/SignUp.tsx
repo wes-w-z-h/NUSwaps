@@ -16,11 +16,11 @@ import { ErrorResponse } from '../types/ErrorResponse.tsx';
 import { useSignup } from '../hooks/useSignup.tsx';
 
 const SignUp = () => {
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [cfmPassword, setCfmPassword] = useState<string>('');
   const [formError, setFormError] = useState({
-    username: '',
+    email: '',
     password: '',
     confirmPassword: '',
   });
@@ -30,17 +30,21 @@ const SignUp = () => {
   const validateFormInput = () => {
     // Initialise object to track errors
     const inputErrors = {
-      username: '',
+      email: '',
       password: '',
       confirmPassword: '',
     };
 
-    // Check empty username or password
-    if (!username) {
-      inputErrors.username = 'Username should not be empty';
+    // Check empty email or password
+    if (!email) {
+      inputErrors.email = 'Email should not be empty';
     }
     if (!password) {
       inputErrors.password = 'Password should not be empty';
+    }
+    // Check valid email domain (@u.nus.edu)
+    if (!email.endsWith('@u.nus.edu')) {
+      inputErrors.email = 'Email should end with @u.nus.edu';
     }
     // Check matching passwords
     if (password !== cfmPassword) {
@@ -57,14 +61,14 @@ const SignUp = () => {
     setFormError(inputErrors);
 
     if (
-      inputErrors.username !== '' ||
+      inputErrors.email !== '' ||
       inputErrors.password !== '' ||
       inputErrors.confirmPassword !== ''
     ) {
       return;
     }
 
-    await signup(username, password);
+    await signup(email, password);
   };
 
   const errRes = error.response as ErrorResponse;
@@ -105,15 +109,15 @@ const SignUp = () => {
                   required
                   fullWidth
                   margin="normal"
-                  name="username"
-                  label="Username"
-                  id="username"
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  name="email"
+                  label="Email (@u.nus.edu)"
+                  id="email"
+                  autoComplete="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <Typography className="error-message">
-                  {formError.username}
+                  {formError.email}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
