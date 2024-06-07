@@ -8,7 +8,7 @@ import env from '../util/validEnv.js';
 import 'dotenv/config';
 
 const createToken = (dataid: any): string =>
-  jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: '30m' });
+  jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: '5m' });
 
 const validateEmail = (val: string): boolean => {
   return val.endsWith('@u.nus.edu');
