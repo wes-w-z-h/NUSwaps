@@ -18,13 +18,13 @@ import { ErrorResponse } from '../types/ErrorResponse';
 import { Alert } from '@mui/material';
 
 const Login = () => {
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const { login, loading, error } = useLogin();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await login(username, password);
+    await login(email, password);
   };
 
   const errRes = error.response as ErrorResponse;
@@ -82,12 +82,12 @@ const Login = () => {
                 required
                 fullWidth
                 margin="normal"
-                name="username"
-                label="Username"
-                id="username"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="email"
+                label="Email (@u.nus.edu)"
+                id="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                 required

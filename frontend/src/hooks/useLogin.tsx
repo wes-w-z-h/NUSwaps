@@ -9,22 +9,21 @@ export const useLogin = () => {
   const { dispatch } = useAuthContext();
   const navigate = useNavigate();
 
-  const login = async (username: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setLoading(true);
     setError({} as AxiosError);
 
     const data = {
-      username: username,
+      email: email,
       password: password,
     };
 
     await axios
-      .post('http://localhost:4000/api/users/login', data)
+      .post('http://localhost:4000/api/auth/login', data)
       .then((res) => {
         console.log(res);
         localStorage.setItem('user', JSON.stringify(res.data));
         dispatch({ type: 'LOGIN', payload: res.data });
-        // TODO: add a dashboard view for logged in
         navigate('/');
       })
       .catch((err) => {
