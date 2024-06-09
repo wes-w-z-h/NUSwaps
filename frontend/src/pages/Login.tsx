@@ -33,11 +33,7 @@ const Login = () => {
     console.log(inputErrors);
     setFormError(inputErrors);
 
-    if (
-      inputErrors.email !== '' ||
-      inputErrors.password !== '' ||
-      inputErrors.confirmPassword !== ''
-    ) {
+    if (inputErrors.email !== '' || inputErrors.password !== '') {
       return;
     }
 
