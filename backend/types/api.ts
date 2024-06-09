@@ -12,10 +12,17 @@ export interface IUser {
 }
 
 export interface IUserMethods {
-  createResponse(token?: string): JSON;
+  createResponse(token?: string): UserAPIResponse;
 }
 
 export type User = Model<IUser, {}, IUserMethods>;
+
+export type UserAPIResponse = {
+  id: Types.ObjectId;
+  email: string;
+  swapRequests?: [ISwap];
+  token?: string;
+};
 
 export interface ISwap {
   _id: Types.ObjectId;
@@ -32,7 +39,17 @@ export interface ISwap {
 }
 
 export interface ISwapMethods {
-  createResponse(): JSON;
+  createResponse(): SwapAPIResponse;
 }
 
 export type Swap = Model<ISwap, {}, ISwapMethods>;
+
+export type SwapAPIResponse = {
+  id: Types.ObjectId;
+  userId: Types.ObjectId;
+  courseId: ModuleCode;
+  lessonType: string;
+  current: string;
+  request: string;
+  status: boolean;
+};
