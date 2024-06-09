@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import { RawLesson, ModuleCode } from '../types/modules.js';
-import { ISwap, ISwapMethods, Swap, SwapAPIResponse } from '../types/api.js';
+import { ISwap, ISwapMethods, Swap, SwapPayload } from '../types/api.js';
 
 function courseSetter(lesson: RawLesson): string {
   return `${lesson.lessonType}-${lesson.classNo}`;
@@ -42,7 +42,7 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
   { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
-swapSchema.method('createResponse', function createReponse(): SwapAPIResponse {
+swapSchema.method('createResponse', function createReponse(): SwapPayload {
   return {
     // eslint-disable-next-line no-underscore-dangle
     id: this._id,

@@ -12,12 +12,12 @@ export interface IUser {
 }
 
 export interface IUserMethods {
-  createResponse(token?: string): UserAPIResponse;
+  createResponse(token?: string): UserPayload;
 }
 
 export type User = Model<IUser, {}, IUserMethods>;
 
-export type UserAPIResponse = {
+export type UserPayload = {
   id: Types.ObjectId;
   email: string;
   swapRequests?: [ISwap];
@@ -39,12 +39,12 @@ export interface ISwap {
 }
 
 export interface ISwapMethods {
-  createResponse(): SwapAPIResponse;
+  createResponse(): SwapPayload;
 }
 
 export type Swap = Model<ISwap, {}, ISwapMethods>;
 
-export type SwapAPIResponse = {
+export type SwapPayload = {
   id: Types.ObjectId;
   userId: Types.ObjectId;
   courseId: ModuleCode;
@@ -52,4 +52,13 @@ export type SwapAPIResponse = {
   current: string;
   request: string;
   status: boolean;
+};
+
+export type APIResponse = {
+  success: boolean;
+  error?: {
+    code: number;
+    message: string;
+  };
+  payload: UserPayload | SwapPayload;
 };

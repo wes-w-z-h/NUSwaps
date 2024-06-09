@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IUser, IUserMethods, User, UserAPIResponse } from '../types/api.js';
+import { IUser, IUserMethods, User, UserPayload } from '../types/api.js';
 import { swapSchema } from './swapModel.js';
 
 const userSchema = new Schema<IUser, User, IUserMethods>(
@@ -33,7 +33,7 @@ userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.method(
   'createResponse',
-  function createResponse(token?: string): UserAPIResponse {
+  function createResponse(token?: string): UserPayload {
     return {
       /* eslint-disable no-underscore-dangle */
       id: this._id,
