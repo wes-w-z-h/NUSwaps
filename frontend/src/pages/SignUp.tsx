@@ -14,6 +14,7 @@ import Alert from '@mui/material/Alert';
 import Copyright from '../components/auth/Copyright.tsx';
 import { ErrorResponse } from '../types/ErrorResponse.tsx';
 import { useSignup } from '../hooks/useSignup.tsx';
+import validateFormInput from '../util/auth/validateFormInput.ts';
 
 const SignUp = () => {
   const [email, setEmail] = useState<string>('');
@@ -27,37 +28,9 @@ const SignUp = () => {
 
   const { signup, loading, error } = useSignup();
 
-  const validateFormInput = () => {
-    // Initialise object to track errors
-    const inputErrors = {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    };
-
-    // Check empty email or password
-    if (!email) {
-      inputErrors.email = 'Email should not be empty';
-    }
-    if (!password) {
-      inputErrors.password = 'Password should not be empty';
-    }
-    // Check valid email domain (@u.nus.edu)
-    if (!email.endsWith('@u.nus.edu')) {
-      inputErrors.email = 'Email should end with @u.nus.edu';
-    }
-    // Check matching passwords
-    if (password !== cfmPassword) {
-      inputErrors.confirmPassword =
-        'Password and Confirm Password should be the same';
-    }
-
-    return inputErrors;
-  };
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const inputErrors = validateFormInput();
+    const inputErrors = validateFormInput(email, password, cfmPassword);
     setFormError(inputErrors);
 
     if (

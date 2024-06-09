@@ -16,15 +16,28 @@ import Copyright from '../components/auth/Copyright';
 import { useLogin } from '../hooks/useLogin';
 import { ErrorResponse } from '../types/ErrorResponse';
 import { Alert } from '@mui/material';
+import validateFormInput from '../util/auth/validateFormInput';
 
 const Login = () => {
-  const [username, setUsername] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [formError, setFormError] = useState({
+    email: '',
+    password: '',
+  });
   const { login, loading, error } = useLogin();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await login(username, password);
+    const inputErrors = validateFormInput(email, password);
+    console.log(inputErrors);
+    setFormError(inputErrors);
+
+    if (inputErrors.email !== '' || inputErrors.password !== '') {
+      return;
+    }
+
+    await login(email, password);
   };
 
   const errRes = error.response as ErrorResponse;
@@ -82,13 +95,16 @@ const Login = () => {
                 required
                 fullWidth
                 margin="normal"
-                name="username"
-                label="Username"
-                id="username"
-                autoComplete="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                name="email"
+                label="Email (@u.nus.edu)"
+                id="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
+              <Typography className="error-message">
+                {formError.email}
+              </Typography>
               <TextField
                 required
                 fullWidth
@@ -101,6 +117,9 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <Typography className="error-message">
+                {formError.password}
+              </Typography>
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
