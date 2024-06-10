@@ -21,13 +21,11 @@ export const useLogin = () => {
     await axios
       .post('http://localhost:4000/api/auth/login', data)
       .then((res) => {
-        console.log(res);
         localStorage.setItem('user', JSON.stringify(res.data));
         dispatch({ type: 'LOGIN', payload: res.data });
-        navigate('/');
+        navigate('/dashboard');
       })
       .catch((err) => {
-        console.error(err);
         setError(err);
       });
 

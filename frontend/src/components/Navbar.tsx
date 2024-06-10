@@ -17,15 +17,15 @@ import { useLogout } from '../hooks/useLogout';
 import { useAuthContext } from '../hooks/useAuthContext';
 
 const Navbar = () => {
-  const pages = ['Home', 'Find'];
-  const loggedOutSettings = ['Login', 'Signup'];
-  const loggedInSettings = ['Profile', 'Logout'];
   const { state } = useAuthContext();
-
   const navigate = useNavigate();
   const { logout } = useLogout();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const pages = [() => (state.user ? 'Dashboard' : 'Home'), () => 'Find'];
+  const loggedOutSettings = ['Login', 'Signup'];
+  const loggedInSettings = ['Profile', 'Logout'];
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -65,8 +65,11 @@ const Navbar = () => {
         navigate('/signup');
         break;
 
+      case 'Dashboard':
+        navigate('/dashboard');
+        break;
+
       default:
-        handleCloseUserMenu();
         navigate('/');
         break;
     }
@@ -131,8 +134,8 @@ const Navbar = () => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={() => handleSetting(page)}>
-                  <Typography textAlign="center">{page}</Typography>
+                <MenuItem key={page()} onClick={() => handleSetting(page())}>
+                  <Typography textAlign="center">{page()}</Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -160,11 +163,11 @@ const Navbar = () => {
             {pages.map((page) => (
               <Button
                 color="inherit"
-                key={page}
-                onClick={() => handleSetting(page)}
+                key={page()}
+                onClick={() => handleSetting(page())}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page()}
               </Button>
             ))}
           </Box>
