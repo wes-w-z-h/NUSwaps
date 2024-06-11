@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
+import { useEffect, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,54 +7,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Swap } from '../../types/Swap';
 import axios from 'axios';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import { Button, Grid } from '@mui/material';
-
-const Row = (props: { row: Swap }) => {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <React.Fragment>
-      <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>{row.courseId}</TableCell>
-        <TableCell>{row.lessonType}</TableCell>
-        <TableCell>{row.current}</TableCell>
-        <TableCell>{row.request}</TableCell>
-        <TableCell>{row.status ? 'True' : 'False'}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Grid container sx={{ margin: 2 }}>
-              <Grid item style={{ textAlign: 'center' }} xs={6}>
-                <Button onClick={() => console.log('edit')}>edit</Button>
-              </Grid>
-              <Grid item style={{ textAlign: 'center' }} xs={6}>
-                <Button color="warning" onClick={() => console.log('delete')}>
-                  delete
-                </Button>
-              </Grid>
-            </Grid>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-};
+import SwapRow from './SwapRow';
 
 const SwapTable = () => {
   const [swaps, setSwaps] = useState<Swap[]>([]);
@@ -102,7 +56,7 @@ const SwapTable = () => {
         </TableHead>
         <TableBody>
           {swaps.map((swap) => (
-            <Row key={swap.id} row={swap} />
+            <SwapRow key={swap.id} row={swap} />
           ))}
         </TableBody>
       </Table>
