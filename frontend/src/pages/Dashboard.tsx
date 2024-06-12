@@ -1,10 +1,14 @@
-import SwapList from '../components/swap/SwapTable';
+import CustomAlert from '../components/CustomAlert';
+import SwapTable from '../components/swap/SwapTable';
+import useGetSwaps from '../hooks/useGetSwaps';
 
 const Dashboard = () => {
+  const { swaps, error } = useGetSwaps();
   return (
     <>
       <div className="dashboard">
-        <SwapList />
+        {error && <CustomAlert message={error} />}
+        <SwapTable swaps={swaps} />
       </div>
     </>
   );
