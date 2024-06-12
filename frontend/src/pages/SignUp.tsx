@@ -10,11 +10,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Alert from '@mui/material/Alert';
 import Copyright from '../components/auth/Copyright.tsx';
-import { ErrorResponse } from '../types/ErrorResponse.tsx';
 import { useSignup } from '../hooks/useSignup.tsx';
 import validateFormInput from '../util/auth/validateFormInput.ts';
+import CustomAlert from '../components/CustomAlert.tsx';
 
 const SignUp = () => {
   const [email, setEmail] = useState<string>('');
@@ -44,15 +43,9 @@ const SignUp = () => {
     await signup(email, password);
   };
 
-  const errRes = error.response as ErrorResponse;
-
   return (
     <>
-      {error.message && (
-        <Alert severity="error" className="error">
-          {error.message + ': ' + errRes.data.error}
-        </Alert>
-      )}
+      {error && <CustomAlert message={error} />}
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
