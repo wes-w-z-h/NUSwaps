@@ -1,6 +1,5 @@
 import { Schema, model } from 'mongoose';
 import { IUser, IUserMethods, User, UserPayload } from '../types/api.js';
-import { swapSchema } from './swapModel.js';
 
 const userSchema = new Schema<IUser, User, IUserMethods>(
   {
@@ -21,10 +20,6 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
       required: true,
       // default: "",
     },
-    swapRequests: {
-      type: [swapSchema], // default is an empty array
-      required: false,
-    },
   },
   { timestamps: true } // createdAt option
 );
@@ -38,7 +33,6 @@ userSchema.method(
       /* eslint-disable no-underscore-dangle */
       id: this._id,
       email: this.email,
-      swapRequests: this.swapRequests,
       token,
     };
   }
