@@ -15,12 +15,12 @@ const SwapTable: React.FC<{ swaps: Swap[] }> = ({ swaps }) => {
         <Table aria-label="collapsible swaps table">
           <TableHead>
             <TableRow>
-              <TableCell />
               <TableCell>Course ID</TableCell>
               <TableCell>Lesson Type</TableCell>
               <TableCell>Current</TableCell>
               <TableCell>Request</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
