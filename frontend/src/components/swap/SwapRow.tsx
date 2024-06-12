@@ -15,6 +15,11 @@ const SwapRow = (props: { row: Swap }) => {
   return (
     <React.Fragment>
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
+        <TableCell>{row.courseId}</TableCell>
+        <TableCell>{row.lessonType}</TableCell>
+        <TableCell>{row.current}</TableCell>
+        <TableCell>{row.request}</TableCell>
+        <TableCell>{row.status ? 'True' : 'False'}</TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -24,11 +29,6 @@ const SwapRow = (props: { row: Swap }) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell>{row.courseId}</TableCell>
-        <TableCell>{row.lessonType}</TableCell>
-        <TableCell>{row.current}</TableCell>
-        <TableCell>{row.request}</TableCell>
-        <TableCell>{row.status ? 'True' : 'False'}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
