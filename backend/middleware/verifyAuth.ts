@@ -9,7 +9,7 @@ const verifyAuth: RequestHandler = async (req, res, next) => {
   // verify token
   const { authorization } = req.headers;
 
-  if (!authorization) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     next(createHttpError(401, 'Unauthorised: auth token required'));
     return;
   }
