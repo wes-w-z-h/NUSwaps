@@ -14,9 +14,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Copyright from '../components/auth/Copyright';
 import { useLogin } from '../hooks/useLogin';
-import { ErrorResponse } from '../types/ErrorResponse';
-import { Alert } from '@mui/material';
 import validateFormInput from '../util/auth/validateFormInput';
+import CustomAlert from '../components/CustomAlert';
 
 const Login = () => {
   const [email, setEmail] = useState<string>('');
@@ -40,15 +39,9 @@ const Login = () => {
     await login(email, password);
   };
 
-  const errRes = error.response as ErrorResponse;
-
   return (
     <>
-      {error.message && (
-        <Alert severity="error">
-          {error.message + ': ' + errRes.data.error}
-        </Alert>
-      )}
+      {error && <CustomAlert message={error} />}
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
