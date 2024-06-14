@@ -61,7 +61,7 @@ export const logout: RequestHandler = async (req, res, next) => {
       sameSite: 'none',
     });
 
-    res.status(200);
+    res.status(200).json({ msg: 'Cookie cleared' });
   } catch (error) {
     next(error);
   }
@@ -76,11 +76,12 @@ export const refresh: RequestHandler = async (req, res, next) => {
 
     const refreshToken = cookies.jwt;
 
+    // TODO: Change types for err, decoded, I'm too lazy to find out :)
     jwt.verify(refreshToken, env.JWT_KEY, async (err: any, decoded: any) => {
       if (err) {
         throw createHttpError(403, 'Forbidden');
       }
-      const user = await UserModel.findById(decoded).exec();
+      const user = await UserModel.findById(decoded.id).exec();
 
       if (!user) {
         throw createHttpError(401, 'Unauthorised');
