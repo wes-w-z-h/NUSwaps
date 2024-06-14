@@ -3,12 +3,12 @@ import SwapTable from '../components/swap/SwapTable';
 import useGetSwaps from '../hooks/useGetSwaps';
 
 const Dashboard = () => {
-  const { swaps, error } = useGetSwaps();
+  const { error } = useGetSwaps();
   return (
     <>
       <div className="dashboard">
         {error && <CustomAlert message={error} />}
-        <SwapTable swaps={swaps} />
+        <SwapTable />
       </div>
     </>
   );

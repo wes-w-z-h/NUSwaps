@@ -13,14 +13,16 @@ type AuthState = {
 
 type AuthAction = { type: 'LOGIN'; payload: UserToken } | { type: 'LOGOUT' };
 
-type AuthContextType = { state: AuthState; dispatch: Dispatch<AuthAction> };
+type AuthContextType = {
+  authState: AuthState;
+  authDispatch: Dispatch<AuthAction>;
+};
 
 export const AuthContext = createContext<AuthContextType>(
   {} as AuthContextType
 );
 
-// FIXME: Fix the fast refresh issue, extract it if possible
-export const authReducer = (state: AuthState, action: AuthAction) => {
+const authReducer = (state: AuthState, action: AuthAction) => {
   switch (action.type) {
     case 'LOGIN':
       return { user: action.payload };
@@ -34,7 +36,7 @@ export const authReducer = (state: AuthState, action: AuthAction) => {
 export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [state, dispatch] = useReducer(authReducer, {
+  const [authState, authDispatch] = useReducer(authReducer, {
     user: null,
   });
 
@@ -42,17 +44,17 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
     const user = localStorage.getItem('user');
 
     if (user !== null) {
-      dispatch({
+      authDispatch({
         type: 'LOGIN',
         payload: JSON.parse(user),
       });
     }
   }, []);
 
-  console.log(state);
+  console.log(authState);
 
   return (
-    <AuthContext.Provider value={{ state, dispatch }}>
+    <AuthContext.Provider value={{ authState, authDispatch }}>
       {children}
     </AuthContext.Provider>
   );
