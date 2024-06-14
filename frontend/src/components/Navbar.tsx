@@ -17,13 +17,13 @@ import { useLogout } from '../hooks/useLogout';
 import { useAuthContext } from '../hooks/useAuthContext';
 
 const Navbar = () => {
-  const { state } = useAuthContext();
+  const { authState } = useAuthContext();
   const navigate = useNavigate();
   const { logout } = useLogout();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const pages = [() => (state.user ? 'Dashboard' : 'Home'), () => 'Find'];
+  const pages = [() => (authState.user ? 'Dashboard' : 'Home'), () => 'Find'];
   const loggedOutSettings = ['Login', 'Signup'];
   const loggedInSettings = ['Profile', 'Logout'];
 
@@ -172,7 +172,7 @@ const Navbar = () => {
             ))}
           </Box>
 
-          {state.user && (
+          {authState.user && (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -206,7 +206,7 @@ const Navbar = () => {
               </Menu>
             </Box>
           )}
-          {!state.user &&
+          {!authState.user &&
             loggedOutSettings.map((setting) => (
               <MenuItem key={setting} onClick={() => handleSetting(setting)}>
                 <Typography textAlign="center">{setting}</Typography>

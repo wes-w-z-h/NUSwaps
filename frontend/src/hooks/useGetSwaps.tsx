@@ -2,21 +2,21 @@ import axios, { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 import { Swap } from '../types/Swap';
 import { useAuthContext } from './useAuthContext';
+import { useSwapsContext } from './useSwapsContext';
 
 const useGetSwaps = () => {
-  const [swaps, setSwaps] = useState<Swap[]>([]);
-  const { state } = useAuthContext();
+  const { swapsDispatch } = useSwapsContext();
+  const { authState } = useAuthContext();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getSwaps = async () => {
       await axios
         .get<Swap[]>('http://localhost:4000/api/swaps/userswaps', {
-          headers: { Authorization: `Bearer ${state.user?.token}` },
+          headers: { Authorization: `Bearer ${authState.user?.token}` },
         })
         .then((data) => {
-          setSwaps(data.data);
-          console.log(data.data);
+          swapsDispatch({ type: 'SET_SWAPS', payload: data.data });
         })
         .catch((error: AxiosError<{ error: string }>) => {
           console.log(error);
@@ -27,12 +27,13 @@ const useGetSwaps = () => {
         });
     };
 
-    if (state.user) {
+    if (authState.user) {
       getSwaps();
     }
-  }, [state.user]);
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [authState.user]);
 
-  return { swaps, error };
+  return { error };
 };
 
 export default useGetSwaps;

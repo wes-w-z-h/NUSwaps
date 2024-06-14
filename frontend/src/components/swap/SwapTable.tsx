@@ -6,9 +6,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import SwapRow from './SwapRow';
-import { Swap } from '../../types/Swap';
+import { useSwapsContext } from '../../hooks/useSwapsContext';
 
-const SwapTable: React.FC<{ swaps: Swap[] }> = ({ swaps }) => {
+const SwapTable: React.FC = () => {
+  const { swapsState } = useSwapsContext();
+
   return (
     <>
       <TableContainer component={Paper}>
@@ -24,7 +26,7 @@ const SwapTable: React.FC<{ swaps: Swap[] }> = ({ swaps }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {swaps.map((swap) => (
+            {swapsState.swaps.map((swap) => (
               <SwapRow key={swap.id} row={swap} />
             ))}
           </TableBody>

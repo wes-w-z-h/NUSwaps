@@ -7,11 +7,14 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { AuthContextProvider } from './context/AuthContext.tsx';
+import { SwapsContextProvider } from './context/SwapsContext.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthContextProvider>
-      <App />
+      <SwapsContextProvider>
+        <App />
+      </SwapsContextProvider>
     </AuthContextProvider>
   </React.StrictMode>
 );

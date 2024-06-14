@@ -13,7 +13,7 @@ import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 
 const App = () => {
-  const { state } = useAuthContext();
+  const { authState } = useAuthContext();
   return (
     <Router>
       <Navbar />
@@ -22,16 +22,16 @@ const App = () => {
         <Route path="/verify/:token" element={<Verification />} />
         <Route
           path="/login"
-          element={state.user ? <Navigate to="/" /> : <Login />}
+          element={authState.user ? <Navigate to="/" /> : <Login />}
         />
         <Route
           path="/signup"
-          element={state.user ? <Navigate to="/" /> : <SignUp />}
+          element={authState.user ? <Navigate to="/" /> : <SignUp />}
         />
         <Route
           path="/dashboard"
-          // TODO: find a better way to handle the locking of routes issue with state.user is that
-          // useEffect runs after so refreshing a page checks the state before its been updated
+          // TODO: find a better way to handle the locking of routes issue with authState.user is that
+          // useEffect runs after so refreshing a page checks the authState before its been updated
           element={
             localStorage.getItem('user') ? <Dashboard /> : <Navigate to="/" />
           }
