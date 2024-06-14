@@ -29,6 +29,8 @@ const useGetSwaps = () => {
 
     if (authState.user) {
       getSwaps();
+    } else {
+      swapsDispatch({ type: 'SET_SWAPS', payload: [] });
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [authState.user]);
