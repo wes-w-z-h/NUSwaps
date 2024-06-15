@@ -32,6 +32,7 @@ const swapReducer = (swapsState: SwapsState, action: SwapsAction) => {
         swaps: swapsState.swaps.filter((swap) => swap.id !== action.payload.id),
       };
     case 'UPDATE_SWAP':
+      // TODO: check if is by refernce then dont gotta do this
       return {
         swaps: swapsState.swaps.map((swap) =>
           swap.id === action.payload.id ? action.payload : swap
