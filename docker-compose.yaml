@@ -7,6 +7,18 @@ services:
     ports:
       - 4000:4000
     image: 'server'
+    depends_on:
+      - mongo
+
+  mongo:
+    container_name: mongodb
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=pw
+    ports:
+      - 27017:27017
+    volumes: [mongodata:/data/db]
 
   api-tester:
     build: backend/tests/.
@@ -27,3 +39,7 @@ services:
     depends_on:
       - server
     image: 'client-dev'
+
+volumes:
+  mongodata:
+    driver: local
