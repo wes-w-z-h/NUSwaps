@@ -1,7 +1,7 @@
 import Button from '@mui/material/Button';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useAuthContext } from '../hooks/auth/useAuthContext';
 
 const Verification = () => {
   const { token } = useParams();

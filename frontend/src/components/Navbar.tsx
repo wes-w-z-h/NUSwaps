@@ -13,8 +13,8 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { useLogout } from '../hooks/useLogout';
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useLogout } from '../hooks/auth/useLogout';
+import { useAuthContext } from '../hooks/auth/useAuthContext';
 
 const Navbar = () => {
   const { authState } = useAuthContext();

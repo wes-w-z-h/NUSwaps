@@ -1,7 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
-import { Swap } from '../types/Swap';
-import { useAuthContext } from './useAuthContext';
+import { Swap } from '../../types/Swap';
+import { useAuthContext } from '../auth/useAuthContext';
 import { useSwapsContext } from './useSwapsContext';
 
 const useGetSwaps = () => {

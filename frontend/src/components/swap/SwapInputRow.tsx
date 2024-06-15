@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import validateAddSwap from '../../util/auth/validateAddSwap';
-import { useAddSwap } from '../../hooks/useAddSwap';
+import validateSwap from '../../util/auth/validateSwap';
+import { useAddSwap } from '../../hooks/swaps/useAddSwap';
 import CustomAlert from '../CustomAlert';
 
-const SwapInputRow = () => {
+const SwapInputRow: React.FC<{
+  setOpen: React.Dispatch<SetStateAction<boolean>>;
+}> = ({ setOpen }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
     courseId: '',
@@ -37,7 +39,7 @@ const SwapInputRow = () => {
   };
 
   const handeClick = async () => {
-    const inputErrors = validateAddSwap(courseId, lessonType, current, request);
+    const inputErrors = validateSwap(courseId, lessonType, current, request);
     console.log(inputErrors);
     setInputErrors(inputErrors);
 
@@ -51,6 +53,7 @@ const SwapInputRow = () => {
     }
 
     await addSwap(courseId, lessonType, current, request);
+    setOpen(false);
     setCourseId('');
     setLessonType('');
     setCurrent('');
@@ -126,7 +129,6 @@ const SwapInputRow = () => {
         </TableCell>
         <TableCell>
           <Button
-            fullWidth
             type="submit"
             variant="text"
             color="success"
@@ -134,6 +136,16 @@ const SwapInputRow = () => {
             onClick={handeClick}
           >
             Add Swap
+          </Button>
+        </TableCell>
+        <TableCell>
+          <Button
+            variant="text"
+            color="warning"
+            disabled={loading}
+            onClick={() => setOpen(false)}
+          >
+            cancel
           </Button>
         </TableCell>
       </TableRow>

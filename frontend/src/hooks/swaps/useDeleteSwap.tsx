@@ -1,45 +1,24 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import { useSwapsContext } from './useSwapsContext';
-import { useAuthContext } from './useAuthContext';
+import { useAuthContext } from '../auth/useAuthContext';
 
-export const useAddSwap = () => {
+const useDeleteSwap = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { swapsDispatch } = useSwapsContext();
   const { authState } = useAuthContext();
-  const navigate = useNavigate();
 
-  const addSwap = async (
-    courseId: string,
-    lessonType: string,
-    current: string,
-    request: string
-  ) => {
+  const deleteSwap = async (id: string) => {
     setLoading(true);
     setError(null);
 
-    const data = {
-      courseId: courseId.toUpperCase().trim(),
-      lessonType: lessonType,
-      current: {
-        classNo: current.trim(),
-        lessonType: lessonType,
-      },
-      request: {
-        classNo: request.trim(),
-        lessonType: lessonType,
-      },
-    };
-
     await axios
-      .post('http://localhost:4000/api/swaps/', data, {
+      .delete(`http://localhost:4000/api/swaps/${id}`, {
         headers: { Authorization: `Bearer ${authState.user?.token}` },
       })
       .then((res) => {
-        swapsDispatch({ type: 'CREATE_SWAP', payload: res.data });
-        navigate('/dashboard');
+        swapsDispatch({ type: 'DELETE_SWAP', payload: res.data });
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
@@ -52,5 +31,7 @@ export const useAddSwap = () => {
     setLoading(false);
   };
 
-  return { addSwap, loading, error };
+  return { deleteSwap, loading, error };
 };
+
+export default useDeleteSwap;
