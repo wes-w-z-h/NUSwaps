@@ -21,7 +21,6 @@ export const useAddSwap = () => {
     setError(null);
 
     const data = {
-      userId: authState.user?.id,
       courseId: courseId.toUpperCase().trim(),
       lessonType: lessonType,
       current: {
