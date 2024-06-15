@@ -7,6 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import SwapRow from './SwapRow';
 import { useSwapsContext } from '../../hooks/useSwapsContext';
+import SwapInputRow from './SwapInputRow';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
@@ -16,6 +17,8 @@ const SwapTable: React.FC = () => {
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
+            {/* TODO: make it hidden and open when a btn is clicked */}
+            <SwapInputRow />
             <TableRow>
               <TableCell>Course ID</TableCell>
               <TableCell>Lesson Type</TableCell>
