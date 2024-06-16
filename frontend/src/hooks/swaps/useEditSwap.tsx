@@ -21,6 +21,7 @@ const useEditSwap = () => {
     setError(null);
 
     const data = {
+      id: id,
       courseId: courseId.toUpperCase().trim(),
       lessonType: lessonType,
       current: {
