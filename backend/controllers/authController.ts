@@ -31,7 +31,7 @@ export const login: RequestHandler = async (req, res, next) => {
       throw createHttpError(401, 'Unauthorised: check email & password');
     }
 
-    const accessToken = createToken(data.id); // short expiry time of 5 mins
+    const accessToken = createToken(data.id, '5s'); // short expiry time of 5 mins
     const refreshToken = createToken(data.id, '1d'); // longer expiry time of 1 day
 
     // Create secure cookie with refresh token
@@ -87,8 +87,8 @@ export const refresh: RequestHandler = async (req, res, next) => {
         throw createHttpError(401, 'Unauthorised');
       }
 
-      const accessToken = createToken(decoded);
-      res.status(200).json({ accessToken });
+      const accessToken = createToken(decoded.id);
+      res.status(200).json({ token: accessToken });
     });
   } catch (error) {
     next(error);

@@ -1,31 +1,33 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from './useAuthContext';
 import axios, { AxiosError } from 'axios';
 
-export const useLogin = () => {
+export const useRefreshToken = () => {
   const [error, setError] = useState<AxiosError>({} as AxiosError);
   const [loading, setLoading] = useState<boolean>(false);
   const { dispatch } = useAuthContext();
-  const navigate = useNavigate();
 
-  const login = async (email: string, password: string) => {
+  const refresh = async () => {
     setLoading(true);
     setError({} as AxiosError);
-
-    const data = {
-      email: email,
-      password: password,
-    };
-
     await axios
-      .post('http://localhost:4000/api/auth/login', data, {
+      .get('http://localhost:4000/api/auth/refresh', {
         withCredentials: true,
       })
       .then((res) => {
-        localStorage.setItem('user', JSON.stringify(res.data));
-        dispatch({ type: 'LOGIN', payload: res.data });
-        navigate('/dashboard');
+        let user;
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+          user = JSON.parse(userStr);
+          user.token = res.data.token;
+          localStorage.setItem('user', JSON.stringify(user));
+        }
+        dispatch({
+          type: 'REFRESH',
+          payload: user,
+        });
+
+        return res.data.token;
       })
       .catch((err) => {
         setError(err);
@@ -34,5 +36,5 @@ export const useLogin = () => {
     setLoading(false);
   };
 
-  return { login, loading, error };
+  return { refresh, loading, error };
 };
