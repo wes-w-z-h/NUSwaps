@@ -27,7 +27,6 @@ const Login = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const inputErrors = validateFormInput(email, password);
-    console.log(inputErrors);
     setFormError(inputErrors);
 
     if (inputErrors.email !== '' || inputErrors.password !== '') {
