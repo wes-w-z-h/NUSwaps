@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -18,12 +18,10 @@ import validateFormInput from '../util/auth/validateFormInput';
 import CustomAlert from '../components/CustomAlert';
 
 const Login = () => {
+  const initialState = { email: '', password: '' };
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [formError, setFormError] = useState({
-    email: '',
-    password: '',
-  });
+  const [formError, setFormError] = useState(initialState);
   const { login, loading, error } = useLogin();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,6 +35,13 @@ const Login = () => {
     }
 
     await login(email, password);
+  };
+
+  const handleChange = (setter: React.Dispatch<SetStateAction<string>>) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormError(initialState);
+      setter(e.target.value);
+    };
   };
 
   return (
@@ -93,7 +98,7 @@ const Login = () => {
                 id="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleChange(setEmail)}
               />
               <Typography className="error-message">
                 {formError.email}
@@ -108,7 +113,7 @@ const Login = () => {
                 type="password"
                 autoComplete="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handleChange(setPassword)}
               />
               <Typography className="error-message">
                 {formError.password}

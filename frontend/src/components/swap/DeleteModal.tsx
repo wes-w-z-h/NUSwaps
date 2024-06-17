@@ -19,7 +19,7 @@ const style = {
   // border: '2px solid #000',
   borderRadius: 3,
   boxShadow: 24,
-  p: 4,
+  p: 2,
 };
 
 const DeleteModal: React.FC<{
