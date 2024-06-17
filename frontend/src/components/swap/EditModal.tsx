@@ -52,7 +52,6 @@ const EditModal: React.FC<{
   const handleClose = () => setOpen(false);
   const handleSubmit = async () => {
     const inputErrors = validateSwap(courseId, lessonType, current, request);
-    console.log(inputErrors);
     setInputErrors(inputErrors);
 
     if (
@@ -63,7 +62,6 @@ const EditModal: React.FC<{
     ) {
       return;
     }
-    console.log(swap.id);
     await editSwap(swap.id, courseId, lessonType, current, request);
     handleClose();
   };

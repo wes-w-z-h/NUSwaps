@@ -40,7 +40,6 @@ const SwapInputRow: React.FC<{
 
   const handeClick = async () => {
     const inputErrors = validateSwap(courseId, lessonType, current, request);
-    console.log(inputErrors);
     setInputErrors(inputErrors);
 
     if (

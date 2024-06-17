@@ -22,7 +22,6 @@ const validateSwap = (
   if (!current) {
     inputErrors.current = 'Current should not be empty';
   }
-
   if (!request) {
     inputErrors.request = 'Request should not be empty';
   }
