@@ -31,8 +31,8 @@ export const login: RequestHandler = async (req, res, next) => {
       throw createHttpError(401, 'Unauthorised: check email & password');
     }
 
-    const accessToken = createToken(data.id, '5s'); // short expiry time of 5 mins
-    const refreshToken = createToken(data.id, '1d'); // longer expiry time of 1 day
+    const accessToken = createToken(data.id, '3s'); // short expiry time of 5 mins
+    const refreshToken = createToken(data.id, '5s'); // longer expiry time of 1 day
 
     // Create secure cookie with refresh token
     res.cookie('jwt', refreshToken, {
@@ -79,7 +79,7 @@ export const refresh: RequestHandler = async (req, res, next) => {
     // TODO: Change types for err, decoded, I'm too lazy to find out :)
     jwt.verify(refreshToken, env.JWT_KEY, async (err: any, decoded: any) => {
       if (err) {
-        throw createHttpError(403, 'Forbidden');
+        return res.status(403).json({ msg: 'Forbidden' });
       }
       const user = await UserModel.findById(decoded.id).exec();
 
@@ -87,8 +87,8 @@ export const refresh: RequestHandler = async (req, res, next) => {
         throw createHttpError(401, 'Unauthorised');
       }
 
-      const accessToken = createToken(decoded.id);
-      res.status(200).json({ token: accessToken });
+      const accessToken = createToken(decoded.id, '3s');
+      return res.status(200).json({ token: accessToken });
     });
   } catch (error) {
     next(error);

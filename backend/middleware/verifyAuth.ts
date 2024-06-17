@@ -24,7 +24,7 @@ const verifyAuth: RequestHandler = async (req, res, next) => {
     req.userId = await UserModel.findById(id).select('_id').exec();
     next();
   } catch (error) {
-    next(createHttpError(401, 'Unauthorised: invalid token'));
+    next(createHttpError(403, 'Forbidden'));
   }
 };
 
