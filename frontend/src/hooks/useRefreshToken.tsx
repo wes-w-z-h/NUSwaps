@@ -10,7 +10,7 @@ export const useRefreshToken = () => {
   const refresh = async () => {
     setLoading(true);
     setError({} as AxiosError);
-    await axios
+    const newToken = await axios
       .get('http://localhost:4000/api/auth/refresh', {
         withCredentials: true,
       })
@@ -34,6 +34,7 @@ export const useRefreshToken = () => {
       });
 
     setLoading(false);
+    return newToken;
   };
 
   return { refresh, loading, error };
