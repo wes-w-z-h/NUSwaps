@@ -1,6 +1,6 @@
 import CustomAlert from '../components/CustomAlert';
 import SwapTable from '../components/swap/SwapTable';
-import useGetSwaps from '../hooks/useGetSwaps';
+import useGetSwaps from '../hooks/swaps/useGetSwaps';
 
 const Dashboard = () => {
   const { error } = useGetSwaps();

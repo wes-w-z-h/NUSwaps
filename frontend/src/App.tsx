@@ -8,7 +8,7 @@ import {
   Routes,
   Navigate,
 } from 'react-router-dom';
-import { useAuthContext } from './hooks/useAuthContext.tsx';
+import { useAuthContext } from './hooks/auth/useAuthContext.tsx';
 import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 

@@ -11,7 +11,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Copyright from '../components/auth/Copyright.tsx';
-import { useSignup } from '../hooks/useSignup.tsx';
+import { useSignup } from '../hooks/auth/useSignup.tsx';
 import validateFormInput from '../util/auth/validateFormInput.ts';
 import CustomAlert from '../components/CustomAlert.tsx';
 

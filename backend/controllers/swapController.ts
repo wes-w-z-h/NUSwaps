@@ -72,7 +72,7 @@ export const createSwap: RequestHandler = async (req, res, next) => {
   } else if (req.body.current.lessonType !== req.body.request.lessonType) {
     res.status(400).json({ error: 'Incompatible lessons to be swapped' });
   } else {
-    await SwapModel.create(req.body)
+    await SwapModel.create({ userId: req.userId, ...req.body })
       .then((data) =>
         data
           ? res.status(201).json(data.createResponse())

@@ -13,7 +13,7 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Copyright from '../components/auth/Copyright';
-import { useLogin } from '../hooks/useLogin';
+import { useLogin } from '../hooks/auth/useLogin';
 import validateFormInput from '../util/auth/validateFormInput';
 import CustomAlert from '../components/CustomAlert';
 
