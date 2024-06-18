@@ -3,6 +3,7 @@ import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import * as bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
+import { SwapModel } from '../models/swapModel.js';
 
 export const getUsers: RequestHandler = async (_req, res, next) => {
   await UserModel.find({})
@@ -15,14 +16,16 @@ export const getUsers: RequestHandler = async (_req, res, next) => {
 
 export const deleteUser: RequestHandler = async (req, res, next) => {
   const id = req.userId;
-  await UserModel.findByIdAndDelete(id)
-    .exec()
-    .then((data) =>
-      data
-        ? res.status(200).json(data.createResponse())
-        : res.status(404).json({ msg: 'User not found' })
-    )
-    .catch((error) => next(createHttpError(400, error.message)));
+  try {
+    const data = await UserModel.findByIdAndDelete(id).exec();
+    if (!data) {
+      throw createHttpError(404, 'User not found');
+    }
+    await SwapModel.deleteMany({ userId: id }).exec();
+    res.status(200).json(data.createResponse());
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateUser: RequestHandler = async (req, res, next) => {
