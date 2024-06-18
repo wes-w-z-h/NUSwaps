@@ -2,7 +2,10 @@ import React, { SetStateAction, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuItem from '@mui/material/MenuItem';
 import validateSwap from '../../util/swaps/validateSwap';
 import { useAddSwap } from '../../hooks/swaps/useAddSwap';
@@ -13,10 +16,10 @@ const SwapInputRow: React.FC<{
 }> = ({ setOpen }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
-    courseId: '',
-    lessonType: '',
-    current: '',
-    request: '',
+    courseId: ' ',
+    lessonType: ' ',
+    current: ' ',
+    request: ' ',
   };
 
   const [lessonType, setLessonType] = useState<string>('');
@@ -43,10 +46,10 @@ const SwapInputRow: React.FC<{
     setInputErrors(inputErrors);
 
     if (
-      inputErrors.courseId !== '' ||
-      inputErrors.lessonType !== '' ||
-      inputErrors.current !== '' ||
-      inputErrors.request !== ''
+      inputErrors.courseId !== ' ' ||
+      inputErrors.lessonType !== ' ' ||
+      inputErrors.current !== ' ' ||
+      inputErrors.request !== ' '
     ) {
       return;
     }
@@ -66,7 +69,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.courseId !== ''}
+            error={inputErrors.courseId !== ' '}
             helperText={inputErrors.courseId}
             margin="normal"
             size="small"
@@ -81,7 +84,7 @@ const SwapInputRow: React.FC<{
           <TextField
             required
             select
-            error={inputErrors.lessonType !== ''}
+            error={inputErrors.lessonType !== ' '}
             helperText={inputErrors.lessonType}
             margin="normal"
             size="small"
@@ -101,7 +104,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.current !== ''}
+            error={inputErrors.current !== ' '}
             helperText={inputErrors.current}
             margin="normal"
             size="small"
@@ -115,7 +118,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.request !== ''}
+            error={inputErrors.request !== ' '}
             helperText={inputErrors.request}
             margin="normal"
             size="small"
@@ -127,25 +130,18 @@ const SwapInputRow: React.FC<{
           />
         </TableCell>
         <TableCell>
-          <Button
-            type="submit"
-            variant="text"
-            color="success"
-            disabled={loading}
-            onClick={handeClick}
-          >
-            Add Swap
-          </Button>
+          <Tooltip title="Add swap" placement="bottom">
+            <IconButton color="success" onClick={handeClick} disabled={loading}>
+              <AddCircleIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell>
-          <Button
-            variant="text"
-            color="warning"
-            disabled={loading}
-            onClick={() => setOpen(false)}
-          >
-            cancel
-          </Button>
+          <Tooltip title="Cancel" placement="bottom">
+            <IconButton onClick={() => setOpen(false)} color="error">
+              <CancelRoundedIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
     </React.Fragment>

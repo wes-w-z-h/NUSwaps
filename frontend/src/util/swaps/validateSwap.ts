@@ -6,24 +6,24 @@ const validateSwap = (
 ) => {
   // Initialise object to track errors
   const inputErrors = {
-    courseId: '',
-    lessonType: '',
-    current: '',
-    request: '',
+    courseId: ' ',
+    lessonType: ' ',
+    current: ' ',
+    request: ' ',
   };
 
   // Check empty email or password
   if (!courseId) {
-    inputErrors.courseId = 'CourseId should not be empty';
+    inputErrors.courseId = 'CourseId is required';
   }
   if (!lessonType) {
-    inputErrors.lessonType = 'LessonType should not be empty';
+    inputErrors.lessonType = 'LessonType is required';
   }
   if (!current) {
-    inputErrors.current = 'Current should not be empty';
+    inputErrors.current = 'Current is required';
   }
   if (!request) {
-    inputErrors.request = 'Request should not be empty';
+    inputErrors.request = 'Request is required';
   }
 
   return inputErrors;
