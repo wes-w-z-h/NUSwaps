@@ -5,7 +5,6 @@ export interface IUser {
   _id: Types.ObjectId;
   email: string;
   password: string;
-  swapRequests?: [ISwap];
   createdAt: Date;
   updatedAt: Date;
   __v: string;
@@ -20,7 +19,6 @@ export type User = Model<IUser, {}, IUserMethods>;
 export type UserPayload = {
   id: Types.ObjectId;
   email: string;
-  swapRequests?: [ISwap];
   token?: string;
 };
 

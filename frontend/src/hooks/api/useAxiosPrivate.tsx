@@ -1,18 +1,18 @@
 // Attach interceptors to axiosPrivate
 import { useEffect } from 'react';
-import { axiosPrivate } from '../util/api/axios';
+import { axiosPrivate } from '../../util/api/axios';
 import { useRefreshToken } from './useRefreshToken';
-import { useAuthContext } from './useAuthContext';
+import { useAuthContext } from '../auth/useAuthContext';
 
 const useAxiosPrivate = () => {
   const { refresh } = useRefreshToken();
-  const { state } = useAuthContext();
+  const { authState } = useAuthContext();
 
   useEffect(() => {
     const requestInterceptor = axiosPrivate.interceptors.request.use(
       (config) => {
         if (!config.headers['Authorization']) {
-          config.headers['Authorization'] = `Bearer ${state.user?.token}`;
+          config.headers['Authorization'] = `Bearer ${authState.user?.token}`;
         }
 
         return config;
@@ -40,7 +40,7 @@ const useAxiosPrivate = () => {
       axiosPrivate.interceptors.request.eject(requestInterceptor);
       axiosPrivate.interceptors.response.eject(responseInterceptor);
     };
-  }, [state, refresh]);
+  }, [authState, refresh]);
 
   return axiosPrivate;
 };

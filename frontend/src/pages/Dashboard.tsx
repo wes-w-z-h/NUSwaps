@@ -1,10 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import CustomAlert from '../components/CustomAlert';
 import SwapTable from '../components/swap/SwapTable';
-import { useAxiosPrivate } from '../hooks/useAxiosPrivate';
-import { useRefreshToken } from '../hooks/useRefreshToken';
-import { useLogout } from '../hooks/useLogout';
+import useGetSwaps from '../hooks/swaps/useGetSwaps';
+import { useNavigate } from 'react-router-dom';
+import { useAxiosPrivate } from '../hooks/api/useAxiosPrivate';
+import { useRefreshToken } from '../hooks/api/useRefreshToken';
+import { useLogout } from '../hooks/auth/useLogout';
 
 const Dashboard = () => {
+  const { error } = useGetSwaps();
   const { refresh } = useRefreshToken();
   const { logout } = useLogout();
   const navigate = useNavigate();
@@ -12,16 +15,18 @@ const Dashboard = () => {
 
   async function handleClick() {
     try {
-      const response = await axiosPrivate.get('/api/swaps/userswaps');
+      const response = await axiosPrivate.get('/swaps/userswaps');
       console.log(response.data);
     } catch (err) {
       logout();
       navigate('/login');
     }
   }
+
   return (
     <>
       <div className="dashboard">
+        {error && <CustomAlert message={error} />}
         <SwapTable />
         <button onClick={() => refresh()}>Refresh</button>
         <button onClick={handleClick}>click</button>

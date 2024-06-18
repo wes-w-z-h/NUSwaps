@@ -13,17 +13,17 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
-import { useLogout } from '../hooks/useLogout';
-import { useAuthContext } from '../hooks/useAuthContext';
+import { useLogout } from '../hooks/auth/useLogout';
+import { useAuthContext } from '../hooks/auth/useAuthContext';
 
 const Navbar = () => {
-  const { state } = useAuthContext();
+  const { authState } = useAuthContext();
   const navigate = useNavigate();
   const { logout } = useLogout();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
-  const pages = [() => (state.user ? 'Dashboard' : 'Home'), () => 'Find'];
+  const pages = [() => (authState.user ? 'Dashboard' : 'Home'), () => 'Find'];
   const loggedOutSettings = ['Login', 'Signup'];
   const loggedInSettings = ['Profile', 'Logout'];
 
@@ -48,8 +48,7 @@ const Navbar = () => {
 
     switch (action) {
       case 'Profile':
-        // TODO: add a view for the profile to edit user profile change the path
-        navigate('/');
+        navigate('/profile');
         break;
 
       case 'Login':
@@ -172,7 +171,7 @@ const Navbar = () => {
             ))}
           </Box>
 
-          {state.user && (
+          {authState.user && (
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -206,7 +205,7 @@ const Navbar = () => {
               </Menu>
             </Box>
           )}
-          {!state.user &&
+          {!authState.user &&
             loggedOutSettings.map((setting) => (
               <MenuItem key={setting} onClick={() => handleSetting(setting)}>
                 <Typography textAlign="center">{setting}</Typography>

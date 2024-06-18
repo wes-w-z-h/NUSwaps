@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:4000';
+const BASE_URL = 'http://localhost:4000/api';
 
 const axiosPublic = axios.create({
   baseURL: BASE_URL,
@@ -12,4 +12,4 @@ const axiosPrivate = axios.create({
   withCredentials: true,
 });
 
-export { axiosPublic, axiosPrivate };
+export { BASE_URL, axiosPublic, axiosPrivate };

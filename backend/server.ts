@@ -3,10 +3,12 @@ import app from './app.js';
 import 'dotenv/config';
 import env from './util/validEnv.js';
 
-const { PORT, MONGO_URI } = env;
+const { PORT, CURR_ENV } = env;
+const MONGO_CONNECTION_STRING: string =
+  CURR_ENV === 'DEVELOPMENT' ? env.LOCAL_MONGO_URI : env.MONGO_URI;
 
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_CONNECTION_STRING)
   .then(() => {
     app.listen(PORT, () => console.log('listening on port:', PORT));
   })

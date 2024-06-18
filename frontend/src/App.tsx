@@ -8,12 +8,13 @@ import {
   Routes,
   Navigate,
 } from 'react-router-dom';
-import { useAuthContext } from './hooks/useAuthContext.tsx';
+import { useAuthContext } from './hooks/auth/useAuthContext.tsx';
 import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import ProfilePage from './pages/ProfilePage.tsx';
 
 const App = () => {
-  const { state } = useAuthContext();
+  const { authState } = useAuthContext();
   return (
     <Router>
       <Navbar />
@@ -21,17 +22,27 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/verify/:token" element={<Verification />} />
         <Route
+          path="/profile"
+          element={
+            localStorage.getItem('user') ? (
+              <ProfilePage />
+            ) : (
+              <Navigate to={'/'} />
+            )
+          }
+        />
+        <Route
           path="/login"
-          element={state.user ? <Navigate to="/" /> : <Login />}
+          element={authState.user ? <Navigate to="/" /> : <Login />}
         />
         <Route
           path="/signup"
-          element={state.user ? <Navigate to="/" /> : <SignUp />}
+          element={authState.user ? <Navigate to="/" /> : <SignUp />}
         />
         <Route
           path="/dashboard"
-          // TODO: find a better way to handle the locking of routes issue with state.user is that
-          // useEffect runs after so refreshing a page checks the state before its been updated
+          // TODO: find a better way to handle the locking of routes issue with authState.user is that
+          // useEffect runs after so refreshing a page checks the authState before its been updated
           element={
             localStorage.getItem('user') ? <Dashboard /> : <Navigate to="/" />
           }

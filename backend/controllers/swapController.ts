@@ -25,7 +25,7 @@ export const getSwap: RequestHandler = async (req, res, next) => {
 
 export const getUserSwaps: RequestHandler = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  await SwapModel.find({ userId: req.userId._id })
+  await SwapModel.find({ userId: req.userId })
     .exec()
     .then((data) =>
       res.status(200).json(data.map((swap) => swap.createResponse()))
@@ -72,7 +72,7 @@ export const createSwap: RequestHandler = async (req, res, next) => {
   } else if (req.body.current.lessonType !== req.body.request.lessonType) {
     res.status(400).json({ error: 'Incompatible lessons to be swapped' });
   } else {
-    await SwapModel.create(req.body)
+    await SwapModel.create({ userId: req.userId, ...req.body })
       .then((data) =>
         data
           ? res.status(201).json(data.createResponse())

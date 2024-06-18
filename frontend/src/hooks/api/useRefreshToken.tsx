@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { useAuthContext } from './useAuthContext';
-import axios, { AxiosError } from 'axios';
+import { useAuthContext } from '../auth/useAuthContext';
+import { AxiosError } from 'axios';
+import { axiosPrivate } from '../../util/api/axios';
 
 export const useRefreshToken = () => {
   const [error, setError] = useState<AxiosError>({} as AxiosError);
   const [loading, setLoading] = useState<boolean>(false);
-  const { dispatch } = useAuthContext();
+  const { authDispatch } = useAuthContext();
 
   const refresh = async () => {
     setLoading(true);
     setError({} as AxiosError);
-    const newToken = await axios
-      .get('http://localhost:4000/api/auth/refresh', {
-        withCredentials: true,
-      })
+    const newToken = await axiosPrivate
+      .get('/auth/refresh')
       .then((res) => {
         let user;
         const userStr = localStorage.getItem('user');
@@ -22,7 +21,7 @@ export const useRefreshToken = () => {
           user.token = res.data.token;
           localStorage.setItem('user', JSON.stringify(user));
         }
-        dispatch({
+        authDispatch({
           type: 'REFRESH',
           payload: user,
         });

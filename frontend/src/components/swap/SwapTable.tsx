@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -6,58 +6,43 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Swap } from '../../types/Swap';
-import axios, { AxiosError } from 'axios';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import IconButton from '@mui/material/IconButton';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import Tooltip from '@mui/material/Tooltip';
 import SwapRow from './SwapRow';
-import Alert from '@mui/material/Alert';
+import { useSwapsContext } from '../../hooks/swaps/useSwapsContext';
+import SwapInputRow from './SwapInputRow';
 
-const SwapTable = () => {
-  const [swaps, setSwaps] = useState<Swap[]>([]);
-  const { state } = useAuthContext();
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getSwaps = async () => {
-      await axios
-        .get<Swap[]>('http://localhost:4000/api/swaps/userswaps', {
-          headers: { Authorization: `Bearer ${state.user?.token}` },
-        })
-        .then((data) => {
-          setSwaps(data.data);
-          console.log(data.data);
-        })
-        .catch((error: AxiosError<{ error: string }>) => {
-          console.log(error);
-          const message = error.response?.data
-            ? `, ${error.response.data.error}`
-            : '';
-          setError(error.toString() + message);
-        });
-    };
-
-    if (state.user) {
-      getSwaps();
-    }
-  }, [state.user]);
+const SwapTable: React.FC = () => {
+  const { swapsState } = useSwapsContext();
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      {error && <Alert severity="error">{error}</Alert>}
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
+            {open && <SwapInputRow setOpen={setOpen} />}
             <TableRow>
               <TableCell>Course ID</TableCell>
               <TableCell>Lesson Type</TableCell>
               <TableCell>Current</TableCell>
               <TableCell>Request</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>
+                {!open && (
+                  <Tooltip title="Add swap" placement="bottom">
+                    <IconButton onClick={() => setOpen(true)} color="success">
+                      <AddCircleOutlineRoundedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+              </TableCell>
               <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
-            {swaps.map((swap) => (
+            {swapsState.swaps.map((swap) => (
               <SwapRow key={swap.id} row={swap} />
             ))}
           </TableBody>
