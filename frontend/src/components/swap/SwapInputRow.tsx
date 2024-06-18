@@ -13,10 +13,10 @@ const SwapInputRow: React.FC<{
 }> = ({ setOpen }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
-    courseId: '',
-    lessonType: '',
-    current: '',
-    request: '',
+    courseId: ' ',
+    lessonType: ' ',
+    current: ' ',
+    request: ' ',
   };
 
   const [lessonType, setLessonType] = useState<string>('');
@@ -43,10 +43,10 @@ const SwapInputRow: React.FC<{
     setInputErrors(inputErrors);
 
     if (
-      inputErrors.courseId !== '' ||
-      inputErrors.lessonType !== '' ||
-      inputErrors.current !== '' ||
-      inputErrors.request !== ''
+      inputErrors.courseId !== ' ' ||
+      inputErrors.lessonType !== ' ' ||
+      inputErrors.current !== ' ' ||
+      inputErrors.request !== ' '
     ) {
       return;
     }
@@ -66,7 +66,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.courseId !== ''}
+            error={inputErrors.courseId !== ' '}
             helperText={inputErrors.courseId}
             margin="normal"
             size="small"
@@ -81,7 +81,7 @@ const SwapInputRow: React.FC<{
           <TextField
             required
             select
-            error={inputErrors.lessonType !== ''}
+            error={inputErrors.lessonType !== ' '}
             helperText={inputErrors.lessonType}
             margin="normal"
             size="small"
@@ -101,7 +101,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.current !== ''}
+            error={inputErrors.current !== ' '}
             helperText={inputErrors.current}
             margin="normal"
             size="small"
@@ -115,7 +115,7 @@ const SwapInputRow: React.FC<{
         <TableCell>
           <TextField
             required
-            error={inputErrors.request !== ''}
+            error={inputErrors.request !== ' '}
             helperText={inputErrors.request}
             margin="normal"
             size="small"
