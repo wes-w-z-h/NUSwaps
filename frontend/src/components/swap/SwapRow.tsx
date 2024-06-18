@@ -30,6 +30,7 @@ const SwapRow: React.FC<{ row: Swap }> = ({ row }) => {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
+            color="secondary"
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>

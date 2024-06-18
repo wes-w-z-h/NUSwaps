@@ -2,7 +2,10 @@ import React, { SetStateAction, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuItem from '@mui/material/MenuItem';
 import validateSwap from '../../util/swaps/validateSwap';
 import { useAddSwap } from '../../hooks/swaps/useAddSwap';
@@ -127,25 +130,18 @@ const SwapInputRow: React.FC<{
           />
         </TableCell>
         <TableCell>
-          <Button
-            type="submit"
-            variant="text"
-            color="success"
-            disabled={loading}
-            onClick={handeClick}
-          >
-            Add Swap
-          </Button>
+          <Tooltip title="Add swap" placement="bottom">
+            <IconButton color="success" onClick={handeClick} disabled={loading}>
+              <AddCircleIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
         <TableCell>
-          <Button
-            variant="text"
-            color="warning"
-            disabled={loading}
-            onClick={() => setOpen(false)}
-          >
-            cancel
-          </Button>
+          <Tooltip title="Cancel" placement="bottom">
+            <IconButton onClick={() => setOpen(false)} color="error">
+              <CancelRoundedIcon />
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
     </React.Fragment>

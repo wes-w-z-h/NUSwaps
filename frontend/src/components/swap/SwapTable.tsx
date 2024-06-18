@@ -6,10 +6,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton';
+import AddCircleOutlineRoundedIcon from '@mui/icons-material/AddCircleOutlineRounded';
+import Tooltip from '@mui/material/Tooltip';
 import SwapRow from './SwapRow';
 import { useSwapsContext } from '../../hooks/swaps/useSwapsContext';
 import SwapInputRow from './SwapInputRow';
-import { Button } from '@mui/material';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
@@ -28,9 +30,12 @@ const SwapTable: React.FC = () => {
               <TableCell>Request</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>
-                {/* TODO: use an icon button instead */}
                 {!open && (
-                  <Button onClick={() => setOpen(!open)}> add swap </Button>
+                  <Tooltip title="Add swap" placement="bottom">
+                    <IconButton onClick={() => setOpen(true)} color="success">
+                      <AddCircleOutlineRoundedIcon />
+                    </IconButton>
+                  </Tooltip>
                 )}
               </TableCell>
               <TableCell />
