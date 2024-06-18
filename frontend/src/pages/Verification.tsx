@@ -2,6 +2,7 @@ import Button from '@mui/material/Button';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthContext } from '../hooks/auth/useAuthContext';
+import { UserToken } from '../types/User';
 
 const Verification = () => {
   const { token } = useParams();
@@ -10,10 +11,11 @@ const Verification = () => {
 
   const handleClick = async () => {
     await axios
-      .get(`http://localhost:4000/api/auth/verify/${token}`)
+      .get<UserToken>(`http://localhost:4000/api/auth/verify/${token}`)
       .then((data) => {
+        localStorage.setItem('user', JSON.stringify(data.data));
         authDispatch({ type: 'LOGIN', payload: data.data });
-        navigate('/');
+        navigate('/dashboard');
       })
       .catch((err) => console.log(err));
   };
