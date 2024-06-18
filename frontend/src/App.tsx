@@ -11,6 +11,7 @@ import {
 import { useAuthContext } from './hooks/auth/useAuthContext.tsx';
 import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import ProfilePage from './pages/ProfilePage.tsx';
 
 const App = () => {
   const { authState } = useAuthContext();
@@ -20,6 +21,16 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/verify/:token" element={<Verification />} />
+        <Route
+          path="/profile"
+          element={
+            localStorage.getItem('user') ? (
+              <ProfilePage />
+            ) : (
+              <Navigate to={'/'} />
+            )
+          }
+        />
         <Route
           path="/login"
           element={authState.user ? <Navigate to="/" /> : <Login />}

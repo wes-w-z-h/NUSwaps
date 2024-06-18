@@ -48,8 +48,7 @@ const Navbar = () => {
 
     switch (action) {
       case 'Profile':
-        // TODO: add a view for the profile to edit user profile change the path
-        navigate('/');
+        navigate('/profile');
         break;
 
       case 'Login':

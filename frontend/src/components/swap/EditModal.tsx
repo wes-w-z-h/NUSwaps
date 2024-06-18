@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { Swap } from '../../types/Swap';
 import CustomAlert from '../CustomAlert';
 import useEditSwap from '../../hooks/swaps/useEditSwap';
-import validateSwap from '../../util/auth/validateSwap';
+import validateSwap from '../../util/swaps/validateSwap';
 import { Typography } from '@mui/material';
 
 const style = {

@@ -20,7 +20,6 @@ const SwapTable: React.FC = () => {
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
-            {/* TODO: make it hidden and open when a btn is clicked */}
             {open && <SwapInputRow setOpen={setOpen} />}
             <TableRow>
               <TableCell>Course ID</TableCell>

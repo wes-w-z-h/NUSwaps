@@ -4,7 +4,7 @@ import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
-import validateSwap from '../../util/auth/validateSwap';
+import validateSwap from '../../util/swaps/validateSwap';
 import { useAddSwap } from '../../hooks/swaps/useAddSwap';
 import CustomAlert from '../CustomAlert';
 
