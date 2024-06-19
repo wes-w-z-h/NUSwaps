@@ -14,7 +14,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import useEditUser from '../hooks/user/useEditUser';
 import CustomAlert from '../components/CustomAlert';
-import { useAuthContext } from '../hooks/auth/useAuthContext';
 import useDeleteUser from '../hooks/user/useDeleteUser';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,7 +32,6 @@ const ProfilePage = () => {
     loading: loadingDelete,
     error: errorDelete,
   } = useDeleteUser();
-  const { authDispatch } = useAuthContext();
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -52,7 +50,6 @@ const ProfilePage = () => {
   };
 
   const handleDeleteAccount = async () => {
-    authDispatch({ type: 'LOGOUT' });
     deleteUser();
     setOpenDialog(false);
     navigate('/');
