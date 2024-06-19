@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { axiosPrivate } from '../../util/api/axios';
 
 export const useSignup = () => {
   const [error, setError] = useState<string | null>(null);
@@ -14,8 +15,8 @@ export const useSignup = () => {
       password: password,
     };
 
-    await axios
-      .post('http://localhost:4000/api/auth/signup', data)
+    await axiosPrivate
+      .post('auth/signup', data)
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
         const message = error.response?.data

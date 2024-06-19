@@ -11,7 +11,10 @@ type AuthState = {
   user: UserToken | null;
 };
 
-type AuthAction = { type: 'LOGIN'; payload: UserToken } | { type: 'LOGOUT' };
+type AuthAction =
+  | { type: 'LOGIN'; payload: UserToken }
+  | { type: 'LOGOUT' }
+  | { type: 'REFRESH'; payload: UserToken };
 
 type AuthContextType = {
   authState: AuthState;
@@ -28,6 +31,8 @@ const authReducer = (state: AuthState, action: AuthAction) => {
       return { user: action.payload };
     case 'LOGOUT':
       return { user: null };
+    case 'REFRESH':
+      return { user: action.payload };
     default:
       return state;
   }
@@ -50,8 +55,6 @@ export const AuthContextProvider: React.FC<{ children: ReactNode }> = ({
       });
     }
   }, []);
-
-  console.log(authState);
 
   return (
     <AuthContext.Provider value={{ authState, authDispatch }}>

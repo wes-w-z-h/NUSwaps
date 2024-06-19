@@ -7,8 +7,8 @@ import sendVerification from '../util/emailService.js';
 import env from '../util/validEnv.js';
 import 'dotenv/config';
 
-const createToken = (dataid: any): string =>
-  jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: '5m' });
+const createToken = (dataid: any, expiry: string = '5m'): string =>
+  jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: expiry });
 
 const validateEmail = (val: string): boolean => {
   return val.endsWith('@u.nus.edu');
@@ -31,8 +31,63 @@ export const login: RequestHandler = async (req, res, next) => {
       throw createHttpError(401, 'Unauthorised: check email & password');
     }
 
-    const token = createToken(data.id);
-    res.status(200).json(data.createResponse(token));
+    const accessToken = createToken(data.id, '15m'); // short expiry time of 15 mins
+    const refreshToken = createToken(data.id, '1d'); // longer expiry time of 1 day
+
+    // Create secure cookie with refresh token
+    res.cookie('jwt', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json(data.createResponse(accessToken));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout: RequestHandler = async (req, res, next) => {
+  const { cookies } = req;
+  try {
+    if (!cookies?.jwt) {
+      res.status(204); // no cookies
+    }
+
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+
+    res.status(200).json({ msg: 'Cookie cleared' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refresh: RequestHandler = async (req, res, next) => {
+  const { cookies } = req;
+  try {
+    if (!cookies?.jwt) {
+      throw createHttpError(401, 'Unauthorised');
+    }
+
+    const refreshToken = cookies.jwt;
+    jwt.verify(refreshToken, env.JWT_KEY, async (err: any, decoded: any) => {
+      if (err) {
+        return res.status(403).json({ msg: 'Forbidden' });
+      }
+      const user = await UserModel.findById(decoded.id).exec();
+
+      if (!user) {
+        throw createHttpError(401, 'Unauthorised');
+      }
+
+      const accessToken = createToken(decoded.id, '15m');
+      return res.status(200).json({ token: accessToken });
+    });
   } catch (error) {
     next(error);
   }

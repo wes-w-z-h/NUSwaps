@@ -1,27 +1,30 @@
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { useSwapsContext } from './useSwapsContext';
-import { useAuthContext } from '../auth/useAuthContext';
+import { useAxiosPrivate } from '../api/useAxiosPrivate';
+import { useLogout } from '../auth/useLogout';
 
 const useDeleteSwap = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { swapsDispatch } = useSwapsContext();
-  const { authState } = useAuthContext();
+  const axiosPrivate = useAxiosPrivate();
+  const { logout } = useLogout();
 
   const deleteSwap = async (id: string) => {
     setLoading(true);
     setError(null);
 
-    await axios
-      .delete(`http://localhost:4000/api/swaps/${id}`, {
-        headers: { Authorization: `Bearer ${authState.user?.token}` },
-      })
+    await axiosPrivate
+      .delete(`/swaps/${id}`)
       .then((res) => {
         swapsDispatch({ type: 'DELETE_SWAP', payload: res.data });
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
+        if (error.response?.status === 403) {
+          logout();
+        }
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

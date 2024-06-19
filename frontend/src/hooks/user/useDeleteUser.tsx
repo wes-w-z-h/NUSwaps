@@ -1,22 +1,24 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { useAuthContext } from '../auth/useAuthContext';
+import { useAxiosPrivate } from '../api/useAxiosPrivate';
+import { useLogout } from '../auth/useLogout';
 
 const useDeleteUser = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const { authState } = useAuthContext();
+  const axiosPrivate = useAxiosPrivate();
+  const { logout } = useLogout();
 
   const deleteUser = async () => {
     setLoading(true);
     setError(null);
 
-    await axios
-      .delete(`http://localhost:4000/api/users/delete`, {
-        headers: { Authorization: `Bearer ${authState.user?.token}` },
-      })
+    await axiosPrivate
+      .delete(`/users/delete`)
       .then((data) => console.log(data.data))
       .catch((error) => {
+        if (error.response?.status === 403) {
+          logout();
+        }
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

@@ -1,27 +1,29 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { useAuthContext } from '../auth/useAuthContext';
+import { useAxiosPrivate } from '../api/useAxiosPrivate';
+import { useLogout } from '../auth/useLogout';
 
 const useEditUser = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const { authState } = useAuthContext();
+  const axiosPrivate = useAxiosPrivate();
+  const { logout } = useLogout();
 
   const editUser = async (oldPassword: string, newPassword: string) => {
     setLoading(true);
     setError(null);
 
-    await axios
-      .patch(
-        `http://localhost:4000/api/users/edit`,
-        {
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-        },
-        { headers: { Authorization: `Bearer ${authState.user?.token}` } }
-      )
+    const data = {
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    };
+
+    await axiosPrivate
+      .patch(`/users/edit`, data)
       .then((data) => console.log(data.data))
       .catch((error) => {
+        if (error.response?.status === 403) {
+          logout();
+        }
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { useSwapsContext } from './useSwapsContext';
-import { useAuthContext } from '../auth/useAuthContext';
+import { useAxiosPrivate } from '../api/useAxiosPrivate';
+import { useLogout } from '../auth/useLogout';
 
 export const useAddSwap = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const { logout } = useLogout();
   const { swapsDispatch } = useSwapsContext();
-  const { authState } = useAuthContext();
+  const axiosPrivate = useAxiosPrivate();
 
   const addSwap = async (
     courseId: string,
@@ -31,15 +33,16 @@ export const useAddSwap = () => {
       },
     };
 
-    await axios
-      .post('http://localhost:4000/api/swaps/', data, {
-        headers: { Authorization: `Bearer ${authState.user?.token}` },
-      })
+    await axiosPrivate
+      .post('/swaps', data)
       .then((res) => {
         swapsDispatch({ type: 'CREATE_SWAP', payload: res.data });
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
+        if (error.response?.status === 403) {
+          logout();
+        }
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

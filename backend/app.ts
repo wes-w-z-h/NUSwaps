@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import createHttpError, { isHttpError } from 'http-errors';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
@@ -12,11 +13,14 @@ const app = express();
 app.use(
   cors({
     origin: 'http://localhost:3000',
+    credentials: true,
   })
 );
 
 // accepts json body
 app.use(express.json());
+
+app.use(cookieParser()); // accepts cookie in req
 
 app.use(morgan('dev'));
 

@@ -50,8 +50,6 @@ export const SwapsContextProvider: React.FC<{ children: ReactNode }> = ({
     swaps: [],
   });
 
-  console.log(swapsState.swaps);
-
   return (
     <SwapsContext.Provider value={{ swapsState, swapsDispatch }}>
       {children}

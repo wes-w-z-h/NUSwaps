@@ -4,6 +4,7 @@ import useGetSwaps from '../hooks/swaps/useGetSwaps';
 
 const Dashboard = () => {
   const { error } = useGetSwaps();
+
   return (
     <>
       <div className="dashboard">

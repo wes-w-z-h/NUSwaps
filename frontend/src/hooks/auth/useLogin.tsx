@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from './useAuthContext';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { axiosPrivate } from '../../util/api/axios';
 
 export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
@@ -18,8 +19,8 @@ export const useLogin = () => {
       password: password,
     };
 
-    await axios
-      .post('http://localhost:4000/api/auth/login', data)
+    await axiosPrivate
+      .post('/auth/login', data)
       .then((res) => {
         localStorage.setItem('user', JSON.stringify(res.data));
         authDispatch({ type: 'LOGIN', payload: res.data });
