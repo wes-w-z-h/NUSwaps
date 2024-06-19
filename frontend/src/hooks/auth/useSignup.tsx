@@ -4,11 +4,13 @@ import { axiosPrivate } from '../../util/api/axios';
 
 export const useSignup = () => {
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const signup = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
+    setMessage(null);
 
     const data = {
       email: email,
@@ -16,7 +18,11 @@ export const useSignup = () => {
     };
 
     await axiosPrivate
-      .post('auth/signup', data)
+      .post<{ message: string }>('auth/signup', data)
+      .then((res) => {
+        const msg = res.data.message + ` to ${email}`;
+        setMessage(msg);
+      })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
         const message = error.response?.data
@@ -28,5 +34,5 @@ export const useSignup = () => {
     setLoading(false);
   };
 
-  return { signup, loading, error };
+  return { signup, loading, error, message };
 };
