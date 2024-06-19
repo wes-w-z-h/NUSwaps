@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useSwapsContext } from './useSwapsContext';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
+import { useLogout } from '../auth/useLogout';
 
 export const useAddSwap = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const { logout } = useLogout();
   const { swapsDispatch } = useSwapsContext();
   const axiosPrivate = useAxiosPrivate();
 
@@ -38,6 +40,9 @@ export const useAddSwap = () => {
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
+        if (error.response?.status === 403) {
+          logout();
+        }
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

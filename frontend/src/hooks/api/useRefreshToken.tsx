@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuthContext } from '../auth/useAuthContext';
 import { AxiosError } from 'axios';
-import { axiosPrivate } from '../../util/api/axios';
+import { axiosPublic } from '../../util/api/axios';
 
 export const useRefreshToken = () => {
   const [error, setError] = useState<AxiosError>({} as AxiosError);
@@ -11,8 +11,10 @@ export const useRefreshToken = () => {
   const refresh = async () => {
     setLoading(true);
     setError({} as AxiosError);
-    const newToken = await axiosPrivate
-      .get('/auth/refresh')
+    const newToken = await axiosPublic
+      .get('/auth/refresh', {
+        withCredentials: true,
+      })
       .then((res) => {
         let user;
         const userStr = localStorage.getItem('user');
