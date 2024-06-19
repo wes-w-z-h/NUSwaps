@@ -3,12 +3,11 @@ import React, { useState } from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-const CustomAlert: React.FC<{ message: string | null }> = ({ message }) => {
+const CustomAlert: React.FC<{
+  message: string | null;
+  severity?: 'error' | 'info';
+}> = ({ message, severity = 'error' }) => {
   const [open, setOpen] = useState<boolean>(true);
-
-  // const handleClick = () => {
-  //   setOpen(true);
-  // };
 
   const handleClose = (
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -31,7 +30,7 @@ const CustomAlert: React.FC<{ message: string | null }> = ({ message }) => {
       >
         <Alert
           onClose={handleClose}
-          severity="error"
+          severity={severity}
           variant="standard"
           sx={{ width: '100%' }}
         >

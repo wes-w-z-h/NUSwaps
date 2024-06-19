@@ -25,7 +25,7 @@ const SignUp = () => {
     confirmPassword: '',
   });
 
-  const { signup, loading, error } = useSignup();
+  const { signup, loading, error, message } = useSignup();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -46,6 +46,7 @@ const SignUp = () => {
   return (
     <>
       {error && <CustomAlert message={error} />}
+      {message && <CustomAlert message={message} severity="info" />}
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
