@@ -55,10 +55,10 @@ const EditModal: React.FC<{
     setInputErrors(inputErrors);
 
     if (
-      inputErrors.courseId !== '' ||
-      inputErrors.lessonType !== '' ||
-      inputErrors.current !== '' ||
-      inputErrors.request !== ''
+      inputErrors.courseId !== ' ' ||
+      inputErrors.lessonType !== ' ' ||
+      inputErrors.current !== ' ' ||
+      inputErrors.request !== ' '
     ) {
       return;
     }
