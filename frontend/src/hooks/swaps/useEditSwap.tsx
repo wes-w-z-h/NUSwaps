@@ -37,7 +37,6 @@ const useEditSwap = () => {
     await axiosPrivate
       .patch<Swap>(`swaps/${id}`, data)
       .then((res) => {
-        console.log(res.data);
         swapsDispatch({ type: 'UPDATE_SWAP', payload: res.data });
       })
       .catch((error: AxiosError<{ error: string }>) => {
