@@ -75,7 +75,6 @@ export const refresh: RequestHandler = async (req, res, next) => {
     }
 
     const refreshToken = cookies.jwt;
-    // TODO: Change types for err, decoded, I'm too lazy to find out :)
     jwt.verify(refreshToken, env.JWT_KEY, async (err: any, decoded: any) => {
       if (err) {
         return res.status(403).json({ msg: 'Forbidden' });
