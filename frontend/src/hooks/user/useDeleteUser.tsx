@@ -14,7 +14,9 @@ const useDeleteUser = () => {
 
     await axiosPrivate
       .delete(`/users/delete`)
-      .then((data) => console.log(data.data))
+      .then(() => {
+        logout();
+      })
       .catch((error) => {
         if (error.response?.status === 403) {
           logout();
