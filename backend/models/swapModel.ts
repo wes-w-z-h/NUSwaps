@@ -42,6 +42,11 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
   { timestamps: true, toJSON: { getters: true } } // createdAt option
 );
 
+swapSchema.index(
+  { userId: 1, courseId: 1, lessonType: 1, current: 1, request: 1 },
+  { unique: true }
+);
+
 swapSchema.method('createResponse', function createReponse(): SwapPayload {
   return {
     // eslint-disable-next-line no-underscore-dangle
