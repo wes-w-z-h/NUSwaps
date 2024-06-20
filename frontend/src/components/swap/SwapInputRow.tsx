@@ -92,7 +92,6 @@ const SwapInputRow: React.FC<{
             margin="normal"
             size="small"
             label="Lesson Type"
-            id="Lesson Type"
             InputLabelProps={{ htmlFor: 'lesson-type-select' }}
             SelectProps={{
               native: false,
