@@ -39,7 +39,11 @@ export const useAddSwap = () => {
         swapsDispatch({ type: 'CREATE_SWAP', payload: res.data });
       })
       .catch((error: AxiosError<{ error: string }>) => {
-        console.log(error);
+        console.log(error.response);
+        if (error.response?.data.error.startsWith('E11000')) {
+          setError(error.message + ', Duplicate swaps are not allowed');
+          return;
+        }
         if (error.response?.status === 403) {
           logout();
         }
