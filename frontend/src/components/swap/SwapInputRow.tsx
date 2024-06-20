@@ -91,8 +91,16 @@ const SwapInputRow: React.FC<{
             helperText={inputErrors.lessonType}
             margin="normal"
             size="small"
-            label="LessonType"
-            id="LessonType"
+            label="Lesson Type"
+            id="Lesson Type"
+            InputLabelProps={{ htmlFor: 'lesson-type-select' }}
+            SelectProps={{
+              native: false,
+              labelId: 'lesson-type-label',
+              inputProps: {
+                id: 'lesson-type-select',
+              },
+            }}
             onChange={changeHandler(setLessonType)}
             value={lessonType}
             sx={{ width: '11vw' }}
