@@ -33,10 +33,10 @@ const EditModal: React.FC<{
   const { editSwap, loading, error } = useEditSwap();
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
-    courseId: '',
-    lessonType: '',
-    current: '',
-    request: '',
+    courseId: ' ',
+    lessonType: ' ',
+    current: ' ',
+    request: ' ',
   };
 
   const [courseId, setCourseId] = useState<string>(swap.courseId);
@@ -100,7 +100,7 @@ const EditModal: React.FC<{
             <TextField
               fullWidth
               required
-              error={inputErrors.courseId !== ''}
+              error={inputErrors.courseId !== ' '}
               helperText={inputErrors.courseId}
               margin="normal"
               size="small"
@@ -113,7 +113,7 @@ const EditModal: React.FC<{
               fullWidth
               required
               select
-              error={inputErrors.lessonType !== ''}
+              error={inputErrors.lessonType !== ' '}
               helperText={inputErrors.lessonType}
               margin="normal"
               size="small"
@@ -131,7 +131,7 @@ const EditModal: React.FC<{
             <TextField
               fullWidth
               required
-              error={inputErrors.current !== ''}
+              error={inputErrors.current !== ' '}
               helperText={inputErrors.current}
               margin="normal"
               size="small"
@@ -143,7 +143,7 @@ const EditModal: React.FC<{
             <TextField
               fullWidth
               required
-              error={inputErrors.request !== ''}
+              error={inputErrors.request !== ' '}
               helperText={inputErrors.request}
               margin="normal"
               size="small"
