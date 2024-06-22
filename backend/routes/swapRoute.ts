@@ -1,6 +1,7 @@
 import express from 'express';
 import * as SwapController from '../controllers/swapController.js';
 import verifyAuth from '../middleware/verifyAuth.js';
+import verifySwap from '../middleware/verifySwap.js';
 
 const swapRouter = express.Router();
 
@@ -11,11 +12,13 @@ swapRouter.get('/userswaps', SwapController.getUserSwaps);
 
 swapRouter.get('/', SwapController.getSwaps);
 
-swapRouter.post('/', SwapController.createSwap);
-
 swapRouter.get('/:id', SwapController.getSwap);
 
 swapRouter.delete('/:id', SwapController.deleteSwap);
+
+swapRouter.use(verifySwap);
+
+swapRouter.post('/', SwapController.createSwap);
 
 swapRouter.patch('/:id', SwapController.updateSwap);
 
