@@ -17,7 +17,7 @@ const SwapInputRow: React.FC<{
     lessonType: string,
     current: string,
     request: string
-  ) => void;
+  ) => Promise<void>;
 }> = ({ setOpen, loading, addSwap }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
@@ -67,7 +67,6 @@ const SwapInputRow: React.FC<{
 
   return (
     <React.Fragment>
-      {/* {error && <CustomAlert message={error} />} */}
       <TableRow>
         <TableCell>
           <TextField
