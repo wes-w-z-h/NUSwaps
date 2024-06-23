@@ -123,7 +123,6 @@ const EditModal: React.FC<{
               value={courseId.toUpperCase().trim()}
               onChange={changeHandler(setCourseId)}
             />
-            {/* TODO: update label */}
             <TextField
               fullWidth
               required
@@ -132,8 +131,15 @@ const EditModal: React.FC<{
               helperText={inputErrors.lessonType}
               margin="normal"
               size="small"
-              label="lessonType"
-              id="LessonType"
+              label="Lesson Type"
+              InputLabelProps={{ htmlFor: 'lesson-type-select' }}
+              SelectProps={{
+                native: false,
+                labelId: 'lesson-type-label',
+                inputProps: {
+                  id: 'lesson-type-select',
+                },
+              }}
               value={lessonType}
               onChange={changeHandler(setLessonType)}
             >
