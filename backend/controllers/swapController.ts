@@ -1,6 +1,57 @@
 import { RequestHandler } from 'express';
-import createHttpError from 'http-errors';
+import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
+
+const verifySwap = async (
+  userId: string,
+  courseId: string,
+  lessonType: string,
+  current: {
+    lessonType: string;
+    classNo: string;
+  },
+  request: {
+    lessonType: string;
+    classNo: string;
+  },
+  swapId?: string
+) => {
+  if (current.lessonType !== request.lessonType) {
+    throw createHttpError(400, 'Incompatible lessons to be swapped');
+  }
+
+  const existing = await SwapModel.find({
+    userId,
+    courseId,
+    lessonType,
+  }).exec();
+
+  if (
+    existing.length === 0 ||
+    (existing.length === 1 && existing[0].id === swapId)
+  ) {
+    return;
+  }
+
+  if (existing[0].current !== `${current.lessonType}-${current.classNo}`) {
+    throw createHttpError(
+      400,
+      `Invalid current slot, differs from existing swap`
+    );
+  }
+
+  const existing2 = await SwapModel.findOne({
+    userId,
+    courseId,
+    lessonType,
+    current,
+    request,
+  });
+
+  if (existing2) {
+    throw createHttpError(400, 'Duplicate swaps not allowed');
+  }
+};
 
 export const getSwaps: RequestHandler = async (req, res, next) => {
   await SwapModel.find({})
@@ -47,37 +98,53 @@ export const deleteSwap: RequestHandler = async (req, res, next) => {
 
 export const updateSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
-  if (!req.body.current || !req.body.request) {
-    res.status(400).json({ error: 'Incomplete request body' });
-  } else if (req.body.current.lessonType !== req.body.request.lessonType) {
-    res.status(400).json({ error: 'Incompatible lessons to be swapped' });
-  } else {
-    await SwapModel.findByIdAndUpdate(id, req.body, {
+  const { userId } = req;
+  const { courseId, lessonType, current, request } = req.body;
+
+  try {
+    await verifySwap(userId, courseId, lessonType, current, request, id);
+    const data = await SwapModel.findByIdAndUpdate(id, req.body, {
       runValidators: true,
       new: true,
-    })
-      .exec()
-      .then((data) =>
-        data
-          ? res.status(200).json(data.createResponse())
-          : res.status(404).json({ msg: 'Swap not found' })
-      )
-      .catch((error) => next(createHttpError(400, error.message)));
+    }).exec();
+
+    if (!data) {
+      throw createHttpError(404, 'Swap not found');
+    }
+
+    res.status(200).json(data.createResponse());
+  } catch (error) {
+    next(error);
   }
 };
 
 export const createSwap: RequestHandler = async (req, res, next) => {
-  if (!req.body.current || !req.body.request) {
-    res.status(400).json({ error: 'Incomplete request body' });
-  } else if (req.body.current.lessonType !== req.body.request.lessonType) {
-    res.status(400).json({ error: 'Incompatible lessons to be swapped' });
-  } else {
-    await SwapModel.create({ userId: req.userId, ...req.body })
-      .then((data) =>
-        data
-          ? res.status(201).json(data.createResponse())
-          : res.status(400).json({ msg: 'Cannot create swap' })
-      )
-      .catch((error) => next(createHttpError(400, error.message)));
+  const { userId } = req;
+  const { current, request, courseId, lessonType } = req.body;
+
+  try {
+    await verifySwap(userId, courseId, lessonType, current, request);
+
+    const data = await SwapModel.create({
+      userId,
+      courseId,
+      lessonType,
+      current,
+      request,
+    });
+
+    if (!data) {
+      throw createHttpError(400, 'Unable to create swap');
+    }
+
+    res.status(200).json(data.createResponse());
+  } catch (error: unknown) {
+    // TODO: see if possible to do this better
+    if (isHttpError(error)) {
+      next(error);
+    } else if (error instanceof Error) {
+      next(createHttpError(400, error.message));
+    }
+    next(error);
   }
 };

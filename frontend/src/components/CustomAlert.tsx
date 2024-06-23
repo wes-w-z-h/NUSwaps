@@ -22,7 +22,7 @@ const CustomAlert: React.FC<{
   };
 
   return (
-    <div>
+    <React.Fragment>
       <Snackbar
         open={open}
         onClose={handleClose}
@@ -37,7 +37,7 @@ const CustomAlert: React.FC<{
           {message}
         </Alert>
       </Snackbar>
-    </div>
+    </React.Fragment>
   );
 };
 export default CustomAlert;

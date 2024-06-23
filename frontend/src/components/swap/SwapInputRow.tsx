@@ -8,12 +8,17 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuItem from '@mui/material/MenuItem';
 import validateSwap from '../../util/swaps/validateSwap';
-import { useAddSwap } from '../../hooks/swaps/useAddSwap';
-import CustomAlert from '../CustomAlert';
 
 const SwapInputRow: React.FC<{
   setOpen: React.Dispatch<SetStateAction<boolean>>;
-}> = ({ setOpen }) => {
+  loading: boolean;
+  addSwap: (
+    courseId: string,
+    lessonType: string,
+    current: string,
+    request: string
+  ) => void;
+}> = ({ setOpen, loading, addSwap }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
     courseId: ' ',
@@ -27,7 +32,6 @@ const SwapInputRow: React.FC<{
   const [current, setCurrent] = useState<string>('');
   const [request, setRequest] = useState<string>('');
   const [inputErrors, setInputErrors] = useState(intialErrorState);
-  const { addSwap, loading, error } = useAddSwap();
 
   const changeHandler = (
     setter: React.Dispatch<React.SetStateAction<string>>
@@ -55,7 +59,6 @@ const SwapInputRow: React.FC<{
     }
 
     await addSwap(courseId, lessonType, current, request);
-    setOpen(false);
     setCourseId('');
     setLessonType('');
     setCurrent('');
@@ -64,7 +67,7 @@ const SwapInputRow: React.FC<{
 
   return (
     <React.Fragment>
-      {error && <CustomAlert message={error} />}
+      {/* {error && <CustomAlert message={error} />} */}
       <TableRow>
         <TableCell>
           <TextField
@@ -88,8 +91,15 @@ const SwapInputRow: React.FC<{
             helperText={inputErrors.lessonType}
             margin="normal"
             size="small"
-            label="lessonType"
-            id="LessonType"
+            label="Lesson Type"
+            InputLabelProps={{ htmlFor: 'lesson-type-select' }}
+            SelectProps={{
+              native: false,
+              labelId: 'lesson-type-label',
+              inputProps: {
+                id: 'lesson-type-select',
+              },
+            }}
             onChange={changeHandler(setLessonType)}
             value={lessonType}
             sx={{ width: '11vw' }}

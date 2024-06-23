@@ -12,17 +12,27 @@ import Tooltip from '@mui/material/Tooltip';
 import SwapRow from './SwapRow';
 import { useSwapsContext } from '../../hooks/swaps/useSwapsContext';
 import SwapInputRow from './SwapInputRow';
+import { useAddSwap } from '../../hooks/swaps/useAddSwap';
+import CustomAlert from '../CustomAlert';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
   const [open, setOpen] = useState(false);
+  const { addSwap, loading, error } = useAddSwap();
 
   return (
     <>
+      {error && <CustomAlert message={error} />}
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
-            {open && <SwapInputRow setOpen={setOpen} />}
+            {open && (
+              <SwapInputRow
+                setOpen={setOpen}
+                loading={loading}
+                addSwap={addSwap}
+              />
+            )}
             <TableRow>
               <TableCell>Course ID</TableCell>
               <TableCell>Lesson Type</TableCell>
