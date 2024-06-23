@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
@@ -49,7 +49,15 @@ const EditModal: React.FC<{
   );
   const [inputErrors, setInputErrors] = useState(intialErrorState);
 
-  const handleClose = () => setOpen(false);
+  const handleClose = (reset: boolean) => {
+    setOpen(false);
+    if (reset) {
+      setCourseId(swap.courseId);
+      setLessonType(swap.lessonType);
+      setCurrent(swap.current.slice(swap.lessonType.length + 1));
+      setRequest(swap.request.slice(swap.lessonType.length + 1));
+    }
+  };
   const handleSubmit = async () => {
     const inputErrors = validateSwap(courseId, lessonType, current, request);
     setInputErrors(inputErrors);
@@ -63,8 +71,14 @@ const EditModal: React.FC<{
       return;
     }
     await editSwap(swap.id, courseId, lessonType, current, request);
-    handleClose();
   };
+
+  useEffect(() => {
+    if (!loading) {
+      handleClose(!!error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, loading]);
 
   const changeHandler = (
     setter: React.Dispatch<React.SetStateAction<string>>
@@ -85,7 +99,7 @@ const EditModal: React.FC<{
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
         open={open}
-        onClose={handleClose}
+        onClose={() => handleClose(true)}
         closeAfterTransition
         slots={{ backdrop: Backdrop }}
         slotProps={{
@@ -117,8 +131,15 @@ const EditModal: React.FC<{
               helperText={inputErrors.lessonType}
               margin="normal"
               size="small"
-              label="lessonType"
-              id="LessonType"
+              label="Lesson Type"
+              InputLabelProps={{ htmlFor: 'lesson-type-select' }}
+              SelectProps={{
+                native: false,
+                labelId: 'lesson-type-label',
+                inputProps: {
+                  id: 'lesson-type-select',
+                },
+              }}
               value={lessonType}
               onChange={changeHandler(setLessonType)}
             >
