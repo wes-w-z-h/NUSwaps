@@ -32,7 +32,7 @@ export const login: RequestHandler = async (req, res, next) => {
     }
 
     const accessToken = createToken(data.id, '15m'); // short expiry time of 15 mins
-    const refreshToken = createToken(data.id, '1d'); // longer expiry time of 1 day
+    const refreshToken = createToken(data.id, '3s'); // longer expiry time of 1 day
 
     // Create secure cookie with refresh token
     res.cookie('jwt', refreshToken, {
@@ -118,6 +118,22 @@ export const signup: RequestHandler = async (req, res, next) => {
     await sendVerification(email, createToken({ email, passwordHash }));
 
     res.status(201).json({ message: 'Verification email sent' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyRefreshToken: RequestHandler = async (req, res, next) => {
+  const { cookies } = req;
+  try {
+    if (!cookies?.jwt) {
+      throw createHttpError(401, 'Unauthorised');
+    }
+
+    const refreshToken = cookies.jwt;
+    jwt.verify(refreshToken, env.JWT_KEY);
+
+    res.status(200).json({ message: 'Valid token' });
   } catch (error) {
     next(error);
   }
