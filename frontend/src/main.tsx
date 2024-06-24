@@ -8,12 +8,15 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import { AuthContextProvider } from './context/AuthContext.tsx';
 import { SwapsContextProvider } from './context/SwapsContext.tsx';
+import { ModsContextsProvider } from './context/ModsContext.tsx';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthContextProvider>
       <SwapsContextProvider>
-        <App />
+        <ModsContextsProvider>
+          <App />
+        </ModsContextsProvider>
       </SwapsContextProvider>
     </AuthContextProvider>
   </React.StrictMode>
