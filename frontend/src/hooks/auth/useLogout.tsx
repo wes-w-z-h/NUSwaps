@@ -9,6 +9,7 @@ export const useLogout = () => {
   const logout = async () => {
     await axiosPrivate.post('/auth/logout');
     localStorage.removeItem('user');
+    localStorage.removeItem('moduleCodes');
     authDispatch({ type: 'LOGOUT' });
     navigate('/login');
   };
