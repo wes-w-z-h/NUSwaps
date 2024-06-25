@@ -8,17 +8,24 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuItem from '@mui/material/MenuItem';
 import validateSwap from '../../util/swaps/validateSwap';
+import { Autocomplete, AutocompleteChangeReason } from '@mui/material';
+import { useModsContext } from '../../hooks/mods/useModsContext';
 
-const SwapInputRow: React.FC<{
+type SwapInputRowProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
-  loading: boolean;
-  addSwap: (
-    courseId: string,
-    lessonType: string,
-    current: string,
-    request: string
-  ) => Promise<void>;
-}> = ({ setOpen, loading, addSwap }) => {
+  addSwap: {
+    addSwap: (
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+};
+
+const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
     courseId: ' ',
@@ -27,8 +34,9 @@ const SwapInputRow: React.FC<{
     request: ' ',
   };
 
+  const { modsState } = useModsContext();
   const [lessonType, setLessonType] = useState<string>('');
-  const [courseId, setCourseId] = useState<string>('');
+  const [courseId, setCourseId] = useState<string>(modsState.moduleCodes[0]);
   const [current, setCurrent] = useState<string>('');
   const [request, setRequest] = useState<string>('');
   const [inputErrors, setInputErrors] = useState(intialErrorState);
@@ -58,18 +66,26 @@ const SwapInputRow: React.FC<{
       return;
     }
 
-    await addSwap(courseId, lessonType, current, request);
-    setCourseId('');
-    setLessonType('');
-    setCurrent('');
-    setRequest('');
+    // console.log(courseId, lessonType, current, request);
+    await addSwap.addSwap(courseId, lessonType, current, request);
   };
 
+  const handleChange = (
+    _event: React.SyntheticEvent<Element, Event>,
+    value: string,
+    reason: AutocompleteChangeReason
+  ) => {
+    if (reason === 'clear') return;
+    setCourseId(value);
+  };
+
+  // TODO: change to virtualized autocomplete
   return (
     <React.Fragment>
       <TableRow>
         <TableCell>
-          <TextField
+          {/* <TextField
+            component={Autocomplete}
             required
             error={inputErrors.courseId !== ' '}
             helperText={inputErrors.courseId}
@@ -80,6 +96,25 @@ const SwapInputRow: React.FC<{
             onChange={changeHandler(setCourseId)}
             value={courseId.toUpperCase().trim()}
             sx={{ width: '13vw' }}
+          /> */}
+          <Autocomplete
+            disablePortal
+            disableClearable
+            id="courseId-combo-box"
+            options={modsState.moduleCodes}
+            size="small"
+            value={courseId}
+            onChange={handleChange}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                sx={{ width: '13vw' }}
+                label="CourseId"
+                margin="normal"
+                error={inputErrors.courseId !== ' '}
+                helperText={inputErrors.courseId}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
@@ -140,7 +175,11 @@ const SwapInputRow: React.FC<{
         </TableCell>
         <TableCell>
           <Tooltip title="Add swap" placement="bottom">
-            <IconButton color="success" onClick={handeClick} disabled={loading}>
+            <IconButton
+              color="success"
+              onClick={handeClick}
+              disabled={addSwap.loading}
+            >
               <AddCircleIcon />
             </IconButton>
           </Tooltip>

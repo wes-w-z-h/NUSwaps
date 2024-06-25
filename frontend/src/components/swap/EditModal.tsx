@@ -7,8 +7,6 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Swap } from '../../types/Swap';
-import CustomAlert from '../CustomAlert';
-import useEditSwap from '../../hooks/swaps/useEditSwap';
 import validateSwap from '../../util/swaps/validateSwap';
 import { Typography } from '@mui/material';
 
@@ -25,12 +23,30 @@ const style = {
   p: 4,
 };
 
-const EditModal: React.FC<{
+type EditModalProps = {
   swap: Swap;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ swap, open, setOpen }) => {
-  const { editSwap, loading, error } = useEditSwap();
+  editSwapObj: {
+    editSwap: (
+      id: string,
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+};
+
+const EditModal: React.FC<EditModalProps> = ({
+  swap,
+  open,
+  setOpen,
+  editSwapObj,
+}) => {
+  const { editSwap, loading, error } = editSwapObj;
   const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
     courseId: ' ',
@@ -94,7 +110,6 @@ const EditModal: React.FC<{
 
   return (
     <React.Fragment>
-      {error && <CustomAlert message={error} />}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

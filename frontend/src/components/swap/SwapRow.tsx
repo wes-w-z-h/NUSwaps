@@ -10,15 +10,45 @@ import { Button, Grid } from '@mui/material';
 import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 
-const SwapRow: React.FC<{ row: Swap }> = ({ row }) => {
+type SwapRowProps = {
+  row: Swap;
+  editSwap: {
+    editSwap: (
+      id: string,
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+  deleteSwap: {
+    deleteSwap: (id: string) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+};
+
+const SwapRow: React.FC<SwapRowProps> = ({ row, editSwap, deleteSwap }) => {
   const [open, setOpen] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
 
   return (
     <React.Fragment>
-      <DeleteModal swap={row} open={openDelModal} setOpen={setOpenDelModal} />
-      <EditModal swap={row} open={openEditModal} setOpen={setOpenEditModal} />
+      <DeleteModal
+        swap={row}
+        open={openDelModal}
+        setOpen={setOpenDelModal}
+        deleteSwapObj={deleteSwap}
+      />
+      <EditModal
+        swap={row}
+        open={openEditModal}
+        setOpen={setOpenEditModal}
+        editSwapObj={editSwap}
+      />
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
