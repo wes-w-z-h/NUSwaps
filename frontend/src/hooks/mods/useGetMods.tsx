@@ -18,10 +18,11 @@ const useGetMods = () => {
         )
         .then((data) => {
           console.log('api called');
-          localStorage.setItem('moduleCodes', JSON.stringify(data.data));
+          const payload = data.data.map((x) => x.moduleCode);
+          localStorage.setItem('moduleCodes', JSON.stringify(payload));
           modsDispatch({
             type: 'SET_MODS',
-            payload: data.data.map((x) => x.moduleCode),
+            payload: payload,
           });
         })
         .catch((error: AxiosError<{ error: string }>) => {

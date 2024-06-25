@@ -8,8 +8,9 @@ import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import MenuItem from '@mui/material/MenuItem';
 import validateSwap from '../../util/swaps/validateSwap';
-import { Autocomplete, AutocompleteChangeReason } from '@mui/material';
+import { AutocompleteChangeReason } from '@mui/material';
 import { useModsContext } from '../../hooks/mods/useModsContext';
+import Virtualize from './input/VirtAutocomplete';
 
 type SwapInputRowProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
@@ -78,26 +79,36 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
     if (reason === 'clear') return;
     setCourseId(value);
   };
+  const changeHandler2 = (
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const handler = (
+      _event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ) => {
+      if (reason === 'clear' || reason === 'removeOption') return;
+
+      setter(value);
+      setInputErrors(intialErrorState);
+    };
+    return handler;
+  };
 
   // TODO: change to virtualized autocomplete
   return (
     <React.Fragment>
       <TableRow>
         <TableCell>
-          {/* <TextField
-            component={Autocomplete}
-            required
-            error={inputErrors.courseId !== ' '}
-            helperText={inputErrors.courseId}
-            margin="normal"
-            size="small"
-            label="CourseId"
-            id="CourseId"
-            onChange={changeHandler(setCourseId)}
-            value={courseId.toUpperCase().trim()}
-            sx={{ width: '13vw' }}
-          /> */}
-          <Autocomplete
+          <Virtualize
+            id="courseId-combo-box"
+            width="13vw"
+            options={modsState.moduleCodes}
+            error={inputErrors.courseId}
+            value={courseId}
+            handleChange={changeHandler2(setCourseId)}
+          />
+          {/* <Autocomplete
             disablePortal
             disableClearable
             id="courseId-combo-box"
@@ -115,7 +126,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
                 helperText={inputErrors.courseId}
               />
             )}
-          />
+          /> */}
         </TableCell>
         <TableCell>
           <TextField
