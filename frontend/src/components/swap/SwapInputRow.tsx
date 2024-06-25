@@ -71,22 +71,15 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
     await addSwap.addSwap(courseId, lessonType, current, request);
   };
 
-  const handleChange = (
-    _event: React.SyntheticEvent<Element, Event>,
-    value: string,
-    reason: AutocompleteChangeReason
-  ) => {
-    if (reason === 'clear') return;
-    setCourseId(value);
-  };
   const changeHandler2 = (
     setter: React.Dispatch<React.SetStateAction<string>>
   ) => {
     const handler = (
-      _event: React.SyntheticEvent<Element, Event>,
+      event: React.SyntheticEvent<Element, Event>,
       value: string,
       reason: AutocompleteChangeReason
     ) => {
+      event.preventDefault();
       if (reason === 'clear' || reason === 'removeOption') return;
 
       setter(value);
@@ -108,25 +101,6 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
             value={courseId}
             handleChange={changeHandler2(setCourseId)}
           />
-          {/* <Autocomplete
-            disablePortal
-            disableClearable
-            id="courseId-combo-box"
-            options={modsState.moduleCodes}
-            size="small"
-            value={courseId}
-            onChange={handleChange}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                sx={{ width: '13vw' }}
-                label="CourseId"
-                margin="normal"
-                error={inputErrors.courseId !== ' '}
-                helperText={inputErrors.courseId}
-              />
-            )}
-          /> */}
         </TableCell>
         <TableCell>
           <TextField

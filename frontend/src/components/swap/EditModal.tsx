@@ -8,7 +8,9 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Swap } from '../../types/Swap';
 import validateSwap from '../../util/swaps/validateSwap';
-import { Typography } from '@mui/material';
+import { AutocompleteChangeReason, Typography } from '@mui/material';
+import Virtualize from './input/VirtAutocomplete';
+import { useModsContext } from '../../hooks/mods/useModsContext';
 
 const style = {
   position: 'absolute' as const,
@@ -54,7 +56,7 @@ const EditModal: React.FC<EditModalProps> = ({
     current: ' ',
     request: ' ',
   };
-
+  const { modsState } = useModsContext();
   const [courseId, setCourseId] = useState<string>(swap.courseId);
   const [lessonType, setLessonType] = useState<string>(swap.lessonType);
   const [current, setCurrent] = useState<string>(
@@ -108,6 +110,23 @@ const EditModal: React.FC<EditModalProps> = ({
     return handler;
   };
 
+  const changeHandler2 = (
+    setter: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    const handler = (
+      event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ) => {
+      event.preventDefault();
+      if (reason === 'clear' || reason === 'removeOption') return;
+
+      setter(value);
+      setInputErrors(intialErrorState);
+    };
+    return handler;
+  };
+
   return (
     <React.Fragment>
       <Modal
@@ -126,17 +145,13 @@ const EditModal: React.FC<EditModalProps> = ({
         <Fade in={open}>
           <Box sx={style} textAlign={'center'} component="form">
             <Typography variant="subtitle1">Edit swap</Typography>
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.courseId !== ' '}
-              helperText={inputErrors.courseId}
-              margin="normal"
-              size="small"
-              label="CourseId"
+            <Virtualize
               id="CourseId"
-              value={courseId.toUpperCase().trim()}
-              onChange={changeHandler(setCourseId)}
+              width="100%"
+              options={modsState.moduleCodes}
+              error={inputErrors.courseId}
+              value={courseId}
+              handleChange={changeHandler2(setCourseId)}
             />
             <TextField
               fullWidth
