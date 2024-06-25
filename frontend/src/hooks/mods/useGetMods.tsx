@@ -40,11 +40,6 @@ const useGetMods = () => {
 
     if (!moduleCodes) {
       getMods();
-    } else {
-      modsDispatch({
-        type: 'SET_MODS',
-        payload: JSON.parse(moduleCodes),
-      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

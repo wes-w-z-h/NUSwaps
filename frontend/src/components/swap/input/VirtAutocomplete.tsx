@@ -144,7 +144,6 @@ type VirtualizeProps = {
   ) => void;
 };
 
-// TODO: pass the changeHandler and value
 const Virtualize: React.FC<VirtualizeProps> = ({
   id,
   width,
@@ -156,6 +155,7 @@ const Virtualize: React.FC<VirtualizeProps> = ({
   return (
     <Autocomplete
       id={id}
+      noOptionsText="No Options"
       disableListWrap
       disableClearable
       disablePortal

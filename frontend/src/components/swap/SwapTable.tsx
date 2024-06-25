@@ -16,6 +16,7 @@ import { useAddSwap } from '../../hooks/swaps/useAddSwap';
 import CustomAlert from '../CustomAlert';
 import useEditSwap from '../../hooks/swaps/useEditSwap';
 import useDeleteSwap from '../../hooks/swaps/useDeleteSwap';
+import useGetModsInfo from '../../hooks/mods/useGetModInfo';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
@@ -23,16 +24,24 @@ const SwapTable: React.FC = () => {
   const addSwap = useAddSwap();
   const editSwap = useEditSwap();
   const deleteSwap = useDeleteSwap();
+  const getModsInfo = useGetModsInfo();
 
   return (
     <>
       {addSwap.error && <CustomAlert message={addSwap.error} />}
       {editSwap.error && <CustomAlert message={editSwap.error} />}
       {deleteSwap.error && <CustomAlert message={deleteSwap.error} />}
+      {getModsInfo.error && <CustomAlert message={getModsInfo.error} />}
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
-            {open && <SwapInputRow setOpen={setOpen} addSwap={addSwap} />}
+            {open && (
+              <SwapInputRow
+                setOpen={setOpen}
+                addSwap={addSwap}
+                getModsInfo={getModsInfo}
+              />
+            )}
             <TableRow>
               <TableCell>Course ID</TableCell>
               <TableCell>Lesson Type</TableCell>

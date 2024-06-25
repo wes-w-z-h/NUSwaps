@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
@@ -6,11 +6,13 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import MenuItem from '@mui/material/MenuItem';
+import Autocomplete, {
+  AutocompleteChangeReason,
+} from '@mui/material/Autocomplete';
 import validateSwap from '../../util/swaps/validateSwap';
-import { AutocompleteChangeReason } from '@mui/material';
 import { useModsContext } from '../../hooks/mods/useModsContext';
 import Virtualize from './input/VirtAutocomplete';
+import { Module } from '../../types/modules';
 
 type SwapInputRowProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
@@ -24,10 +26,18 @@ type SwapInputRowProps = {
     loading: boolean;
     error: string | null;
   };
+  getModsInfo: {
+    error: string | null;
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
+    loading: boolean;
+  };
 };
 
-const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
-  const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
+const SwapInputRow: React.FC<SwapInputRowProps> = ({
+  setOpen,
+  addSwap,
+  getModsInfo,
+}) => {
   const intialErrorState = {
     courseId: ' ',
     lessonType: ' ',
@@ -36,22 +46,59 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
   };
 
   const { modsState } = useModsContext();
-  const [lessonType, setLessonType] = useState<string>('');
+  const [mod, setMod] = useState<Module | null>(null);
+  const [lessonType, setLessonType] = useState<string>('-');
+  const [lessonTypes, setLessonTypes] = useState<string[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+  const [requestOptions, setRequestOptions] = useState<string[]>([]);
   const [courseId, setCourseId] = useState<string>(modsState.moduleCodes[0]);
-  const [current, setCurrent] = useState<string>('');
-  const [request, setRequest] = useState<string>('');
+  const [current, setCurrent] = useState<string>('-');
+  const [request, setRequest] = useState<string>('-');
   const [inputErrors, setInputErrors] = useState(intialErrorState);
 
-  const changeHandler = (
-    setter: React.Dispatch<React.SetStateAction<string>>
+  // when the mod changes -> change the lessonType
+  useEffect(() => {
+    if (mod) {
+      const lts = mod.semesterData[0].timetable
+        .map((v) => v.lessonType)
+        .filter((v) => v !== 'Lecture');
+      // console.log(mod.semesterData[0].timetable.map((v) => v.lessonType));
+      const s: Set<string> = new Set();
+      lts.forEach((v) => s.add(v));
+      setLessonTypes([...s]);
+      setLessonType(lts[0] ? lts[0] : '-');
+    }
+  }, [mod]);
+
+  // when the lessonType changes -> change the current and request
+  useEffect(() => {
+    console.log(lessonType);
+    if (mod) {
+      const options = mod?.semesterData[0].timetable
+        .filter((v) => v.lessonType === lessonType)
+        .map((v) => v.classNo);
+      setCurrentOptions(options);
+      setCurrent(options[0] ? options[0] : '-');
+      setRequestOptions(options);
+      setRequest(options[0] ? options[0] : '-');
+    }
+  }, [lessonType, mod]);
+
+  const courseIdChangeHandler = async (
+    event: React.SyntheticEvent<Element, Event>,
+    value: string,
+    reason: AutocompleteChangeReason
   ) => {
-    const handler = (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-      setter(event.target.value);
-      setInputErrors(intialErrorState);
-    };
-    return handler;
+    if (reason === 'clear') {
+      return;
+    }
+    event.preventDefault();
+    setCourseId(value);
+    let mod = modsState.mods.find((v) => v.moduleCode === value);
+    if (!mod) {
+      mod = await getModsInfo.getModInfo(value);
+    }
+    mod ? setMod(mod) : setMod(null);
   };
 
   const handeClick = async () => {
@@ -67,28 +114,9 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
       return;
     }
 
-    // console.log(courseId, lessonType, current, request);
     await addSwap.addSwap(courseId, lessonType, current, request);
   };
 
-  const changeHandler2 = (
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const handler = (
-      event: React.SyntheticEvent<Element, Event>,
-      value: string,
-      reason: AutocompleteChangeReason
-    ) => {
-      event.preventDefault();
-      if (reason === 'clear' || reason === 'removeOption') return;
-
-      setter(value);
-      setInputErrors(intialErrorState);
-    };
-    return handler;
-  };
-
-  // TODO: change to virtualized autocomplete
   return (
     <React.Fragment>
       <TableRow>
@@ -99,63 +127,73 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({ setOpen, addSwap }) => {
             options={modsState.moduleCodes}
             error={inputErrors.courseId}
             value={courseId}
-            handleChange={changeHandler2(setCourseId)}
+            handleChange={courseIdChangeHandler}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            required
-            select
-            error={inputErrors.lessonType !== ' '}
-            helperText={inputErrors.lessonType}
-            margin="normal"
-            size="small"
-            label="Lesson Type"
-            InputLabelProps={{ htmlFor: 'lesson-type-select' }}
-            SelectProps={{
-              native: false,
-              labelId: 'lesson-type-label',
-              inputProps: {
-                id: 'lesson-type-select',
-              },
-            }}
-            onChange={changeHandler(setLessonType)}
+          <Autocomplete
+            disablePortal
+            disableClearable
+            id="combo-box-demo"
+            options={lessonTypes}
             value={lessonType}
-            sx={{ width: '11vw' }}
-          >
-            {lessonTypes.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </TableCell>
-        <TableCell>
-          <TextField
-            required
-            error={inputErrors.current !== ' '}
-            helperText={inputErrors.current}
-            margin="normal"
-            size="small"
-            label="Current"
-            id="Current"
-            onChange={changeHandler(setCurrent)}
-            value={current}
-            sx={{ width: '13vw' }}
+            onChange={(_event, value) => setLessonType(value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                margin="normal"
+                size="small"
+                label="LessonType"
+                sx={{ width: '13vw' }}
+                error={inputErrors.lessonType !== ' '}
+                helperText={inputErrors.lessonType}
+              />
+            )}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            required
-            error={inputErrors.request !== ' '}
-            helperText={inputErrors.request}
-            margin="normal"
-            size="small"
-            label="Request"
-            id="Request"
-            onChange={changeHandler(setRequest)}
+          <Autocomplete
+            disablePortal
+            disableClearable
+            id="combo-box-demo"
+            options={currentOptions}
+            value={current}
+            onChange={(_event, value) => setCurrent(value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                label="Current"
+                margin="normal"
+                size="small"
+                error={inputErrors.current !== ' '}
+                helperText={inputErrors.current}
+                sx={{ width: '13vw' }}
+              />
+            )}
+          />
+        </TableCell>
+        <TableCell>
+          <Autocomplete
+            disablePortal
+            disableClearable
+            id="combo-box-demo"
+            options={requestOptions}
             value={request}
-            sx={{ width: '13vw' }}
+            onChange={(_event, value) => setRequest(value)}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                label="Request"
+                margin="normal"
+                size="small"
+                error={inputErrors.request !== ' '}
+                helperText={inputErrors.request}
+                sx={{ width: '13vw' }}
+              />
+            )}
           />
         </TableCell>
         <TableCell>

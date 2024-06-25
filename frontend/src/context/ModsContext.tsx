@@ -1,4 +1,10 @@
-import { Dispatch, ReactNode, createContext, useReducer } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  createContext,
+  useEffect,
+  useReducer,
+} from 'react';
 import { Module, ModuleCode } from '../types/modules';
 
 type ModsState = {
@@ -8,7 +14,8 @@ type ModsState = {
 
 type ModsAction =
   | { type: 'SET_MODS'; payload: ModuleCode[] }
-  | { type: 'SET_MOD'; payload: Module };
+  | { type: 'SET_MODS_INFO'; payload: Module[] }
+  | { type: 'SET_MOD_INFO'; payload: Module };
 
 type ModsContextType = {
   modsState: ModsState;
@@ -23,9 +30,14 @@ const swapReducer = (modsState: ModsState, action: ModsAction) => {
   switch (action.type) {
     case 'SET_MODS':
       return { mods: modsState.mods, moduleCodes: action.payload };
-    case 'SET_MOD':
+    case 'SET_MOD_INFO':
       return {
         mods: [...modsState.mods, action.payload],
+        moduleCodes: modsState.moduleCodes,
+      };
+    case 'SET_MODS_INFO':
+      return {
+        mods: action.payload,
         moduleCodes: modsState.moduleCodes,
       };
     default:
@@ -40,6 +52,19 @@ export const ModsContextsProvider: React.FC<{ children: ReactNode }> = ({
     mods: [],
     moduleCodes: [],
   });
+
+  useEffect(() => {
+    let stored = localStorage.getItem('modsInfo');
+    if (stored !== null) {
+      console.log('inside effect info');
+      modsDispatch({ type: 'SET_MODS_INFO', payload: JSON.parse(stored) });
+    }
+    stored = localStorage.getItem('moduleCodes');
+    if (stored !== null) {
+      console.log('inside effect code');
+      modsDispatch({ type: 'SET_MODS', payload: JSON.parse(stored) });
+    }
+  }, []);
   console.log(modsState);
   return (
     <ModsContexts.Provider value={{ modsState, modsDispatch }}>
