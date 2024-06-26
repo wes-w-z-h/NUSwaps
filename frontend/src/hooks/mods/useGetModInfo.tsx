@@ -1,15 +1,13 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useState } from 'react';
-import { useLogout } from '../auth/useLogout';
 import { Module } from '../../types/modules';
 import { useModsContext } from './useModsContext';
 
-const useGetModsInfo = () => {
+const useGetModInfo = () => {
   const ACAD_YEAR = '2023-2024';
   const { modsDispatch } = useModsContext();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const { logout } = useLogout();
 
   const getModInfo = async (courseId: string) => {
     setLoading(true);
@@ -31,14 +29,9 @@ const useGetModsInfo = () => {
         );
         return mod;
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 403) {
-            logout();
-          }
-          const message = error.response?.data
-            ? `, ${error.response.data.error}`
-            : '';
-          setError(error.message + message);
+        if (error instanceof Error) {
+          const message = error.message ? `, ${error.message}` : '';
+          setError(error.name + message);
         }
       }
     };
@@ -65,4 +58,4 @@ const useGetModsInfo = () => {
   return { error, getModInfo, loading };
 };
 
-export default useGetModsInfo;
+export default useGetModInfo;
