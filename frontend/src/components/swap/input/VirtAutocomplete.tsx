@@ -165,7 +165,7 @@ const Virtualize: React.FC<VirtualizeProps> = ({
       disablePortal
       PopperComponent={StyledPopper}
       ListboxComponent={ListboxComponent}
-      options={options}
+      options={options.sort()}
       onChange={handleChange}
       value={value}
       groupBy={options.length > 30 ? (option) => option[0] : undefined}

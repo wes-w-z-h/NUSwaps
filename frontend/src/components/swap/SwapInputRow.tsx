@@ -83,7 +83,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
     }
   }, [lessonType, mod]);
 
-  // when the current/ options changes -> change the requestOptions and request
+  // when the current/ options changes -> change the requestOptions
   useEffect(() => {
     console.log('current effect');
     if (currentOptions) {
@@ -91,6 +91,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
     } else setRequestOptions([]);
   }, [current, currentOptions]);
 
+  // when the current/ req/ req options changes -> change the request
   useEffect(() => {
     console.log('req effect', requestOptions);
     const firstOption = requestOptions[0] || '-';
@@ -99,7 +100,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
     if (current === request || request === '-')
       if (current === firstOption) setRequest(secondOption);
       else setRequest(firstOption);
-  }, [requestOptions, request, current]);
+  }, [requestOptions, current, request]);
 
   const changeHandler =
     (
@@ -165,6 +166,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
             error={inputErrors.lessonType}
             value={lessonType}
             handleChange={changeHandler(setLessonType)}
+            equalityFunc={(option, value) => value === '-' || option === value}
           />
         </TableCell>
         <TableCell>
@@ -176,6 +178,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
             error={inputErrors.current}
             value={current}
             handleChange={changeHandler(setCurrent)}
+            equalityFunc={(option, value) => value === '-' || option === value}
           />
         </TableCell>
         <TableCell>
