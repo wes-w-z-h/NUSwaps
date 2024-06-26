@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import { Swap } from '../../types/Swap';
 import validateSwap from '../../util/swaps/validateSwap';
 import { AutocompleteChangeReason, Typography } from '@mui/material';
 import Virtualize from './input/VirtAutocomplete';
 import { useModsContext } from '../../hooks/mods/useModsContext';
+import useUpdateInputs from '../../hooks/swaps/useUpdateInputs';
+import { Module } from '../../types/modules';
 
 const style = {
   position: 'absolute' as const,
@@ -40,6 +40,11 @@ type EditModalProps = {
     loading: boolean;
     error: string | null;
   };
+  getModsInfo: {
+    error: string | null;
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
+    loading: boolean;
+  };
 };
 
 const EditModal: React.FC<EditModalProps> = ({
@@ -47,25 +52,45 @@ const EditModal: React.FC<EditModalProps> = ({
   open,
   setOpen,
   editSwapObj,
+  getModsInfo,
 }) => {
-  const { editSwap, loading, error } = editSwapObj;
-  const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
   const intialErrorState = {
     courseId: ' ',
     lessonType: ' ',
     current: ' ',
     request: ' ',
   };
+
   const { modsState } = useModsContext();
+  const [mod, setMod] = useState<Module | null>(null);
+  const [lessonTypes, setLessonTypes] = useState<string[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+  const [requestOptions, setRequestOptions] = useState<string[]>([]);
   const [courseId, setCourseId] = useState<string>(swap.courseId);
-  const [lessonType, setLessonType] = useState<string>(swap.lessonType);
-  const [current, setCurrent] = useState<string>(
-    swap.current.slice(swap.lessonType.length + 1)
-  );
-  const [request, setRequest] = useState<string>(
-    swap.request.slice(swap.lessonType.length + 1)
-  );
+  const [lessonType, setLessonType] = useState<string>('');
+  const [current, setCurrent] = useState<string>('');
+  const [request, setRequest] = useState<string>('');
+  const { editSwap, loading, error } = editSwapObj;
   const [inputErrors, setInputErrors] = useState(intialErrorState);
+
+  useUpdateInputs(
+    {
+      mod,
+      lessonType,
+      current,
+      currentOptions,
+      request,
+      requestOptions,
+    },
+    {
+      setLessonTypes,
+      setLessonType,
+      setCurrent,
+      setRequest,
+      setCurrentOptions,
+      setRequestOptions,
+    }
+  );
 
   const handleClose = (reset: boolean) => {
     setOpen(false);
@@ -91,41 +116,42 @@ const EditModal: React.FC<EditModalProps> = ({
     await editSwap(swap.id, courseId, lessonType, current, request);
   };
 
+  const changeHandler =
+    (
+      setter: React.Dispatch<SetStateAction<string>>,
+      f: (value?: string) => void = () => {}
+    ) =>
+    async (
+      event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ): Promise<void> => {
+      setInputErrors(intialErrorState);
+      event.preventDefault();
+      if (reason === 'clear') return;
+      setter(value);
+      f(value);
+    };
+
+  const updateMod = async (value?: string) => {
+    let mod = modsState.mods.find((v) => v.moduleCode === value);
+    if (!mod) {
+      mod = await getModsInfo.getModInfo(value as string);
+    }
+    mod ? setMod(mod) : setMod(null);
+  };
+
+  useEffect(() => {
+    updateMod(swap.courseId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!loading) {
       handleClose(!!error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, loading]);
-
-  const changeHandler = (
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const handler = (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-      setter(event.target.value);
-      setInputErrors(intialErrorState);
-    };
-    return handler;
-  };
-
-  const changeHandler2 = (
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const handler = (
-      event: React.SyntheticEvent<Element, Event>,
-      value: string,
-      reason: AutocompleteChangeReason
-    ) => {
-      event.preventDefault();
-      if (reason === 'clear' || reason === 'removeOption') return;
-
-      setter(value);
-      setInputErrors(intialErrorState);
-    };
-    return handler;
-  };
 
   return (
     <React.Fragment>
@@ -147,61 +173,48 @@ const EditModal: React.FC<EditModalProps> = ({
             <Typography variant="subtitle1">Edit swap</Typography>
             <Virtualize
               id="CourseId"
+              label="Course Id"
               width="100%"
               options={modsState.moduleCodes}
               error={inputErrors.courseId}
               value={courseId}
-              handleChange={changeHandler2(setCourseId)}
+              handleChange={changeHandler(setCourseId, updateMod)}
             />
-            <TextField
-              fullWidth
-              required
-              select
-              error={inputErrors.lessonType !== ' '}
-              helperText={inputErrors.lessonType}
-              margin="normal"
-              size="small"
+            <Virtualize
+              id="lessonType-combo-box"
               label="Lesson Type"
-              InputLabelProps={{ htmlFor: 'lesson-type-select' }}
-              SelectProps={{
-                native: false,
-                labelId: 'lesson-type-label',
-                inputProps: {
-                  id: 'lesson-type-select',
-                },
-              }}
+              width="100%"
+              options={lessonTypes}
+              error={inputErrors.lessonType}
               value={lessonType}
-              onChange={changeHandler(setLessonType)}
-            >
-              {lessonTypes.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.current !== ' '}
-              helperText={inputErrors.current}
-              margin="normal"
-              size="small"
-              label="Current"
-              id="Current"
-              value={current}
-              onChange={changeHandler(setCurrent)}
+              handleChange={changeHandler(setLessonType)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
             />
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.request !== ' '}
-              helperText={inputErrors.request}
-              margin="normal"
-              size="small"
+            <Virtualize
+              id="current-combo-box"
+              label="Current"
+              width="100%"
+              options={currentOptions}
+              error={inputErrors.current}
+              value={current}
+              handleChange={changeHandler(setCurrent)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
+            />
+            <Virtualize
+              id="request-combo-box"
               label="Request"
-              id="Request"
+              width="100%"
+              options={requestOptions}
+              error={inputErrors.request}
               value={request}
-              onChange={changeHandler(setRequest)}
+              handleChange={changeHandler(setRequest)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
             />
             <Button
               variant="text"

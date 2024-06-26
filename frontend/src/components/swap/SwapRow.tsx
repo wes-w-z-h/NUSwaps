@@ -9,6 +9,7 @@ import { Swap } from '../../types/Swap';
 import { Button, Grid } from '@mui/material';
 import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
+import { Module } from '../../types/modules';
 
 type SwapRowProps = {
   row: Swap;
@@ -28,9 +29,19 @@ type SwapRowProps = {
     loading: boolean;
     error: string | null;
   };
+  getModsInfo: {
+    error: string | null;
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
+    loading: boolean;
+  };
 };
 
-const SwapRow: React.FC<SwapRowProps> = ({ row, editSwap, deleteSwap }) => {
+const SwapRow: React.FC<SwapRowProps> = ({
+  row,
+  editSwap,
+  deleteSwap,
+  getModsInfo,
+}) => {
   const [open, setOpen] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
@@ -48,6 +59,7 @@ const SwapRow: React.FC<SwapRowProps> = ({ row, editSwap, deleteSwap }) => {
         open={openEditModal}
         setOpen={setOpenEditModal}
         editSwapObj={editSwap}
+        getModsInfo={getModsInfo}
       />
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>

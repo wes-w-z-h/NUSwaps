@@ -1,4 +1,4 @@
-import React, { SetStateAction, useEffect, useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
@@ -10,6 +10,7 @@ import validateSwap from '../../util/swaps/validateSwap';
 import { useModsContext } from '../../hooks/mods/useModsContext';
 import Virtualize from './input/VirtAutocomplete';
 import { Module } from '../../types/modules';
+import useUpdateInputs from '../../hooks/swaps/useUpdateInputs';
 
 type SwapInputRowProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
@@ -53,54 +54,24 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
   const [request, setRequest] = useState<string>('-');
   const [inputErrors, setInputErrors] = useState(intialErrorState);
 
-  // when the mod changes -> change the lessonType
-  useEffect(() => {
-    if (mod) {
-      console.log('mod effect');
-      const lts = mod.semesterData[0].timetable
-        .map((v) => v.lessonType)
-        .filter((v) => v !== 'Lecture');
-      // console.log(mod.semesterData[0].timetable.map((v) => v.lessonType));
-      const s: Set<string> = new Set();
-      lts.forEach((v) => s.add(v));
-      setLessonTypes([...s]);
-      setLessonType(lts[0] ? lts[0] : '-');
+  useUpdateInputs(
+    {
+      mod,
+      lessonType,
+      current,
+      currentOptions,
+      request,
+      requestOptions,
+    },
+    {
+      setLessonTypes,
+      setLessonType,
+      setCurrent,
+      setRequest,
+      setCurrentOptions,
+      setRequestOptions,
     }
-  }, [mod]);
-
-  // when the lessonType changes -> change the current and request
-  useEffect(() => {
-    console.log('lessonType effect');
-    if (mod) {
-      const options = mod?.semesterData[0].timetable
-        .filter((v) => v.lessonType === lessonType)
-        .map((v) => v.classNo);
-      const firstOption = options[0] || '-';
-      setCurrentOptions(options);
-      setRequestOptions(options);
-      setCurrent(firstOption);
-      setRequest(firstOption);
-    }
-  }, [lessonType, mod]);
-
-  // when the current/ options changes -> change the requestOptions
-  useEffect(() => {
-    console.log('current effect');
-    if (currentOptions) {
-      setRequestOptions(currentOptions.filter((v) => v !== current));
-    } else setRequestOptions([]);
-  }, [current, currentOptions]);
-
-  // when the current/ req/ req options changes -> change the request
-  useEffect(() => {
-    console.log('req effect', requestOptions);
-    const firstOption = requestOptions[0] || '-';
-    const secondOption = requestOptions[1] || '-';
-
-    if (current === request || request === '-')
-      if (current === firstOption) setRequest(secondOption);
-      else setRequest(firstOption);
-  }, [requestOptions, current, request]);
+  );
 
   const changeHandler =
     (
@@ -149,7 +120,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
         <TableCell>
           <Virtualize
             id="courseId-combo-box"
-            label="CourseId"
+            label="Course Id"
             width="13vw"
             options={modsState.moduleCodes}
             error={inputErrors.courseId}
@@ -160,7 +131,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
         <TableCell>
           <Virtualize
             id="lessonType-combo-box"
-            label="LessonType"
+            label="Lesson Type"
             width="13vw"
             options={lessonTypes}
             error={inputErrors.lessonType}

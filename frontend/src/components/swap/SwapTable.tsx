@@ -67,6 +67,7 @@ const SwapTable: React.FC = () => {
                 row={swap}
                 editSwap={editSwap}
                 deleteSwap={deleteSwap}
+                getModsInfo={getModsInfo}
               />
             ))}
           </TableBody>
