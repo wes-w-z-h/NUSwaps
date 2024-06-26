@@ -32,7 +32,6 @@ const useUpdateInputs = (
   // when the mod changes -> change the lessonType
   useEffect(() => {
     if (mod) {
-      console.log('mod effect');
       const lts = mod.semesterData[0].timetable
         .map((v) => v.lessonType)
         .filter((v) => v !== 'Lecture');
@@ -47,7 +46,6 @@ const useUpdateInputs = (
 
   // when the lessonType changes -> change the current and request
   useEffect(() => {
-    console.log('lessonType effect');
     if (mod) {
       const options = mod?.semesterData[0].timetable
         .filter((v) => v.lessonType === lessonType)
@@ -64,7 +62,6 @@ const useUpdateInputs = (
 
   // when the current/ options changes -> change the requestOptions
   useEffect(() => {
-    console.log('current effect');
     if (currentOptions) {
       setRequestOptions(currentOptions.filter((v) => v !== current));
     } else setRequestOptions([]);
@@ -73,7 +70,6 @@ const useUpdateInputs = (
 
   // when the current/ req/ req options changes -> change the request
   useEffect(() => {
-    console.log('req effect', requestOptions);
     const firstOption = requestOptions[0] || '-';
     const secondOption = requestOptions[1] || '-';
 

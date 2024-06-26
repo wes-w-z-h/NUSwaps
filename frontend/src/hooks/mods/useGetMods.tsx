@@ -1,6 +1,5 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useLogout } from '../auth/useLogout';
 import { ModuleCondensed } from '../../types/modules';
 import { useModsContext } from './useModsContext';
 
@@ -8,7 +7,6 @@ const useGetMods = () => {
   const ACAD_YEAR = '2023-2024';
   const { modsDispatch } = useModsContext();
   const [error, setError] = useState<string | null>(null);
-  const { logout } = useLogout();
 
   useEffect(() => {
     const getMods = async () => {
@@ -17,7 +15,6 @@ const useGetMods = () => {
           `https://api.nusmods.com/v2/${ACAD_YEAR}/moduleList.json`
         )
         .then((data) => {
-          console.log('api called');
           const payload = data.data.map((x) => x.moduleCode);
           localStorage.setItem('moduleCodes', JSON.stringify(payload));
           modsDispatch({
@@ -25,15 +22,12 @@ const useGetMods = () => {
             payload: payload,
           });
         })
-        .catch((error: AxiosError<{ error: string }>) => {
+        .catch((error) => {
           console.log(error);
-          if (error.response?.status === 403) {
-            logout();
+          if (error instanceof Error) {
+            const message = error.message ? `, ${error.message}` : '';
+            setError(error.name + message);
           }
-          const message = error.response?.data
-            ? `, ${error.response.data.error}`
-            : '';
-          setError(error.message + message);
         });
     };
     const moduleCodes = localStorage.getItem('moduleCodes');

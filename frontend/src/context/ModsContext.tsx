@@ -56,16 +56,13 @@ export const ModsContextsProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     let stored = localStorage.getItem('modsInfo');
     if (stored !== null) {
-      console.log('inside effect info');
       modsDispatch({ type: 'SET_MODS_INFO', payload: JSON.parse(stored) });
     }
     stored = localStorage.getItem('moduleCodes');
     if (stored !== null) {
-      console.log('inside effect code');
       modsDispatch({ type: 'SET_MODS', payload: JSON.parse(stored) });
     }
   }, []);
-  console.log(modsState);
   return (
     <ModsContexts.Provider value={{ modsState, modsDispatch }}>
       {children}

@@ -41,7 +41,6 @@ const useGetModInfo = () => {
     if (!modsInfo) {
       return await getMod();
     }
-    console.log('inside get mod');
     const stored: Module[] = JSON.parse(modsInfo);
     const item = stored.find((mod) => mod.moduleCode === courseId);
     if (item) {
