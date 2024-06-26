@@ -22,16 +22,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/verify/:token" element={<Verification />} />
-        <Route
-          path="/profile"
-          element={
-            localStorage.getItem('user') ? (
-              <ProfilePage />
-            ) : (
-              <Navigate to={'/'} />
-            )
-          }
-        />
+        <Route path="/" element={<ProtectedRoute />}>
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
         <Route
           path="/login"
           element={authState.user ? <Navigate to="/" /> : <Login />}
@@ -41,15 +34,7 @@ const App = () => {
           element={authState.user ? <Navigate to="/" /> : <SignUp />}
         />
         <Route path="/" element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            // TODO: find a better way to handle the locking of routes issue with authState.user is that
-            // useEffect runs after so refreshing a page checks the authState before its been updated
-            element={
-              // localStorage.getItem('user') ? <Dashboard /> : <Navigate to="/" />
-              <Dashboard />
-            }
-          />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
     </Router>
