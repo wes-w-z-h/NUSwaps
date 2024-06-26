@@ -1,14 +1,11 @@
 import React, { SetStateAction, useEffect, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import Autocomplete, {
-  AutocompleteChangeReason,
-} from '@mui/material/Autocomplete';
+import { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import validateSwap from '../../util/swaps/validateSwap';
 import { useModsContext } from '../../hooks/mods/useModsContext';
 import Virtualize from './input/VirtAutocomplete';
@@ -47,11 +44,11 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
 
   const { modsState } = useModsContext();
   const [mod, setMod] = useState<Module | null>(null);
-  const [lessonType, setLessonType] = useState<string>('-');
   const [lessonTypes, setLessonTypes] = useState<string[]>([]);
   const [currentOptions, setCurrentOptions] = useState<string[]>([]);
   const [requestOptions, setRequestOptions] = useState<string[]>([]);
   const [courseId, setCourseId] = useState<string>(modsState.moduleCodes[0]);
+  const [lessonType, setLessonType] = useState<string>('-');
   const [current, setCurrent] = useState<string>('-');
   const [request, setRequest] = useState<string>('-');
   const [inputErrors, setInputErrors] = useState(intialErrorState);
@@ -59,6 +56,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
   // when the mod changes -> change the lessonType
   useEffect(() => {
     if (mod) {
+      console.log('mod effect');
       const lts = mod.semesterData[0].timetable
         .map((v) => v.lessonType)
         .filter((v) => v !== 'Lecture');
@@ -72,31 +70,58 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
 
   // when the lessonType changes -> change the current and request
   useEffect(() => {
-    console.log(lessonType);
+    console.log('lessonType effect');
     if (mod) {
       const options = mod?.semesterData[0].timetable
         .filter((v) => v.lessonType === lessonType)
         .map((v) => v.classNo);
+      const firstOption = options[0] || '-';
       setCurrentOptions(options);
-      setCurrent(options[0] ? options[0] : '-');
       setRequestOptions(options);
-      setRequest(options[0] ? options[0] : '-');
+      setCurrent(firstOption);
+      setRequest(firstOption);
     }
   }, [lessonType, mod]);
 
-  const courseIdChangeHandler = async (
-    event: React.SyntheticEvent<Element, Event>,
-    value: string,
-    reason: AutocompleteChangeReason
-  ) => {
-    if (reason === 'clear') {
-      return;
-    }
-    event.preventDefault();
-    setCourseId(value);
+  // when the current/ options changes -> change the requestOptions and request
+  useEffect(() => {
+    console.log('current effect');
+    if (currentOptions) {
+      setRequestOptions(currentOptions.filter((v) => v !== current));
+    } else setRequestOptions([]);
+  }, [current, currentOptions]);
+
+  useEffect(() => {
+    console.log('req effect', requestOptions);
+    const firstOption = requestOptions[0] || '-';
+    const secondOption = requestOptions[1] || '-';
+
+    if (current === request || request === '-')
+      if (current === firstOption) setRequest(secondOption);
+      else setRequest(firstOption);
+  }, [requestOptions, request, current]);
+
+  const changeHandler =
+    (
+      setter: React.Dispatch<SetStateAction<string>>,
+      f: (value?: string) => void = () => {}
+    ) =>
+    async (
+      event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ): Promise<void> => {
+      setInputErrors(intialErrorState);
+      event.preventDefault();
+      if (reason === 'clear') return;
+      setter(value);
+      f(value);
+    };
+
+  const updateMod = async (value?: string) => {
     let mod = modsState.mods.find((v) => v.moduleCode === value);
     if (!mod) {
-      mod = await getModsInfo.getModInfo(value);
+      mod = await getModsInfo.getModInfo(value as string);
     }
     mod ? setMod(mod) : setMod(null);
   };
@@ -123,77 +148,46 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
         <TableCell>
           <Virtualize
             id="courseId-combo-box"
+            label="CourseId"
             width="13vw"
             options={modsState.moduleCodes}
             error={inputErrors.courseId}
             value={courseId}
-            handleChange={courseIdChangeHandler}
+            handleChange={changeHandler(setCourseId, updateMod)}
           />
         </TableCell>
         <TableCell>
-          <Autocomplete
-            disablePortal
-            disableClearable
-            id="combo-box-demo"
+          <Virtualize
+            id="lessonType-combo-box"
+            label="LessonType"
+            width="13vw"
             options={lessonTypes}
+            error={inputErrors.lessonType}
             value={lessonType}
-            onChange={(_event, value) => setLessonType(value)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                margin="normal"
-                size="small"
-                label="LessonType"
-                sx={{ width: '13vw' }}
-                error={inputErrors.lessonType !== ' '}
-                helperText={inputErrors.lessonType}
-              />
-            )}
+            handleChange={changeHandler(setLessonType)}
           />
         </TableCell>
         <TableCell>
-          <Autocomplete
-            disablePortal
-            disableClearable
-            id="combo-box-demo"
+          <Virtualize
+            id="current-combo-box"
+            label="Current"
+            width="13vw"
             options={currentOptions}
+            error={inputErrors.current}
             value={current}
-            onChange={(_event, value) => setCurrent(value)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                label="Current"
-                margin="normal"
-                size="small"
-                error={inputErrors.current !== ' '}
-                helperText={inputErrors.current}
-                sx={{ width: '13vw' }}
-              />
-            )}
+            handleChange={changeHandler(setCurrent)}
           />
         </TableCell>
         <TableCell>
-          <Autocomplete
-            disablePortal
-            disableClearable
-            id="combo-box-demo"
+          <Virtualize
+            id="request-combo-box"
+            label="Request"
+            width="13vw"
             options={requestOptions}
+            error={inputErrors.request}
             value={request}
-            onChange={(_event, value) => setRequest(value)}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                required
-                label="Request"
-                margin="normal"
-                size="small"
-                error={inputErrors.request !== ' '}
-                helperText={inputErrors.request}
-                sx={{ width: '13vw' }}
-              />
-            )}
+            handleChange={changeHandler(setRequest)}
+            equalityFunc={(option, value) => value === '-' || option === value}
           />
         </TableCell>
         <TableCell>

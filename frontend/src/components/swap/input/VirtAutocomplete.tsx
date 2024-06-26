@@ -133,6 +133,7 @@ const StyledPopper = styled(Popper)({
 
 type VirtualizeProps = {
   id: string;
+  label: string;
   width: string;
   options: string[];
   error: string;
@@ -142,15 +143,18 @@ type VirtualizeProps = {
     value: string,
     reason: AutocompleteChangeReason
   ) => void;
+  equalityFunc?: (option: string, value: string) => boolean;
 };
 
 const Virtualize: React.FC<VirtualizeProps> = ({
   id,
+  label,
   width,
   options,
   error,
   value,
   handleChange,
+  equalityFunc = (option: string, value: string) => option === value,
 }) => {
   return (
     <Autocomplete
@@ -164,13 +168,14 @@ const Virtualize: React.FC<VirtualizeProps> = ({
       options={options}
       onChange={handleChange}
       value={value}
-      groupBy={(option) => option[0]}
+      groupBy={options.length > 30 ? (option) => option[0] : undefined}
+      isOptionEqualToValue={equalityFunc}
       renderInput={(params) => (
         <TextField
           {...params}
           required
           sx={{ width: width }}
-          label="CourseId"
+          label={label}
           margin="normal"
           size="small"
           error={error !== ' '}
