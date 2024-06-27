@@ -67,7 +67,7 @@ const EditModal: React.FC<EditModalProps> = ({
   const [lessonTypes, setLessonTypes] = useState<string[]>([]);
   const [currentOptions, setCurrentOptions] = useState<string[]>([]);
   const [requestOptions, setRequestOptions] = useState<string[]>([]);
-  const [courseId, setCourseId] = useState<string>(swap.courseId);
+  const [courseId, setCourseId] = useState<string>('');
   const [lessonType, setLessonType] = useState<string>('');
   const [current, setCurrent] = useState<string>('');
   const [request, setRequest] = useState<string>('');
@@ -93,13 +93,17 @@ const EditModal: React.FC<EditModalProps> = ({
     }
   );
 
+  const resetStates = () => {
+    setCourseId(swap.courseId);
+    setLessonType(swap.lessonType);
+    setCurrent(swap.current);
+    setRequest(swap.request);
+  };
+
   const handleClose = (reset: boolean) => {
     setOpen(false);
     if (reset) {
-      setCourseId(swap.courseId);
-      setLessonType(swap.lessonType);
-      setCurrent(swap.current);
-      setRequest(swap.request);
+      resetStates();
     }
   };
   const handleSubmit = async () => {
@@ -144,6 +148,7 @@ const EditModal: React.FC<EditModalProps> = ({
 
   useEffect(() => {
     updateMod(swap.courseId);
+    resetStates();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
