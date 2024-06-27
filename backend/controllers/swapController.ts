@@ -23,7 +23,7 @@ const verifySwap = async (
     return;
   }
 
-  if (existing[0].current !== `${current}`) {
+  if (existing[0].current !== current) {
     throw createHttpError(
       400,
       `Invalid current slot, differs from existing swap`
