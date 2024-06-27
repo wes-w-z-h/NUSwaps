@@ -1,10 +1,6 @@
 import { model, Schema } from 'mongoose';
-import { RawLesson, ModuleCode } from '../types/modules.js';
+import { ModuleCode } from '../types/modules.js';
 import { ISwap, ISwapMethods, Swap, SwapPayload } from '../types/api.js';
-
-function courseSetter(lesson: RawLesson): string {
-  return `${lesson.lessonType}-${lesson.classNo}`;
-}
 
 const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
   {
@@ -26,12 +22,10 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
     current: {
       type: String,
       required: true,
-      set: courseSetter,
     },
     request: {
       type: String,
       required: true,
-      set: courseSetter,
     },
     status: {
       type: Boolean,

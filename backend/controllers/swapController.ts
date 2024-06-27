@@ -6,20 +6,10 @@ const verifySwap = async (
   userId: string,
   courseId: string,
   lessonType: string,
-  current: {
-    lessonType: string;
-    classNo: string;
-  },
-  request: {
-    lessonType: string;
-    classNo: string;
-  },
+  current: string,
+  request: string,
   swapId?: string
 ) => {
-  if (current.lessonType !== request.lessonType) {
-    throw createHttpError(400, 'Incompatible lessons to be swapped');
-  }
-
   const existing = await SwapModel.find({
     userId,
     courseId,
@@ -33,7 +23,7 @@ const verifySwap = async (
     return;
   }
 
-  if (existing[0].current !== `${current.lessonType}-${current.classNo}`) {
+  if (existing[0].current !== current) {
     throw createHttpError(
       400,
       `Invalid current slot, differs from existing swap`

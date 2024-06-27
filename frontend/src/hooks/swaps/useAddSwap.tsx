@@ -21,16 +21,10 @@ export const useAddSwap = () => {
     setError(null);
 
     const data = {
-      courseId: courseId.toUpperCase().trim(),
+      courseId: courseId,
       lessonType: lessonType,
-      current: {
-        classNo: current.trim(),
-        lessonType: lessonType,
-      },
-      request: {
-        classNo: request.trim(),
-        lessonType: lessonType,
-      },
+      current: current,
+      request: request,
     };
 
     await axiosPrivate
