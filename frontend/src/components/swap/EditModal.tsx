@@ -98,8 +98,8 @@ const EditModal: React.FC<EditModalProps> = ({
     if (reset) {
       setCourseId(swap.courseId);
       setLessonType(swap.lessonType);
-      setCurrent(swap.current.slice(swap.lessonType.length + 1));
-      setRequest(swap.request.slice(swap.lessonType.length + 1));
+      setCurrent(swap.current);
+      setRequest(swap.request);
     }
   };
   const handleSubmit = async () => {

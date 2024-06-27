@@ -9,11 +9,6 @@ const verifySwap: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  if (current.lessonType !== request.lessonType) {
-    next(createHttpError(400, 'Incompatible lessons to be swapped'));
-    return;
-  }
-
   next();
 };
 
