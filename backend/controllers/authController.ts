@@ -123,6 +123,22 @@ export const signup: RequestHandler = async (req, res, next) => {
   }
 };
 
+export const verifyRefreshToken: RequestHandler = async (req, res, next) => {
+  const { cookies } = req;
+  try {
+    if (!cookies?.jwt) {
+      throw createHttpError(401, 'Unauthorised');
+    }
+
+    const refreshToken = cookies.jwt;
+    jwt.verify(refreshToken, env.JWT_KEY);
+
+    res.status(200).json({ message: 'Valid token' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const verifyUser: RequestHandler = async (req, res) => {
   const { token } = req.params;
 
