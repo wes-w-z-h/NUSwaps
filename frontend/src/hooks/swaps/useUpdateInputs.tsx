@@ -35,11 +35,11 @@ const useUpdateInputs = (
       const lts = mod.semesterData[0].timetable
         .map((v) => v.lessonType)
         .filter((v) => v !== 'Lecture');
-      // console.log(mod.semesterData[0].timetable.map((v) => v.lessonType));
+      // console.log('mod effect');
       const s: Set<string> = new Set();
       lts.forEach((v) => s.add(v));
       setLessonTypes([...s]);
-      setLessonType(lts[0] ? lts[0] : '-');
+      if (!s.has(lessonType)) setLessonType(lts[0] ? lts[0] : '-');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mod]);
@@ -50,12 +50,12 @@ const useUpdateInputs = (
       const options = mod?.semesterData[0].timetable
         .filter((v) => v.lessonType === lessonType)
         .map((v) => v.classNo);
-
+      // console.log('lessonType effect', lessonType);
       const firstOption = options[0] || '-';
       setCurrentOptions(options);
       setRequestOptions(options);
-      setCurrent(firstOption);
-      setRequest(firstOption);
+      if (!options.includes(current)) setCurrent(firstOption);
+      if (!options.includes(request)) setRequest(firstOption);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonType, mod]);
@@ -64,6 +64,7 @@ const useUpdateInputs = (
   useEffect(() => {
     if (currentOptions) {
       setRequestOptions(currentOptions.filter((v) => v !== current));
+      // console.log('current effect', currentOptions);
     } else setRequestOptions([]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current, currentOptions]);
@@ -72,10 +73,13 @@ const useUpdateInputs = (
   useEffect(() => {
     const firstOption = requestOptions[0] || '-';
     const secondOption = requestOptions[1] || '-';
+    // console.log('request effect', requestOptions);
 
-    if (current === request || request === '-')
+    if (current === request || request === '-') {
+      // console.log('request', request);
       if (current === firstOption) setRequest(secondOption);
       else setRequest(firstOption);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestOptions, current]);
 };
