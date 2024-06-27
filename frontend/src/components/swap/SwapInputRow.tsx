@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
@@ -52,6 +52,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
   const [lessonType, setLessonType] = useState<string>('-');
   const [current, setCurrent] = useState<string>('-');
   const [request, setRequest] = useState<string>('-');
+  const [submit, setSubmit] = useState<boolean>(false);
   const [inputErrors, setInputErrors] = useState(intialErrorState);
 
   useUpdateInputs(
@@ -112,8 +113,16 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
     }
 
     await addSwap.addSwap(courseId, lessonType, current, request);
-    setOpen(false);
+    setSubmit(true);
   };
+
+  useEffect(() => {
+    if (submit && !addSwap.error) {
+      setOpen(false);
+      setSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submit]);
 
   return (
     <React.Fragment>
