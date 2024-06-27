@@ -13,16 +13,16 @@ const validateSwap = (
   };
 
   // Check empty email or password
-  if (!courseId) {
+  if (!courseId || courseId === '-') {
     inputErrors.courseId = 'CourseId is required';
   }
-  if (!lessonType) {
+  if (!lessonType || lessonType === '-') {
     inputErrors.lessonType = 'LessonType is required';
   }
-  if (!current) {
+  if (!current || current === '-') {
     inputErrors.current = 'Current is required';
   }
-  if (!request) {
+  if (!request || request === '-') {
     inputErrors.request = 'Request is required';
   }
 

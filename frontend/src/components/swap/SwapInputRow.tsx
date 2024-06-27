@@ -1,25 +1,41 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import MenuItem from '@mui/material/MenuItem';
+import { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import validateSwap from '../../util/swaps/validateSwap';
+import { useModsContext } from '../../hooks/mods/useModsContext';
+import Virtualize from './input/VirtAutocomplete';
+import { Module } from '../../types/modules';
+import useUpdateInputs from '../../hooks/swaps/useUpdateInputs';
 
-const SwapInputRow: React.FC<{
+type SwapInputRowProps = {
   setOpen: React.Dispatch<SetStateAction<boolean>>;
-  loading: boolean;
-  addSwap: (
-    courseId: string,
-    lessonType: string,
-    current: string,
-    request: string
-  ) => Promise<void>;
-}> = ({ setOpen, loading, addSwap }) => {
-  const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
+  addSwap: {
+    addSwap: (
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+  getModsInfo: {
+    error: string | null;
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
+    loading: boolean;
+  };
+};
+
+const SwapInputRow: React.FC<SwapInputRowProps> = ({
+  setOpen,
+  addSwap,
+  getModsInfo,
+}) => {
   const intialErrorState = {
     courseId: ' ',
     lessonType: ' ',
@@ -27,22 +43,60 @@ const SwapInputRow: React.FC<{
     request: ' ',
   };
 
-  const [lessonType, setLessonType] = useState<string>('');
-  const [courseId, setCourseId] = useState<string>('');
-  const [current, setCurrent] = useState<string>('');
-  const [request, setRequest] = useState<string>('');
+  const { modsState } = useModsContext();
+  const [mod, setMod] = useState<Module | null>(null);
+  const [lessonTypes, setLessonTypes] = useState<string[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+  const [requestOptions, setRequestOptions] = useState<string[]>([]);
+  const [courseId, setCourseId] = useState<string>(modsState.moduleCodes[0]);
+  const [lessonType, setLessonType] = useState<string>('-');
+  const [current, setCurrent] = useState<string>('-');
+  const [request, setRequest] = useState<string>('-');
+  const [submit, setSubmit] = useState<boolean>(false);
   const [inputErrors, setInputErrors] = useState(intialErrorState);
 
-  const changeHandler = (
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const handler = (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-      setter(event.target.value);
+  useUpdateInputs(
+    {
+      mod,
+      lessonType,
+      current,
+      currentOptions,
+      request,
+      requestOptions,
+    },
+    {
+      setLessonTypes,
+      setLessonType,
+      setCurrent,
+      setRequest,
+      setCurrentOptions,
+      setRequestOptions,
+    }
+  );
+
+  const changeHandler =
+    (
+      setter: React.Dispatch<SetStateAction<string>>,
+      f: (value?: string) => void = () => {}
+    ) =>
+    async (
+      event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ): Promise<void> => {
       setInputErrors(intialErrorState);
+      event.preventDefault();
+      if (reason === 'clear') return;
+      setter(value);
+      f(value);
     };
-    return handler;
+
+  const updateMod = async (value?: string) => {
+    let mod = modsState.mods.find((v) => v.moduleCode === value);
+    if (!mod) {
+      mod = await getModsInfo.getModInfo(value as string);
+    }
+    mod ? setMod(mod) : setMod(null);
   };
 
   const handeClick = async () => {
@@ -58,89 +112,77 @@ const SwapInputRow: React.FC<{
       return;
     }
 
-    await addSwap(courseId, lessonType, current, request);
-    setCourseId('');
-    setLessonType('');
-    setCurrent('');
-    setRequest('');
+    await addSwap.addSwap(courseId, lessonType, current, request);
+    setSubmit(true);
   };
+
+  useEffect(() => {
+    if (submit) {
+      if (!addSwap.error) {
+        setOpen(false);
+      }
+      setSubmit(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submit]);
 
   return (
     <React.Fragment>
       <TableRow>
         <TableCell>
-          <TextField
-            required
-            error={inputErrors.courseId !== ' '}
-            helperText={inputErrors.courseId}
-            margin="normal"
-            size="small"
-            label="CourseId"
-            id="CourseId"
-            onChange={changeHandler(setCourseId)}
-            value={courseId.toUpperCase().trim()}
-            sx={{ width: '13vw' }}
+          <Virtualize
+            id="courseId-combo-box"
+            label="Course Id"
+            width="13vw"
+            options={modsState.moduleCodes}
+            error={inputErrors.courseId}
+            value={courseId}
+            handleChange={changeHandler(setCourseId, updateMod)}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            required
-            select
-            error={inputErrors.lessonType !== ' '}
-            helperText={inputErrors.lessonType}
-            margin="normal"
-            size="small"
+          <Virtualize
+            id="lessonType-combo-box"
             label="Lesson Type"
-            InputLabelProps={{ htmlFor: 'lesson-type-select' }}
-            SelectProps={{
-              native: false,
-              labelId: 'lesson-type-label',
-              inputProps: {
-                id: 'lesson-type-select',
-              },
-            }}
-            onChange={changeHandler(setLessonType)}
+            width="13vw"
+            options={lessonTypes}
+            error={inputErrors.lessonType}
             value={lessonType}
-            sx={{ width: '11vw' }}
-          >
-            {lessonTypes.map((option) => (
-              <MenuItem key={option} value={option}>
-                {option}
-              </MenuItem>
-            ))}
-          </TextField>
-        </TableCell>
-        <TableCell>
-          <TextField
-            required
-            error={inputErrors.current !== ' '}
-            helperText={inputErrors.current}
-            margin="normal"
-            size="small"
-            label="Current"
-            id="Current"
-            onChange={changeHandler(setCurrent)}
-            value={current}
-            sx={{ width: '13vw' }}
+            handleChange={changeHandler(setLessonType)}
+            equalityFunc={(option, value) => value === '-' || option === value}
           />
         </TableCell>
         <TableCell>
-          <TextField
-            required
-            error={inputErrors.request !== ' '}
-            helperText={inputErrors.request}
-            margin="normal"
-            size="small"
+          <Virtualize
+            id="current-combo-box"
+            label="Current"
+            width="13vw"
+            options={currentOptions}
+            error={inputErrors.current}
+            value={current}
+            handleChange={changeHandler(setCurrent)}
+            equalityFunc={(option, value) => value === '-' || option === value}
+          />
+        </TableCell>
+        <TableCell>
+          <Virtualize
+            id="request-combo-box"
             label="Request"
-            id="Request"
-            onChange={changeHandler(setRequest)}
+            width="13vw"
+            options={requestOptions}
+            error={inputErrors.request}
             value={request}
-            sx={{ width: '13vw' }}
+            handleChange={changeHandler(setRequest)}
+            equalityFunc={(option, value) => value === '-' || option === value}
           />
         </TableCell>
         <TableCell>
           <Tooltip title="Add swap" placement="bottom">
-            <IconButton color="success" onClick={handeClick} disabled={loading}>
+            <IconButton
+              color="success"
+              onClick={handeClick}
+              disabled={addSwap.loading}
+            >
               <AddCircleIcon />
             </IconButton>
           </Tooltip>

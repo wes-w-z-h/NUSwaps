@@ -6,8 +6,6 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { Swap } from '../../types/Swap';
-import useDeleteSwap from '../../hooks/swaps/useDeleteSwap';
-import CustomAlert from '../CustomAlert';
 
 const style = {
   position: 'absolute' as const,
@@ -22,12 +20,24 @@ const style = {
   p: 2,
 };
 
-const DeleteModal: React.FC<{
+type DeleteModalProps = {
   swap: Swap;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ swap, open, setOpen }) => {
-  const { deleteSwap, loading, error } = useDeleteSwap();
+  deleteSwapObj: {
+    deleteSwap: (id: string) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+};
+
+const DeleteModal: React.FC<DeleteModalProps> = ({
+  swap,
+  open,
+  setOpen,
+  deleteSwapObj,
+}) => {
+  const { deleteSwap, loading } = deleteSwapObj;
 
   const handleClick = async () => {
     await deleteSwap(swap.id);
@@ -38,7 +48,6 @@ const DeleteModal: React.FC<{
 
   return (
     <React.Fragment>
-      {error && <CustomAlert message={error} />}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"

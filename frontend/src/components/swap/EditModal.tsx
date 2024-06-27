@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
-import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
 import { Swap } from '../../types/Swap';
-import CustomAlert from '../CustomAlert';
-import useEditSwap from '../../hooks/swaps/useEditSwap';
 import validateSwap from '../../util/swaps/validateSwap';
-import { Typography } from '@mui/material';
+import { AutocompleteChangeReason } from '@mui/material/Autocomplete';
+import Typography from '@mui/material/Typography';
+import Virtualize from './input/VirtAutocomplete';
+import { useModsContext } from '../../hooks/mods/useModsContext';
+import useUpdateInputs from '../../hooks/swaps/useUpdateInputs';
+import { Module } from '../../types/modules';
 
 const style = {
   position: 'absolute' as const,
@@ -25,13 +26,35 @@ const style = {
   p: 4,
 };
 
-const EditModal: React.FC<{
+type EditModalProps = {
   swap: Swap;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ swap, open, setOpen }) => {
-  const { editSwap, loading, error } = useEditSwap();
-  const lessonTypes: string[] = ['Tutorial', 'Recitation', 'Lab'];
+  editSwapObj: {
+    editSwap: (
+      id: string,
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  };
+  getModsInfo: {
+    error: string | null;
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
+    loading: boolean;
+  };
+};
+
+const EditModal: React.FC<EditModalProps> = ({
+  swap,
+  open,
+  setOpen,
+  editSwapObj,
+  getModsInfo,
+}) => {
   const intialErrorState = {
     courseId: ' ',
     lessonType: ' ',
@@ -39,15 +62,36 @@ const EditModal: React.FC<{
     request: ' ',
   };
 
+  const { modsState } = useModsContext();
+  const [mod, setMod] = useState<Module | null>(null);
+  const [lessonTypes, setLessonTypes] = useState<string[]>([]);
+  const [currentOptions, setCurrentOptions] = useState<string[]>([]);
+  const [requestOptions, setRequestOptions] = useState<string[]>([]);
   const [courseId, setCourseId] = useState<string>(swap.courseId);
-  const [lessonType, setLessonType] = useState<string>(swap.lessonType);
-  const [current, setCurrent] = useState<string>(
-    swap.current.slice(swap.lessonType.length + 1)
-  );
-  const [request, setRequest] = useState<string>(
-    swap.request.slice(swap.lessonType.length + 1)
-  );
+  const [lessonType, setLessonType] = useState<string>('');
+  const [current, setCurrent] = useState<string>('');
+  const [request, setRequest] = useState<string>('');
+  const { editSwap, loading, error } = editSwapObj;
   const [inputErrors, setInputErrors] = useState(intialErrorState);
+
+  useUpdateInputs(
+    {
+      mod,
+      lessonType,
+      current,
+      currentOptions,
+      request,
+      requestOptions,
+    },
+    {
+      setLessonTypes,
+      setLessonType,
+      setCurrent,
+      setRequest,
+      setCurrentOptions,
+      setRequestOptions,
+    }
+  );
 
   const handleClose = (reset: boolean) => {
     setOpen(false);
@@ -73,6 +117,36 @@ const EditModal: React.FC<{
     await editSwap(swap.id, courseId, lessonType, current, request);
   };
 
+  const changeHandler =
+    (
+      setter: React.Dispatch<SetStateAction<string>>,
+      f: (value?: string) => void = () => {}
+    ) =>
+    async (
+      event: React.SyntheticEvent<Element, Event>,
+      value: string,
+      reason: AutocompleteChangeReason
+    ): Promise<void> => {
+      setInputErrors(intialErrorState);
+      event.preventDefault();
+      if (reason === 'clear') return;
+      setter(value);
+      f(value);
+    };
+
+  const updateMod = async (value?: string) => {
+    let mod = modsState.mods.find((v) => v.moduleCode === value);
+    if (!mod) {
+      mod = await getModsInfo.getModInfo(value as string);
+    }
+    mod ? setMod(mod) : setMod(null);
+  };
+
+  useEffect(() => {
+    updateMod(swap.courseId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     if (!loading) {
       handleClose(!!error);
@@ -80,21 +154,8 @@ const EditModal: React.FC<{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, loading]);
 
-  const changeHandler = (
-    setter: React.Dispatch<React.SetStateAction<string>>
-  ) => {
-    const handler = (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-      setter(event.target.value);
-      setInputErrors(intialErrorState);
-    };
-    return handler;
-  };
-
   return (
     <React.Fragment>
-      {error && <CustomAlert message={error} />}
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -111,67 +172,50 @@ const EditModal: React.FC<{
         <Fade in={open}>
           <Box sx={style} textAlign={'center'} component="form">
             <Typography variant="subtitle1">Edit swap</Typography>
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.courseId !== ' '}
-              helperText={inputErrors.courseId}
-              margin="normal"
-              size="small"
-              label="CourseId"
+            <Virtualize
               id="CourseId"
-              value={courseId.toUpperCase().trim()}
-              onChange={changeHandler(setCourseId)}
+              label="Course Id"
+              width="100%"
+              options={modsState.moduleCodes}
+              error={inputErrors.courseId}
+              value={courseId}
+              handleChange={changeHandler(setCourseId, updateMod)}
             />
-            <TextField
-              fullWidth
-              required
-              select
-              error={inputErrors.lessonType !== ' '}
-              helperText={inputErrors.lessonType}
-              margin="normal"
-              size="small"
+            <Virtualize
+              id="lessonType-combo-box"
               label="Lesson Type"
-              InputLabelProps={{ htmlFor: 'lesson-type-select' }}
-              SelectProps={{
-                native: false,
-                labelId: 'lesson-type-label',
-                inputProps: {
-                  id: 'lesson-type-select',
-                },
-              }}
+              width="100%"
+              options={lessonTypes}
+              error={inputErrors.lessonType}
               value={lessonType}
-              onChange={changeHandler(setLessonType)}
-            >
-              {lessonTypes.map((option) => (
-                <MenuItem key={option} value={option}>
-                  {option}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.current !== ' '}
-              helperText={inputErrors.current}
-              margin="normal"
-              size="small"
-              label="Current"
-              id="Current"
-              value={current}
-              onChange={changeHandler(setCurrent)}
+              handleChange={changeHandler(setLessonType)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
             />
-            <TextField
-              fullWidth
-              required
-              error={inputErrors.request !== ' '}
-              helperText={inputErrors.request}
-              margin="normal"
-              size="small"
+            <Virtualize
+              id="current-combo-box"
+              label="Current"
+              width="100%"
+              options={currentOptions}
+              error={inputErrors.current}
+              value={current}
+              handleChange={changeHandler(setCurrent)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
+            />
+            <Virtualize
+              id="request-combo-box"
               label="Request"
-              id="Request"
+              width="100%"
+              options={requestOptions}
+              error={inputErrors.request}
               value={request}
-              onChange={changeHandler(setRequest)}
+              handleChange={changeHandler(setRequest)}
+              equalityFunc={(option, value) =>
+                value === '-' || option === value
+              }
             />
             <Button
               variant="text"
