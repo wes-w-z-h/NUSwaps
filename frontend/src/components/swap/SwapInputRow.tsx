@@ -117,8 +117,10 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
   };
 
   useEffect(() => {
-    if (submit && !addSwap.error) {
-      setOpen(false);
+    if (submit) {
+      if (!addSwap.error) {
+        setOpen(false);
+      }
       setSubmit(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

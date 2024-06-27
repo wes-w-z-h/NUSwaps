@@ -77,7 +77,7 @@ const useUpdateInputs = (
       if (current === firstOption) setRequest(secondOption);
       else setRequest(firstOption);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestOptions, current, request]);
+  }, [requestOptions, current]);
 };
 
 export default useUpdateInputs;
