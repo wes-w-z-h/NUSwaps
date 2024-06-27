@@ -112,6 +112,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
     }
 
     await addSwap.addSwap(courseId, lessonType, current, request);
+    setOpen(false);
   };
 
   return (
