@@ -10,6 +10,25 @@ const MONGO_CONNECTION_STRING: string =
 mongoose
   .connect(MONGO_CONNECTION_STRING)
   .then(() => {
-    app.listen(PORT, () => console.log('listening on port:', PORT));
+    const server = app.listen(PORT, () =>
+      console.log('listening on port:', PORT)
+    );
+    // eslint-disable-next-line global-require
+    const io = require('socket.io')(server, {
+      cors: {
+        origin: 'http://localhost:3000',
+      },
+    });
+    io.on('connection', (socket: any) => {
+      // console.log('Connection established to ', socket);
+
+      socket.on('ping', () => {
+        socket.emit('pong', 'pongggg');
+      });
+
+      socket.on('disconnect', () => {
+        console.log('Disconnected');
+      });
+    });
   })
   .catch((error) => console.log(error));
