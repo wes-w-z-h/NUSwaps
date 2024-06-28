@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express';
 import { SwapModel } from '../models/swapModel.js';
+import greedyMatch from '../util/matcher.js';
 
 // Finds all matches for the swap request
 export const getMatch: RequestHandler = async (req, res, next) => {
@@ -29,9 +30,9 @@ export const getMatch: RequestHandler = async (req, res, next) => {
  */
 export const getOptimalMatch: RequestHandler = async (req, res, next) => {
   try {
-    let swaps = await SwapModel.find({});
-    swaps = swaps.filter((swap) => !swap.status);
-    res.status(200).json(swaps);
+    const swaps = await SwapModel.find({ status: false });
+    const partners = greedyMatch(req.body, swaps);
+    res.status(200).json(partners);
   } catch (error) {
     next(error);
   }
