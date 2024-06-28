@@ -37,7 +37,7 @@ app.use('/api/matches', matchRouter);
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 console.log(__dirname);
 console.log(__dirname.substring(0, __dirname.length - 8));
-const p = path.resolve(__dirname, '../frontend/dist/', 'index.html');
+const p = path.resolve(__dirname, '../../frontend/dist/', 'index.html');
 console.log(p);
 app.get('*', (req, res) => {
   res.sendFile(p);
