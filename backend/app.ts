@@ -36,13 +36,10 @@ app.use('/api/matches', matchRouter);
 // use frontend routes
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 console.log(__dirname.substring(0, __dirname.length - 8));
+const p = path.resolve(__dirname, '../frontend/dist/', 'index.html');
+console.log(p);
 app.get('*', (req, res) => {
-  res.sendFile(
-    path.join(
-      __dirname.substring(0, __dirname.length - '/backend'.length),
-      '/frontend/dist/index.html'
-    )
-  );
+  res.sendFile(p);
 });
 
 app.use((req, res, next) => {
