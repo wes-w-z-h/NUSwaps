@@ -32,7 +32,7 @@ export const login: RequestHandler = async (req, res, next) => {
     }
 
     const accessToken = createToken(data.id, '15m'); // short expiry time of 15 mins
-    const refreshToken = createToken(data.id, '3s'); // longer expiry time of 1 day
+    const refreshToken = createToken(data.id, '1d'); // longer expiry time of 1 day
 
     // Create secure cookie with refresh token
     res.cookie('jwt', refreshToken, {
@@ -153,7 +153,7 @@ export const verifyRefreshToken: RequestHandler = async (req, res, next) => {
     if (!cookies?.jwt) {
       throw createHttpError(401, 'Unauthorised: missing refresh token');
     }
-    console.log('here');
+
     const refreshToken = cookies.jwt;
     jwt.verify(refreshToken, env.JWT_KEY);
 
