@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
 import sendVerification from '../util/emailService.js';
 import env from '../util/validEnv.js';
-import 'dotenv/config';
 
 const createToken = (dataid: any, expiry: string = '5m'): string =>
   jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: expiry });

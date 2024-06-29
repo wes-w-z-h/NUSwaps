@@ -9,4 +9,6 @@ export default cleanEnv(process.env, {
   USER_ADDRESS: str(),
   APP_PASSWORD: str(),
   CURR_ENV: str(),
+  FRONTEND_URL_LOCAL: str(),
+  FRONTEND_URL_PROD: str(),
 });

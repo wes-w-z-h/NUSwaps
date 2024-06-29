@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import * as bcrypt from 'bcrypt';
