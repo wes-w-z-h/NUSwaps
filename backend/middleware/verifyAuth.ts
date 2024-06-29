@@ -1,7 +1,6 @@
 import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import 'dotenv/config';
 import env from '../util/validEnv.js';
 import UserModel from '../models/userModel.js';
 

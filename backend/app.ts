@@ -3,31 +3,48 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import createHttpError, { isHttpError } from 'http-errors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
 import authRouter from './routes/authRoute.js';
+import env from './util/validEnv.js';
 
 const app = express();
 
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-  })
-);
+const loadMiddleware = () => {
+  app.use(express.json());
+  app.use(cookieParser()); // accepts cookie in req
 
-// accepts json body
-app.use(express.json());
+  app.use(morgan('dev'));
 
-app.use(cookieParser()); // accepts cookie in req
+  app.use('/api/auth', authRouter);
+  app.use('/api/users', userRouter);
+  app.use('/api/swaps', swapRouter);
+  app.use('/api/matches', matchRouter);
+};
 
-app.use(morgan('dev'));
-
-app.use('/api/auth', authRouter);
-app.use('/api/users', userRouter);
-app.use('/api/swaps', swapRouter);
-app.use('/api/matches', matchRouter);
+if (env.CURR_ENV === 'DEVELOPMENT') {
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
+  loadMiddleware();
+} else {
+  loadMiddleware();
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+  const __filename = fileURLToPath(import.meta.url);
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+  const __dirname = path.dirname(__filename);
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  const p = path.resolve(__dirname, '../../frontend/dist/', 'index.html');
+  app.get('*', (req, res) => {
+    res.sendFile(p);
+  });
+}
 
 app.use((req, res, next) => {
   next(createHttpError(404, 'Missing endpoint.'));
