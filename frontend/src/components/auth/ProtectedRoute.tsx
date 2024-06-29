@@ -6,8 +6,7 @@ const ProtectedRoute = () => {
   const { verifyToken } = useVerifyToken();
   useEffect(() => {
     verifyToken();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [verifyToken]);
 
   return (
     <div>
