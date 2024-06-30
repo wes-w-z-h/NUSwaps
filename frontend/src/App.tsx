@@ -14,9 +14,10 @@ import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 
 const App = () => {
+  /** TODO: Implement web socket
   useEffect(() => {
     const socket = io('http://localhost:4000');
     socket.on('connect', () => {
@@ -28,6 +29,7 @@ const App = () => {
       });
     });
   }, []);
+  */
   const { authState } = useAuthContext();
   return (
     <Router>

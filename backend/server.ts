@@ -13,6 +13,7 @@ mongoose
     const server = app.listen(PORT, () =>
       console.log('listening on port:', PORT)
     );
+    /** TODO: Implement Web Socket
     // eslint-disable-next-line global-require
     const io = require('socket.io')(server, {
       cors: {
@@ -30,5 +31,6 @@ mongoose
         console.log('Disconnected');
       });
     });
+    */
   })
   .catch((error) => console.log(error));
