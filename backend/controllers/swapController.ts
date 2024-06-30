@@ -146,6 +146,8 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
       throw createHttpError(400, 'Unable to reject swap');
     }
 
+    getOptimalMatch(rejectedSwap);
+
     res.status(200).json(rejectedSwap?.createResponse());
   } catch (error) {
     next(error);
