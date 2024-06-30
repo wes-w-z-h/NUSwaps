@@ -3,7 +3,7 @@ import createHttpError from 'http-errors';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
-import sendVerification from '../util/emailService.js';
+import { sendVerification } from '../util/emailService.js';
 import env from '../util/validEnv.js';
 import 'dotenv/config';
 
