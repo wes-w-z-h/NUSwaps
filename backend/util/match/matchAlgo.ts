@@ -1,6 +1,5 @@
 import { ISwap } from '../../types/api.js';
 
-// TODO: Implement this into addSwap and updateSwap controllers
 function findTwoWay(req: ISwap, moduleRequests: ISwap[]): ISwap[] | null {
   const twoWaySwaps = moduleRequests.filter((swap) => {
     return swap.request === req.current && swap.current === req.request;
