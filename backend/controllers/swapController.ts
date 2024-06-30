@@ -2,6 +2,7 @@ import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 import getOptimalMatch from '../util/match/matchService.js';
+import { SwapStatus } from '../types/api.js';
 
 const verifySwap = async (
   userId: string,
@@ -42,6 +43,20 @@ const verifySwap = async (
   if (existing2) {
     throw createHttpError(400, 'Duplicate swaps not allowed');
   }
+};
+
+const verifyMatchedStatus = async (id: string) => {
+  await SwapModel.findById(id)
+    .exec()
+    .then((swap) => {
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+      const matchedStatus: SwapStatus = 'MATCHED';
+      if (swap.status !== matchedStatus) {
+        throw createHttpError(400, 'Invalid request to confirm swap');
+      }
+    });
 };
 
 export const getSwaps: RequestHandler = async (req, res, next) => {
@@ -85,6 +100,56 @@ export const deleteSwap: RequestHandler = async (req, res, next) => {
         : res.status(404).json({ msg: 'Swap not found' })
     )
     .catch((error) => next(createHttpError(400, error.message)));
+};
+
+export const confirmSwap: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    await verifyMatchedStatus(id);
+
+    const confirmedSwap = await SwapModel.findByIdAndUpdate(
+      id,
+      { status: 'CONFIRMED' },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
+
+    if (!confirmedSwap) {
+      throw createHttpError(400, 'Unable to confirm swap');
+    }
+
+    res.status(200).json(confirmedSwap?.createResponse());
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const rejectSwap: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    await verifyMatchedStatus(id);
+
+    const rejectedSwap = await SwapModel.findByIdAndUpdate(
+      id,
+      { status: 'UNMATCHED' },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
+
+    if (!rejectedSwap) {
+      throw createHttpError(400, 'Unable to reject swap');
+    }
+
+    res.status(200).json(rejectedSwap?.createResponse());
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updateSwap: RequestHandler = async (req, res, next) => {

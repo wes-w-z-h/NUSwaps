@@ -26,7 +26,7 @@ const getOptimalMatch = async (newSwap: ISwap) => {
     }
     await SwapModel.findByIdAndUpdate(
       swap.id,
-      { status: 'UNCONFIRMED' },
+      { status: 'MATCHED' },
       {
         runValidators: true,
         new: true,
