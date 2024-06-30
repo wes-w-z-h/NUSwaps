@@ -53,10 +53,7 @@ function findThreeWay(req: ISwap, moduleRequests: ISwap[]): ISwap[] | null {
 
 // Given an array of existing requests and a new request,
 // find possible 2/3 way swaps for the new request
-export default function greedyMatch(
-  req: ISwap,
-  existing: ISwap[]
-): ISwap[] | null {
+export default function greedyMatch(req: ISwap, existing: ISwap[]): ISwap[] {
   const moduleRequests = existing.filter((swap) => {
     return (
       swap.courseId === req.courseId &&
@@ -79,5 +76,5 @@ export default function greedyMatch(
     return trio;
   }
 
-  return null;
+  return [];
 }
