@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
+import getOptimalMatch from '../util/match/matchService.js';
 
 const verifySwap = async (
   userId: string,
@@ -102,6 +103,8 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
       throw createHttpError(404, 'Swap not found');
     }
 
+    getOptimalMatch(data);
+
     res.status(200).json(data.createResponse());
   } catch (error) {
     next(error);
@@ -126,6 +129,8 @@ export const createSwap: RequestHandler = async (req, res, next) => {
     if (!data) {
       throw createHttpError(400, 'Unable to create swap');
     }
+
+    getOptimalMatch(data);
 
     res.status(200).json(data.createResponse());
   } catch (error: unknown) {

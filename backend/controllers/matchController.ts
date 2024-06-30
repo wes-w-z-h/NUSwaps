@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import createHttpError from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
-import greedyMatch from '../util/matcher.js';
+import greedyMatch from '../util/match/matchAlgo.js';
 import UserModel from '../models/userModel.js';
 import { sendMatch } from '../util/emailService.js';
 
