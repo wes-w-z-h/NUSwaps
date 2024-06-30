@@ -11,7 +11,7 @@ import { ISwap } from '../../types/api.js';
  * Sends an email notification to matched parties
  */
 const getOptimalMatch = async (newSwap: ISwap) => {
-  const existingSwaps = await SwapModel.find({ status: false }).exec();
+  const existingSwaps = await SwapModel.find({ status: 'UNMATCHED' }).exec();
   const partnerSwaps = greedyMatch(newSwap, existingSwaps);
   if (!partnerSwaps) {
     return;
@@ -20,15 +20,25 @@ const getOptimalMatch = async (newSwap: ISwap) => {
   // Usage of for loop to use await
   // eslint-disable-next-line no-restricted-syntax
   for await (const swap of partnerSwaps) {
-    // TODO: Update swap status (once we have updated the statuses)
     const user = await UserModel.findById(swap.userId).exec();
     if (!user) {
       throw createHttpError(400, 'User not found');
     }
+    await SwapModel.findByIdAndUpdate(
+      swap.id,
+      { status: 'UNCONFIRMED' },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
+
     // TODO: Remove this, didn't want to spam this fella with emails
     if (user.email !== 'e1122360@u.nus.edu') {
       await sendMatch(user.email, swap);
     }
+
+    // TODO: Emit event in socket
   }
 };
 

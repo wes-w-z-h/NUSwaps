@@ -58,7 +58,7 @@ export default function greedyMatch(req: ISwap, existing: ISwap[]): ISwap[] {
     return (
       swap.courseId === req.courseId &&
       swap.lessonType === req.lessonType &&
-      !swap.status
+      swap.status === 'UNMATCHED'
     );
   });
 
