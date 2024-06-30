@@ -28,9 +28,9 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
       required: true,
     },
     status: {
-      type: Boolean,
+      type: String,
       required: true,
-      default: false,
+      default: 'UNMATCHED',
     },
   },
   { timestamps: true, toJSON: { getters: true } } // createdAt option

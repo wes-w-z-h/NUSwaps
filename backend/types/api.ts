@@ -22,6 +22,8 @@ export type UserPayload = {
   token?: string;
 };
 
+export type SwapStatus = 'UNMATCHED' | 'MATCHED' | 'CONFIRMED' | 'COMPLETED';
+
 export interface ISwap {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
@@ -29,7 +31,7 @@ export interface ISwap {
   lessonType: string;
   current: string;
   request: string;
-  status: boolean;
+  status: SwapStatus;
   createdAt: Date;
   updatedAt: Date;
   __v: string;
@@ -49,7 +51,7 @@ export type SwapPayload = {
   lessonType: string;
   current: string;
   request: string;
-  status: boolean;
+  status: SwapStatus;
 };
 
 export type APIResponse = {
