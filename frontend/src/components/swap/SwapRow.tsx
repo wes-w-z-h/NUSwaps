@@ -66,7 +66,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
         <TableCell>{row.lessonType}</TableCell>
         <TableCell>{row.current}</TableCell>
         <TableCell>{row.request}</TableCell>
-        <TableCell>{row.status ? 'True' : 'False'}</TableCell>
+        <TableCell>{row.status}</TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
