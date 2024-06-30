@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -10,10 +9,10 @@ const CustomAlert: React.FC<{
   const [open, setOpen] = useState<boolean>(true);
 
   const handleClose = (
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _event?: React.SyntheticEvent | Event,
+    event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
+    event?.preventDefault();
     if (reason === 'clickaway') {
       return;
     }
