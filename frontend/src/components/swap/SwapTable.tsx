@@ -71,8 +71,8 @@ const SwapTable: React.FC = () => {
               <SwapRow
                 key={swap.id}
                 row={swap}
-                editSwap={editSwap}
-                deleteSwap={deleteSwap}
+                editSwap={swap.status === 'UNMATCHED' ? editSwap : null}
+                deleteSwap={swap.status === 'UNMATCHED' ? deleteSwap : null}
                 getModsInfo={getModsInfo}
                 confirmSwap={swap.status === 'MATCHED' ? confirmSwap : null}
                 rejectSwap={swap.status === 'MATCHED' ? rejectSwap : null}
