@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from './useAuthContext';
+import { useSocketContext } from '../useSocketContext';
 import { AxiosError } from 'axios';
 import { axiosPrivate } from '../../util/api/axios';
 
@@ -8,6 +9,7 @@ export const useLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { authDispatch } = useAuthContext();
+  const { connectSocket } = useSocketContext();
   const navigate = useNavigate();
 
   const login = async (email: string, password: string) => {
@@ -24,6 +26,7 @@ export const useLogin = () => {
       .then((res) => {
         localStorage.setItem('user', JSON.stringify(res.data));
         authDispatch({ type: 'LOGIN', payload: res.data });
+        connectSocket();
         navigate('/dashboard');
       })
       .catch((error: AxiosError<{ error: string }>) => {
