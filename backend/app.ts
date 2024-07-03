@@ -16,7 +16,9 @@ const loadMiddleware = () => {
   app.use(cookieParser()); // accepts cookie in req
 
   app.use(morgan('dev'));
-
+  app.get('/', (req, res) => {
+    res.status(200).json({ msg: 'keep-alive' });
+  });
   app.use('/api/auth', authRouter);
   app.use('/api/users', userRouter);
   app.use('/api/swaps', swapRouter);
