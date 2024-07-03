@@ -5,7 +5,6 @@ import * as bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
 import { sendVerification } from '../util/emailService.js';
 import env from '../util/validEnv.js';
-import 'dotenv/config';
 
 const createToken = (dataid: any, expiry: string = '5m'): string =>
   jwt.sign({ id: dataid }, env.JWT_KEY, { expiresIn: expiry });
@@ -71,7 +70,7 @@ export const refresh: RequestHandler = async (req, res, next) => {
   const { cookies } = req;
   try {
     if (!cookies?.jwt) {
-      throw createHttpError(401, 'Unauthorised');
+      throw createHttpError(401, 'Unauthorised: missing refresh token');
     }
 
     const refreshToken = cookies.jwt;
@@ -82,7 +81,7 @@ export const refresh: RequestHandler = async (req, res, next) => {
       const user = await UserModel.findById(decoded.id).exec();
 
       if (!user) {
-        throw createHttpError(401, 'Unauthorised');
+        throw createHttpError(401, 'Unauthorised: no user found');
       }
 
       const accessToken = createToken(decoded.id, '15m');
@@ -123,22 +122,6 @@ export const signup: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const verifyRefreshToken: RequestHandler = async (req, res, next) => {
-  const { cookies } = req;
-  try {
-    if (!cookies?.jwt) {
-      throw createHttpError(401, 'Unauthorised');
-    }
-
-    const refreshToken = cookies.jwt;
-    jwt.verify(refreshToken, env.JWT_KEY);
-
-    res.status(200).json({ message: 'Valid token' });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const verifyUser: RequestHandler = async (req, res) => {
   const { token } = req.params;
 
@@ -160,5 +143,21 @@ export const verifyUser: RequestHandler = async (req, res) => {
     res.status(200).json(data.createResponse(authToken));
   } catch (error) {
     res.status(400).json({ message: 'Invalid or expired token' });
+  }
+};
+
+export const verifyRefreshToken: RequestHandler = async (req, res, next) => {
+  const { cookies } = req;
+  try {
+    if (!cookies?.jwt) {
+      throw createHttpError(401, 'Unauthorised: missing refresh token');
+    }
+
+    const refreshToken = cookies.jwt;
+    jwt.verify(refreshToken, env.JWT_KEY);
+
+    res.status(200).json({ message: 'Valid token' });
+  } catch (error) {
+    next(createHttpError(403, 'Forbidden: invalid refresh token'));
   }
 };

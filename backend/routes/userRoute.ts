@@ -4,9 +4,6 @@ import verifyAuth from '../middleware/verifyAuth.js';
 
 const userRouter = express.Router();
 
-// TODO: remove this route when not needed anymore
-userRouter.get('/', UserController.getUsers);
-
 userRouter.use(verifyAuth);
 
 userRouter.delete('/delete', UserController.deleteUser);
