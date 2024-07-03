@@ -47,15 +47,28 @@ const verifySwap = async (
 };
 
 const verifyMatchedStatus = async (id: string) => {
-  await SwapModel.findById(id)
+  // Verify valid swap
+  const currSwap = await SwapModel.findById(id)
     .exec()
     .then((swap) => {
       if (!swap) {
         throw createHttpError(404, 'Swap not found');
       }
+
       const matchedStatus: SwapStatus = 'MATCHED';
       if (swap.status !== matchedStatus || !swap.match) {
-        throw createHttpError(400, 'Invalid request to confirm swap');
+        throw createHttpError(400, 'Invalid request to confirm / reject swap');
+      }
+
+      return swap;
+    });
+
+  // Verify valid match
+  await MatchModel.findById(currSwap.match)
+    .exec()
+    .then((match) => {
+      if (match?.status !== 'PENDING') {
+        throw createHttpError(400, 'Invalid request to confirm / reject swap');
       }
     });
 };
@@ -123,7 +136,7 @@ export const confirmSwap: RequestHandler = async (req, res, next) => {
     }
 
     const match = await MatchModel.findById(confirmedSwap.match).exec();
-    const newStatus = match?.getNewStatus();
+    const newStatus = await match?.getNewStatus();
     await MatchModel.findByIdAndUpdate(confirmedSwap.match, {
       status: newStatus,
     }).exec();
