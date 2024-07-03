@@ -136,12 +136,16 @@ export const confirmSwap: RequestHandler = async (req, res, next) => {
     }
 
     const match = await MatchModel.findById(confirmedSwap.match).exec();
-    const newStatus = await match?.getNewStatus();
+    if (!match) {
+      throw createHttpError(404, 'Match not found');
+    }
+    const newStatus = await match.getNewStatus();
+
     await MatchModel.findByIdAndUpdate(confirmedSwap.match, {
       status: newStatus,
     }).exec();
 
-    res.status(200).json(confirmedSwap?.createResponse());
+    res.status(200).json(confirmedSwap.createResponse());
   } catch (error) {
     next(error);
   }
@@ -156,14 +160,20 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
     let rejectedSwap = await SwapModel.findById(id).exec();
 
     if (!rejectedSwap) {
-      throw createHttpError(400, 'Unable to reject swap');
+      throw createHttpError(404, 'Swap not found');
     }
 
     const swapIds = await MatchModel.findByIdAndUpdate(rejectedSwap.match, {
       status: 'REJECTED',
     })
       .exec()
-      .then((match) => match?.swaps);
+      .then((match) => {
+        if (!match) {
+          throw createHttpError('404', 'Match not found');
+        }
+
+        return match.swaps;
+      });
 
     if (!swapIds) {
       throw createHttpError(400, 'Unable to reject swap');
@@ -196,7 +206,11 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
       }
     ).exec();
 
-    res.status(200).json(rejectedSwap?.createResponse());
+    if (!rejectedSwap) {
+      throw createHttpError(400, 'Unable to reject swap');
+    }
+
+    res.status(200).json(rejectedSwap.createResponse());
   } catch (error) {
     next(error);
   }
