@@ -153,14 +153,7 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
   try {
     await verifyMatchedStatus(id);
 
-    const rejectedSwap = await SwapModel.findByIdAndUpdate(
-      id,
-      { status: 'UNMATCHED' },
-      {
-        runValidators: true,
-        new: true,
-      }
-    ).exec();
+    let rejectedSwap = await SwapModel.findById(id).exec();
 
     if (!rejectedSwap) {
       throw createHttpError(400, 'Unable to reject swap');
@@ -178,19 +171,30 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
 
     // eslint-disable-next-line no-restricted-syntax
     for await (const swapId of swapIds) {
-      const swap = await SwapModel.findByIdAndUpdate(
-        swapId,
-        { status: 'UNMATCHED' },
-        {
-          runValidators: true,
-          new: true,
+      // eslint-disable-next-line no-underscore-dangle
+      if (swapId.toString() !== rejectedSwap._id.toString()) {
+        const swap = await SwapModel.findByIdAndUpdate(
+          swapId,
+          { status: 'UNMATCHED', match: null },
+          {
+            runValidators: true,
+            new: true,
+          }
+        ).exec();
+        if (swap) {
+          getOptimalMatch(swap);
         }
-      ).exec();
-
-      if (swap) {
-        getOptimalMatch(swap);
       }
     }
+
+    rejectedSwap = await SwapModel.findByIdAndUpdate(
+      id,
+      { status: 'UNMATCHED', match: null },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
 
     res.status(200).json(rejectedSwap?.createResponse());
   } catch (error) {

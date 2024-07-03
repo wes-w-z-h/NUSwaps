@@ -35,6 +35,7 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
     match: {
       type: Schema.Types.ObjectId,
       ref: 'Match',
+      default: null,
     },
   },
   { timestamps: true, toJSON: { getters: true } } // createdAt option
