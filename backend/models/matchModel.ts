@@ -41,7 +41,7 @@ matchSchema.method(
     for await (const swapId of swaps) {
       const swap = await SwapModel.findById(swapId);
       if (swap?.status === 'UNMATCHED') {
-        return 'REJECTED';
+        return Promise.resolve('REJECTED');
       }
       if (swap?.status === 'MATCHED') {
         isAccepted = false;
@@ -49,9 +49,9 @@ matchSchema.method(
     }
 
     if (isAccepted) {
-      return 'ACCEPTED';
+      return Promise.resolve('ACCEPTED');
     }
-    return 'PENDING';
+    return Promise.resolve('PENDING');
   }
 );
 
