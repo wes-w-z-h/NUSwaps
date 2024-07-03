@@ -34,6 +34,12 @@ if (env.CURR_ENV === 'DEVELOPMENT') {
   );
   loadMiddleware();
 } else {
+  app.use(
+    cors({
+      origin: 'https://nuswaps-1.onrender.com',
+      credentials: true,
+    })
+  );
   loadMiddleware();
   // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
   const __filename = fileURLToPath(import.meta.url);
