@@ -8,7 +8,7 @@ import {
   Routes,
   Navigate,
 } from 'react-router-dom';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 import { useAuthContext } from './hooks/auth/useAuthContext.tsx';
 import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
