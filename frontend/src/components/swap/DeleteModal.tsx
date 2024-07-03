@@ -67,7 +67,9 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
               Course: {swap.courseId} --- Status:{' '}
               {swap.status ? 'matched' : 'pending'}
             </Typography>
-
+            <Typography id="lessonType">
+              Lesson type: {swap.lessonType}
+            </Typography>
             <Typography id="current">Current slot: {swap.current}</Typography>
             <Typography id="request">Request slot: {swap.request}</Typography>
             <br />

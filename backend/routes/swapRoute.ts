@@ -10,8 +10,6 @@ swapRouter.use(verifyAuth);
 
 swapRouter.get('/userswaps', SwapController.getUserSwaps);
 
-swapRouter.get('/', SwapController.getSwaps);
-
 swapRouter.get('/:id', SwapController.getSwap);
 
 swapRouter.delete('/:id', SwapController.deleteSwap);

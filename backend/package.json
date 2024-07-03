@@ -8,7 +8,8 @@
     "start": "node server.js",
     "dev": "tsx watch --clear-screen=false server.ts",
     "lint": "eslint .",
-    "lint-fix": "eslint . --fix"
+    "lint-fix": "eslint . --fix",
+    "build": "npm i --prefix ../frontend && npm run build --prefix ../frontend && npm i && npx tsc"
   },
   "keywords": [],
   "author": "",

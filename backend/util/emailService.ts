@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
 import env from '../util/validEnv.js';
-import 'dotenv/config';
 import { ISwap } from '../types/api.js';
 
 const transporter = nodemailer.createTransport({
@@ -11,12 +10,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const link =
+  env.CURR_ENV === 'DEVELOPMENT'
+    ? env.FRONTEND_URL_LOCAL
+    : env.FRONTEND_URL_PROD;
+
 const sendVerification = (to: string, token: string) => {
   const mailOptions = {
     from: 'NUSwaps',
     to,
     subject: 'Account Verification',
-    html: `<p>Click <a href="http://localhost:3000/verify/${token}">here</a> to verify your account. Link expires in 5 minutes</p>`,
+    html: `<p>Click <a href="${link}/verify/${token}">here</a> to verify your account. Link expires in 5 minutes</p>`,
   };
 
   return transporter.sendMail(mailOptions);

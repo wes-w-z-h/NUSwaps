@@ -73,6 +73,7 @@ const EditModal: React.FC<EditModalProps> = ({
   const [request, setRequest] = useState<string>('');
   const { editSwap, loading, error } = editSwapObj;
   const [inputErrors, setInputErrors] = useState(intialErrorState);
+  const [submit, setSubmit] = useState<boolean>(false);
 
   useUpdateInputs(
     {
@@ -94,7 +95,9 @@ const EditModal: React.FC<EditModalProps> = ({
   );
 
   const resetStates = () => {
+    setInputErrors(intialErrorState);
     setCourseId(swap.courseId);
+    updateMod(swap.courseId);
     setLessonType(swap.lessonType);
     setCurrent(swap.current);
     setRequest(swap.request);
@@ -106,7 +109,9 @@ const EditModal: React.FC<EditModalProps> = ({
       resetStates();
     }
   };
-  const handleSubmit = async () => {
+
+  const handeClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     const inputErrors = validateSwap(courseId, lessonType, current, request);
     setInputErrors(inputErrors);
 
@@ -118,7 +123,9 @@ const EditModal: React.FC<EditModalProps> = ({
     ) {
       return;
     }
+
     await editSwap(swap.id, courseId, lessonType, current, request);
+    setSubmit(true);
   };
 
   const changeHandler =
@@ -153,11 +160,14 @@ const EditModal: React.FC<EditModalProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      handleClose(!!error);
+    if (submit) {
+      if (!error) {
+        handleClose(!!error);
+      }
+      setSubmit(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error, loading]);
+  }, [submit]);
 
   return (
     <React.Fragment>
@@ -227,7 +237,7 @@ const EditModal: React.FC<EditModalProps> = ({
               color="secondary"
               type="submit"
               disabled={loading}
-              onClick={handleSubmit}
+              onClick={handeClick}
             >
               Confirm change
             </Button>
