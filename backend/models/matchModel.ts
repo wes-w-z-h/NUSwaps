@@ -22,14 +22,6 @@ const matchSchema = new Schema<IMatch, Match, IMatchMethods>(
       type: String,
       required: true,
     },
-    current: {
-      type: String,
-      required: true,
-    },
-    request: {
-      type: String,
-      required: true,
-    },
     status: {
       type: String,
       required: true,

@@ -61,8 +61,6 @@ export interface IMatch {
   _id: Types.ObjectId;
   courseId: ModuleCode;
   lessonType: string;
-  current: string;
-  request: string;
   swaps: [Types.ObjectId];
   status: MatchStatus;
   createdAt: Date;
