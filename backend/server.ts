@@ -9,11 +9,17 @@ const MONGO_CONNECTION_STRING: string =
 
 mongoose.connect(MONGO_CONNECTION_STRING).catch((error) => console.log(error));
 
-const server = app.listen(PORT, () => console.log('listening on port:', PORT));
+app.listen(PORT, () => console.log('listening on port:', PORT));
+
+/** 
+// const server = app.listen(PORT, () => console.log('listening on port:', PORT));
 // eslint-disable-next-line global-require
 const io = require('socket.io')(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin:
+      CURR_ENV === 'DEVELOPMENT'
+        ? env.FRONTEND_URL_LOCAL
+        : env.FRONTEND_URL_PROD,
   },
 });
 
@@ -28,3 +34,4 @@ io.on('connection', (socket: any) => {
     console.log('Disconnected');
   });
 });
+*/

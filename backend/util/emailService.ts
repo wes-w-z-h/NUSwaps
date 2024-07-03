@@ -31,7 +31,7 @@ const sendMatch = (to: string, swap: ISwap) => {
     from: 'NUSwaps',
     to,
     subject: 'NUSwaps - Match found',
-    html: `<p>We have found a match for your requested swap for ${swap.courseId}. Please accept the match <a href="http://localhost:3000/dashboard">here</a> as soon as possible.</p>`,
+    html: `<p>We have found a match for your requested swap for ${swap.courseId}. Please accept the match <a href="${link}/dashboard">here</a> as soon as possible.</p>`,
   };
 
   return transporter.sendMail(mailOptions);
