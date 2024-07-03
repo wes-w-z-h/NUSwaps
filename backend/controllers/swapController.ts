@@ -166,7 +166,31 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
       throw createHttpError(400, 'Unable to reject swap');
     }
 
-    getOptimalMatch(rejectedSwap);
+    const swapIds = await MatchModel.findByIdAndUpdate(rejectedSwap.match, {
+      status: 'REJECTED',
+    })
+      .exec()
+      .then((match) => match?.swaps);
+
+    if (!swapIds) {
+      throw createHttpError(400, 'Unable to reject swap');
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const swapId of swapIds) {
+      const swap = await SwapModel.findByIdAndUpdate(
+        swapId,
+        { status: 'UNMATCHED' },
+        {
+          runValidators: true,
+          new: true,
+        }
+      ).exec();
+
+      if (swap) {
+        getOptimalMatch(swap);
+      }
+    }
 
     res.status(200).json(rejectedSwap?.createResponse());
   } catch (error) {
