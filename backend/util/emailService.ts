@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import env from '../util/validEnv.js';
+import { ISwap } from '../types/api.js';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail', // You can use any other email service
@@ -25,4 +26,15 @@ const sendVerification = (to: string, token: string) => {
   return transporter.sendMail(mailOptions);
 };
 
-export default sendVerification;
+const sendMatch = (to: string, swap: ISwap) => {
+  const mailOptions = {
+    from: 'NUSwaps',
+    to,
+    subject: 'NUSwaps - Match found',
+    html: `<p>We have found a match for your requested swap for ${swap.courseId}. Please accept the match <a href="${link}/dashboard">here</a> as soon as possible.</p>`,
+  };
+
+  return transporter.sendMail(mailOptions);
+};
+
+export { sendVerification, sendMatch };

@@ -17,6 +17,8 @@ import CustomAlert from '../CustomAlert';
 import useEditSwap from '../../hooks/swaps/useEditSwap';
 import useDeleteSwap from '../../hooks/swaps/useDeleteSwap';
 import useGetModsInfo from '../../hooks/mods/useGetModInfo';
+import { useConfirmSwap } from '../../hooks/swaps/useConfirmSwap';
+import { useRejectSwap } from '../../hooks/swaps/useRejectSwap';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
@@ -24,6 +26,8 @@ const SwapTable: React.FC = () => {
   const addSwap = useAddSwap();
   const editSwap = useEditSwap();
   const deleteSwap = useDeleteSwap();
+  const confirmSwap = useConfirmSwap();
+  const rejectSwap = useRejectSwap();
   const getModsInfo = useGetModsInfo();
 
   return (
@@ -32,6 +36,8 @@ const SwapTable: React.FC = () => {
       {editSwap.error && <CustomAlert message={editSwap.error} />}
       {deleteSwap.error && <CustomAlert message={deleteSwap.error} />}
       {getModsInfo.error && <CustomAlert message={getModsInfo.error} />}
+      {confirmSwap.error && <CustomAlert message={confirmSwap.error} />}
+      {rejectSwap.error && <CustomAlert message={rejectSwap.error} />}
       <TableContainer component={Paper}>
         <Table aria-label="collapsible swaps table">
           <TableHead>
@@ -65,9 +71,11 @@ const SwapTable: React.FC = () => {
               <SwapRow
                 key={swap.id}
                 row={swap}
-                editSwap={editSwap}
-                deleteSwap={deleteSwap}
+                editSwap={swap.status === 'UNMATCHED' ? editSwap : null}
+                deleteSwap={swap.status === 'UNMATCHED' ? deleteSwap : null}
                 getModsInfo={getModsInfo}
+                confirmSwap={swap.status === 'MATCHED' ? confirmSwap : null}
+                rejectSwap={swap.status === 'MATCHED' ? rejectSwap : null}
               />
             ))}
           </TableBody>

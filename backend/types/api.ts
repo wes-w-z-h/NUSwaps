@@ -22,6 +22,8 @@ export type UserPayload = {
   token?: string;
 };
 
+export type SwapStatus = 'UNMATCHED' | 'MATCHED' | 'CONFIRMED' | 'COMPLETED';
+
 export interface ISwap {
   _id: Types.ObjectId;
   userId: Types.ObjectId;
@@ -29,7 +31,8 @@ export interface ISwap {
   lessonType: string;
   current: string;
   request: string;
-  status: boolean;
+  status: SwapStatus;
+  match: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   __v: string;
@@ -49,8 +52,27 @@ export type SwapPayload = {
   lessonType: string;
   current: string;
   request: string;
-  status: boolean;
+  status: SwapStatus;
 };
+
+export type MatchStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export interface IMatch {
+  _id: Types.ObjectId;
+  courseId: ModuleCode;
+  lessonType: string;
+  swaps: [Types.ObjectId];
+  status: MatchStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: string;
+}
+
+export interface IMatchMethods {
+  getNewStatus(): Promise<MatchStatus>;
+}
+
+export type Match = Model<IMatch, {}, IMatchMethods>;
 
 export type APIResponse = {
   success: boolean;

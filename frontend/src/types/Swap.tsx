@@ -1,3 +1,5 @@
+export type SwapStatus = 'UNMATCHED' | 'MATCHED' | 'CONFIRMED' | 'COMPLETED';
+
 export type Swap = {
   id: string;
   userId: string;
@@ -5,5 +7,5 @@ export type Swap = {
   lessonType: string;
   current: string;
   request: string;
-  status: boolean;
+  status: SwapStatus;
 };

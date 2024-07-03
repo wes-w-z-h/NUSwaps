@@ -11,6 +11,7 @@ import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 import { Module } from '../../types/modules';
 
+// TODO: Possible to create separate components for different swap statuses
 type SwapRowProps = {
   row: Swap;
   editSwap: {
@@ -23,12 +24,22 @@ type SwapRowProps = {
     ) => Promise<void>;
     loading: boolean;
     error: string | null;
-  };
+  } | null;
   deleteSwap: {
     deleteSwap: (id: string) => Promise<void>;
     loading: boolean;
     error: string | null;
-  };
+  } | null;
+  confirmSwap: {
+    confirmSwap: (id: string) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  } | null;
+  rejectSwap: {
+    rejectSwap: (id: string) => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  } | null;
   getModsInfo: {
     error: string | null;
     getModInfo: (courseId: string) => Promise<Module | undefined>;
@@ -40,6 +51,8 @@ const SwapRow: React.FC<SwapRowProps> = ({
   row,
   editSwap,
   deleteSwap,
+  confirmSwap,
+  rejectSwap,
   getModsInfo,
 }) => {
   const [open, setOpen] = useState(false);
@@ -48,25 +61,29 @@ const SwapRow: React.FC<SwapRowProps> = ({
 
   return (
     <React.Fragment>
-      <DeleteModal
-        swap={row}
-        open={openDelModal}
-        setOpen={setOpenDelModal}
-        deleteSwapObj={deleteSwap}
-      />
-      <EditModal
-        swap={row}
-        open={openEditModal}
-        setOpen={setOpenEditModal}
-        editSwapObj={editSwap}
-        getModsInfo={getModsInfo}
-      />
+      {deleteSwap && (
+        <DeleteModal
+          swap={row}
+          open={openDelModal}
+          setOpen={setOpenDelModal}
+          deleteSwapObj={deleteSwap}
+        />
+      )}
+      {editSwap && (
+        <EditModal
+          swap={row}
+          open={openEditModal}
+          setOpen={setOpenEditModal}
+          editSwapObj={editSwap}
+          getModsInfo={getModsInfo}
+        />
+      )}
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
         <TableCell>{row.current}</TableCell>
         <TableCell>{row.request}</TableCell>
-        <TableCell>{row.status ? 'True' : 'False'}</TableCell>
+        <TableCell>{row.status}</TableCell>
         <TableCell>
           <IconButton
             aria-label="expand row"
@@ -82,14 +99,35 @@ const SwapRow: React.FC<SwapRowProps> = ({
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Grid container sx={{ margin: 2 }}>
-              <Grid item style={{ textAlign: 'center' }} xs={6}>
-                <Button onClick={() => setOpenEditModal(true)}>edit</Button>
-              </Grid>
-              <Grid item style={{ textAlign: 'center' }} xs={6}>
-                <Button color="warning" onClick={() => setOpenDelModal(true)}>
-                  delete
-                </Button>
-              </Grid>
+              {editSwap && (
+                <Grid item style={{ textAlign: 'center' }} xs>
+                  <Button onClick={() => setOpenEditModal(true)}>edit</Button>
+                </Grid>
+              )}
+              {deleteSwap && (
+                <Grid item style={{ textAlign: 'center' }} xs>
+                  <Button color="warning" onClick={() => setOpenDelModal(true)}>
+                    delete
+                  </Button>
+                </Grid>
+              )}
+              {confirmSwap && (
+                <Grid item style={{ textAlign: 'center' }} xs>
+                  <Button onClick={() => confirmSwap.confirmSwap(row.id)}>
+                    confirm
+                  </Button>
+                </Grid>
+              )}
+              {rejectSwap && (
+                <Grid item style={{ textAlign: 'center' }} xs>
+                  <Button
+                    color="warning"
+                    onClick={() => rejectSwap.rejectSwap(row.id)}
+                  >
+                    reject
+                  </Button>
+                </Grid>
+              )}
             </Grid>
           </Collapse>
         </TableCell>

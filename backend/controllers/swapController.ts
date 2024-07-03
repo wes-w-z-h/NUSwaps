@@ -1,6 +1,9 @@
 import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
+import getOptimalMatch from '../util/match/matchService.js';
+import { SwapStatus } from '../types/api.js';
+import { MatchModel } from '../models/matchModel.js';
 
 const verifySwap = async (
   userId: string,
@@ -41,6 +44,33 @@ const verifySwap = async (
   if (existing2) {
     throw createHttpError(400, 'Duplicate swaps not allowed');
   }
+};
+
+const verifyMatchedStatus = async (id: string) => {
+  // Verify valid swap
+  const currSwap = await SwapModel.findById(id)
+    .exec()
+    .then((swap) => {
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+
+      const matchedStatus: SwapStatus = 'MATCHED';
+      if (swap.status !== matchedStatus || !swap.match) {
+        throw createHttpError(400, 'Invalid request to confirm / reject swap');
+      }
+
+      return swap;
+    });
+
+  // Verify valid match
+  await MatchModel.findById(currSwap.match)
+    .exec()
+    .then((match) => {
+      if (match?.status !== 'PENDING') {
+        throw createHttpError(400, 'Invalid request to confirm / reject swap');
+      }
+    });
 };
 
 export const getSwaps: RequestHandler = async (req, res, next) => {
@@ -86,6 +116,106 @@ export const deleteSwap: RequestHandler = async (req, res, next) => {
     .catch((error) => next(createHttpError(400, error.message)));
 };
 
+export const confirmSwap: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    await verifyMatchedStatus(id);
+
+    const confirmedSwap = await SwapModel.findByIdAndUpdate(
+      id,
+      { status: 'CONFIRMED' },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
+
+    if (!confirmedSwap) {
+      throw createHttpError(400, 'Unable to confirm swap');
+    }
+
+    const match = await MatchModel.findById(confirmedSwap.match).exec();
+    if (!match) {
+      throw createHttpError(404, 'Match not found');
+    }
+    const newStatus = await match.getNewStatus();
+
+    await MatchModel.findByIdAndUpdate(confirmedSwap.match, {
+      status: newStatus,
+    }).exec();
+
+    res.status(200).json(confirmedSwap.createResponse());
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const rejectSwap: RequestHandler = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    await verifyMatchedStatus(id);
+
+    let rejectedSwap = await SwapModel.findById(id).exec();
+
+    if (!rejectedSwap) {
+      throw createHttpError(404, 'Swap not found');
+    }
+
+    const swapIds = await MatchModel.findByIdAndUpdate(rejectedSwap.match, {
+      status: 'REJECTED',
+    })
+      .exec()
+      .then((match) => {
+        if (!match) {
+          throw createHttpError('404', 'Match not found');
+        }
+
+        return match.swaps;
+      });
+
+    if (!swapIds) {
+      throw createHttpError(400, 'Unable to reject swap');
+    }
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const swapId of swapIds) {
+      // eslint-disable-next-line no-underscore-dangle
+      if (swapId.toString() !== rejectedSwap._id.toString()) {
+        const swap = await SwapModel.findByIdAndUpdate(
+          swapId,
+          { status: 'UNMATCHED', match: null },
+          {
+            runValidators: true,
+            new: true,
+          }
+        ).exec();
+        if (swap) {
+          getOptimalMatch(swap);
+        }
+      }
+    }
+
+    rejectedSwap = await SwapModel.findByIdAndUpdate(
+      id,
+      { status: 'UNMATCHED', match: null },
+      {
+        runValidators: true,
+        new: true,
+      }
+    ).exec();
+
+    if (!rejectedSwap) {
+      throw createHttpError(400, 'Unable to reject swap');
+    }
+
+    res.status(200).json(rejectedSwap.createResponse());
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const updateSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
   const { userId } = req;
@@ -101,6 +231,8 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
     if (!data) {
       throw createHttpError(404, 'Swap not found');
     }
+
+    getOptimalMatch(data);
 
     res.status(200).json(data.createResponse());
   } catch (error) {
@@ -126,6 +258,8 @@ export const createSwap: RequestHandler = async (req, res, next) => {
     if (!data) {
       throw createHttpError(400, 'Unable to create swap');
     }
+
+    getOptimalMatch(data);
 
     res.status(200).json(data.createResponse());
   } catch (error: unknown) {

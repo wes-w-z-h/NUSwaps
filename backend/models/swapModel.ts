@@ -28,9 +28,14 @@ const swapSchema = new Schema<ISwap, Swap, ISwapMethods>(
       required: true,
     },
     status: {
-      type: Boolean,
+      type: String,
       required: true,
-      default: false,
+      default: 'UNMATCHED',
+    },
+    match: {
+      type: Schema.Types.ObjectId,
+      ref: 'Match',
+      default: null,
     },
   },
   { timestamps: true, toJSON: { getters: true } } // createdAt option

@@ -14,6 +14,10 @@ swapRouter.get('/:id', SwapController.getSwap);
 
 swapRouter.delete('/:id', SwapController.deleteSwap);
 
+swapRouter.patch('/confirm/:id', SwapController.confirmSwap);
+
+swapRouter.patch('/reject/:id', SwapController.rejectSwap);
+
 swapRouter.use(verifySwap);
 
 swapRouter.post('/', SwapController.createSwap);
