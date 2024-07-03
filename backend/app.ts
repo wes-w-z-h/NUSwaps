@@ -23,14 +23,9 @@ const loadMiddleware = () => {
   app.use('/api/matches', matchRouter);
 };
 
-const URL =
-  env.CURR_ENV === 'DEVELOPMENT'
-    ? env.FRONTEND_URL_LOCAL
-    : env.FRONTEND_URL_PROD;
-
 app.use(
   cors({
-    origin: URL,
+    origin: env.FRONTEND_URL,
     credentials: true,
   })
 );

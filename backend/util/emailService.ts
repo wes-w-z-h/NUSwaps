@@ -10,10 +10,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const link =
-  env.CURR_ENV === 'DEVELOPMENT'
-    ? env.FRONTEND_URL_LOCAL
-    : env.FRONTEND_URL_PROD;
+const link = env.FRONTEND_URL;
 
 const sendVerification = (to: string, token: string) => {
   const mailOptions = {
