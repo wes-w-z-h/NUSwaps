@@ -32,6 +32,7 @@ export interface ISwap {
   current: string;
   request: string;
   status: SwapStatus;
+  match: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
   __v: string;
@@ -53,6 +54,27 @@ export type SwapPayload = {
   request: string;
   status: SwapStatus;
 };
+
+export type MatchStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export interface IMatch {
+  _id: Types.ObjectId;
+  courseId: ModuleCode;
+  lessonType: string;
+  current: string;
+  request: string;
+  swaps: [Types.ObjectId];
+  status: MatchStatus;
+  createdAt: Date;
+  updatedAt: Date;
+  __v: string;
+}
+
+export interface IMatchMethods {
+  updateStatus(): MatchStatus;
+}
+
+export type Match = Model<IMatch, {}, IMatchMethods>;
 
 export type APIResponse = {
   success: boolean;
