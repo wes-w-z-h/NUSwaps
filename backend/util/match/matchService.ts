@@ -14,7 +14,7 @@ import { MatchModel } from '../../models/matchModel.js';
 const getOptimalMatch = async (newSwap: ISwap) => {
   const existingSwaps = await SwapModel.find({ status: 'UNMATCHED' }).exec();
   const partnerSwaps = greedyMatch(newSwap, existingSwaps);
-  if (!partnerSwaps) {
+  if (partnerSwaps.length === 0) {
     return;
   }
   const swapIds = partnerSwaps.map((swap) => swap.id);

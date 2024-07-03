@@ -7,7 +7,7 @@ const matchSchema = new Schema<IMatch, Match, IMatchMethods>(
   {
     swaps: [
       {
-        type: [Schema.Types.ObjectId],
+        type: Schema.Types.ObjectId,
         ref: 'Swap',
         required: true,
         immutable: true,
