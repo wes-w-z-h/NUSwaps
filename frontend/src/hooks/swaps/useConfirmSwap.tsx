@@ -4,7 +4,7 @@ import { useSwapsContext } from './useSwapsContext';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
 import { useLogout } from '../auth/useLogout';
 
-export const useConfirmSwap = () => {
+const useConfirmSwap = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { logout } = useLogout();
@@ -36,3 +36,5 @@ export const useConfirmSwap = () => {
 
   return { confirmSwap, loading, error };
 };
+
+export default useConfirmSwap;

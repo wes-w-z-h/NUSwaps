@@ -17,7 +17,7 @@ import CustomAlert from '../CustomAlert';
 import useEditSwap from '../../hooks/swaps/useEditSwap';
 import useDeleteSwap from '../../hooks/swaps/useDeleteSwap';
 import useGetModsInfo from '../../hooks/mods/useGetModInfo';
-import { useConfirmSwap } from '../../hooks/swaps/useConfirmSwap';
+import useConfirmSwap from '../../hooks/swaps/useConfirmSwap';
 import { useRejectSwap } from '../../hooks/swaps/useRejectSwap';
 
 const SwapTable: React.FC = () => {
