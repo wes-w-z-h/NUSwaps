@@ -3,8 +3,6 @@ import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import createHttpError, { isHttpError } from 'http-errors';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
@@ -25,32 +23,18 @@ const loadMiddleware = () => {
   app.use('/api/matches', matchRouter);
 };
 
-if (env.CURR_ENV === 'DEVELOPMENT') {
-  app.use(
-    cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    })
-  );
-  loadMiddleware();
-} else {
-  app.use(
-    cors({
-      origin: 'https://nuswaps-1.onrender.com',
-      credentials: true,
-    })
-  );
-  loadMiddleware();
-  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-  const __filename = fileURLToPath(import.meta.url);
-  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
-  const __dirname = path.dirname(__filename);
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
-  const p = path.resolve(__dirname, '../../frontend/dist/', 'index.html');
-  app.get('*', (req, res) => {
-    res.sendFile(p);
-  });
-}
+const URL =
+  env.CURR_ENV === 'DEVELOPMENT'
+    ? env.FRONTEND_URL_LOCAL
+    : env.FRONTEND_URL_PROD;
+
+app.use(
+  cors({
+    origin: URL,
+    credentials: true,
+  })
+);
+loadMiddleware();
 
 app.use((req, res, next) => {
   next(createHttpError(404, 'Missing endpoint.'));
