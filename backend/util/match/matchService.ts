@@ -4,6 +4,7 @@ import greedyMatch from './matchAlgo.js';
 import { sendMatch } from '../emailService.js';
 import UserModel from '../../models/userModel.js';
 import { ISwap } from '../../types/api.js';
+import { MatchModel } from '../../models/matchModel.js';
 
 /**
  * Finds the optimal swaps with all unmatched swap requests
@@ -16,6 +17,13 @@ const getOptimalMatch = async (newSwap: ISwap) => {
   if (!partnerSwaps) {
     return;
   }
+  const swapIds = partnerSwaps.map((swap) => swap.id);
+  const match = await MatchModel.create({
+    courseId: newSwap.courseId,
+    lessonType: newSwap.lessonType,
+    swaps: swapIds,
+    status: 'PENDING',
+  });
 
   // Usage of for loop to use await
   // eslint-disable-next-line no-restricted-syntax
@@ -26,7 +34,8 @@ const getOptimalMatch = async (newSwap: ISwap) => {
     }
     await SwapModel.findByIdAndUpdate(
       swap.id,
-      { status: 'MATCHED' },
+      // eslint-disable-next-line no-underscore-dangle
+      { status: 'MATCHED', match: match._id },
       {
         runValidators: true,
         new: true,
