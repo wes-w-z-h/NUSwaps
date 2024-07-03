@@ -3,6 +3,7 @@ import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 import getOptimalMatch from '../util/match/matchService.js';
 import { SwapStatus } from '../types/api.js';
+import { MatchModel } from '../models/matchModel.js';
 
 const verifySwap = async (
   userId: string,
@@ -53,7 +54,7 @@ const verifyMatchedStatus = async (id: string) => {
         throw createHttpError(404, 'Swap not found');
       }
       const matchedStatus: SwapStatus = 'MATCHED';
-      if (swap.status !== matchedStatus) {
+      if (swap.status !== matchedStatus || !swap.match) {
         throw createHttpError(400, 'Invalid request to confirm swap');
       }
     });
@@ -120,6 +121,12 @@ export const confirmSwap: RequestHandler = async (req, res, next) => {
     if (!confirmedSwap) {
       throw createHttpError(400, 'Unable to confirm swap');
     }
+
+    const match = await MatchModel.findById(confirmedSwap.match).exec();
+    const newStatus = match?.getNewStatus();
+    await MatchModel.findByIdAndUpdate(confirmedSwap.match, {
+      status: newStatus,
+    }).exec();
 
     res.status(200).json(confirmedSwap?.createResponse());
   } catch (error) {

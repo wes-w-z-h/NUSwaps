@@ -42,7 +42,10 @@ const getOptimalMatch = async (newSwap: ISwap) => {
       }
     ).exec();
 
-    await sendMatch(user.email, swap);
+    // TODO: Remove this
+    if (user.email !== 'e1122360@u.nus.edu') {
+      await sendMatch(user.email, swap);
+    }
 
     // TODO: Emit event in socket
   }

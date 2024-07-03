@@ -69,7 +69,7 @@ export interface IMatch {
 }
 
 export interface IMatchMethods {
-  updateStatus(): MatchStatus;
+  getNewStatus(): MatchStatus;
 }
 
 export type Match = Model<IMatch, {}, IMatchMethods>;
