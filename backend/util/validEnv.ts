@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
 const __dirname = path.dirname(__filename);
 const p = path.resolve(__dirname, `../.env.${process.env.NODE_ENV}`);
-console.log(p);
+// console.log(p);
 dotenv.config({ path: p });
 
 export default cleanEnv(process.env, {

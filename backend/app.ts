@@ -1,13 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import createHttpError, { isHttpError } from 'http-errors';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
 import authRouter from './routes/authRoute.js';
-import env from './util/validEnv.js';
 
 const app = express();
 
@@ -25,13 +25,18 @@ const loadMiddleware = () => {
   app.use('/api/matches', matchRouter);
 };
 
-app.use(
-  cors({
-    origin: env.FRONTEND_URL,
-    credentials: true,
-  })
-);
 loadMiddleware();
+if (process.env.NODE_ENV === 'production') {
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+  const __filename = fileURLToPath(import.meta.url);
+  // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
+  const __dirname = path.dirname(__filename);
+  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
+  const p = path.resolve(__dirname, '../../frontend/dist/', 'index.html');
+  app.get('*', (req, res) => {
+    res.sendFile(p);
+  });
+}
 
 app.use((req, res, next) => {
   next(createHttpError(404, 'Missing endpoint.'));
