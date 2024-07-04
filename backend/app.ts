@@ -1,15 +1,13 @@
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
-import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import createHttpError, { isHttpError } from 'http-errors';
-import path from 'path';
 import { fileURLToPath } from 'url';
+import path from 'path';
 import userRouter from './routes/userRoute.js';
 import swapRouter from './routes/swapRoute.js';
 import matchRouter from './routes/matchRoute.js';
 import authRouter from './routes/authRoute.js';
-import env from './util/validEnv.js';
 
 const app = express();
 
@@ -18,23 +16,14 @@ const loadMiddleware = () => {
   app.use(cookieParser()); // accepts cookie in req
 
   app.use(morgan('dev'));
-
   app.use('/api/auth', authRouter);
   app.use('/api/users', userRouter);
   app.use('/api/swaps', swapRouter);
   app.use('/api/matches', matchRouter);
 };
 
-if (env.CURR_ENV === 'DEVELOPMENT') {
-  app.use(
-    cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    })
-  );
-  loadMiddleware();
-} else {
-  loadMiddleware();
+loadMiddleware();
+if (process.env.NODE_ENV === 'production') {
   // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
   const __filename = fileURLToPath(import.meta.url);
   // eslint-disable-next-line @typescript-eslint/naming-convention, no-underscore-dangle
