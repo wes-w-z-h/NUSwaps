@@ -31,11 +31,11 @@ export const updateUser: RequestHandler = async (req, res, next) => {
   const id = req.userId;
   const { oldPassword, newPassword } = req.body;
 
-  if (!oldPassword || !newPassword) {
-    throw createHttpError(400, 'Missing fields');
-  }
-
   try {
+    if (!oldPassword || !newPassword) {
+      throw createHttpError(400, 'Missing fields');
+    }
+
     let data = await UserModel.findById(id).exec();
     if (!data) {
       throw createHttpError(404, 'User not found');
