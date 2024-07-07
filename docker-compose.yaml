@@ -3,7 +3,7 @@ services:
     build: backend/.
     container_name: server
     env_file:
-      - backend/.env
+      - backend/.env.docker
     ports:
       - 4000:4000
     image: 'server'
@@ -34,6 +34,8 @@ services:
   client-dev:
     build: frontend/.
     container_name: client-dev
+    env_file:
+      - frontend/.env.development
     ports:
       - 3000:3000
     depends_on:
