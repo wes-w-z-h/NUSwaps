@@ -4,5 +4,5 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 4000
-RUN npx tsc
-CMD ["node", "dist/server.js"]
+# RUN npx tsc
+CMD ["npm", "run", "dev"]
