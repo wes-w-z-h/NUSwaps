@@ -74,19 +74,15 @@ export const refresh: RequestHandler = async (req, res, next) => {
     }
 
     const refreshToken = cookies.jwt;
-    jwt.verify(refreshToken, env.JWT_KEY, async (err: any, decoded: any) => {
-      if (err) {
-        return res.status(403).json({ msg: 'Forbidden' });
-      }
-      const user = await UserModel.findById(decoded.id).exec();
+    const decoded = jwt.verify(refreshToken, env.JWT_KEY) as JwtPayload;
+    const user = await UserModel.findById(decoded.id).exec();
 
-      if (!user) {
-        throw createHttpError(401, 'Unauthorised: no user found');
-      }
+    if (!user) {
+      throw createHttpError(401, 'Unauthorised: no user not found');
+    }
 
-      const accessToken = createToken(decoded.id, '15m');
-      return res.status(200).json({ token: accessToken });
-    });
+    const accessToken = createToken(decoded.id, '15m');
+    res.status(200).json({ token: accessToken });
   } catch (error) {
     next(error);
   }
