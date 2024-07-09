@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
-import getOptimalMatch from '../util/match/matchService.js';
+import { getOptimalMatch, rejectMatch } from '../util/match/matchService.js';
 import { SwapStatus } from '../types/api.js';
 import { MatchModel } from '../models/matchModel.js';
 
@@ -158,44 +158,11 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
     await verifyMatchedStatus(id);
 
     let rejectedSwap = await SwapModel.findById(id).exec();
-
     if (!rejectedSwap) {
       throw createHttpError(404, 'Swap not found');
     }
 
-    const swapIds = await MatchModel.findByIdAndUpdate(rejectedSwap.match, {
-      status: 'REJECTED',
-    })
-      .exec()
-      .then((match) => {
-        if (!match) {
-          throw createHttpError('404', 'Match not found');
-        }
-
-        return match.swaps;
-      });
-
-    if (!swapIds) {
-      throw createHttpError(400, 'Unable to reject swap');
-    }
-
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const swapId of swapIds) {
-      // eslint-disable-next-line no-underscore-dangle
-      if (swapId.toString() !== rejectedSwap._id.toString()) {
-        const swap = await SwapModel.findByIdAndUpdate(
-          swapId,
-          { status: 'UNMATCHED', match: null },
-          {
-            runValidators: true,
-            new: true,
-          }
-        ).exec();
-        if (swap) {
-          getOptimalMatch(swap);
-        }
-      }
-    }
+    await rejectMatch(rejectedSwap);
 
     rejectedSwap = await SwapModel.findByIdAndUpdate(
       id,

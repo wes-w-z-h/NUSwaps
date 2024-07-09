@@ -1,7 +1,7 @@
 import createHttpError from 'http-errors';
 import { SwapModel } from '../../models/swapModel.js';
 import greedyMatch from './matchAlgo.js';
-import { sendMatch } from '../emailService.js';
+import { sendMatchFound, sendMatchRejected } from '../emailService.js';
 import UserModel from '../../models/userModel.js';
 import { ISwap } from '../../types/api.js';
 import { MatchModel } from '../../models/matchModel.js';
@@ -11,7 +11,7 @@ import { MatchModel } from '../../models/matchModel.js';
  * that matches the most number of swaps.
  * Sends an email notification to matched parties
  */
-const getOptimalMatch = async (newSwap: ISwap) => {
+export const getOptimalMatch = async (newSwap: ISwap) => {
   const existingSwaps = await SwapModel.find({ status: 'UNMATCHED' }).exec();
   const partnerSwaps = greedyMatch(newSwap, existingSwaps);
   if (partnerSwaps.length === 0) {
@@ -42,10 +42,61 @@ const getOptimalMatch = async (newSwap: ISwap) => {
       }
     ).exec();
 
-    await sendMatch(user.email, swap);
+    await sendMatchFound(user.email, swap);
 
     // TODO: Emit event in socket
   }
 };
 
-export default getOptimalMatch;
+/**
+ * Updates the status of the swap and other swaps in the match
+ * Sends an email notification to rejected parties
+ * @param rejectedSwap Swap that has been rejected
+ */
+export const rejectMatch = async (rejectedSwap: ISwap) => {
+  const swapIds = await MatchModel.findByIdAndUpdate(rejectedSwap.match, {
+    status: 'REJECTED',
+  })
+    .exec()
+    .then((match) => {
+      if (!match) {
+        throw createHttpError('404', 'Match not found');
+      }
+
+      return match.swaps;
+    });
+
+  if (!swapIds) {
+    throw createHttpError(400, 'Unable to reject swap');
+  }
+
+  // eslint-disable-next-line no-restricted-syntax
+  for await (const swapId of swapIds) {
+    // eslint-disable-next-line no-underscore-dangle
+    if (swapId.toString() !== rejectedSwap._id.toString()) {
+      // Update swap status to 'UNMATCHED'
+      const swap = await SwapModel.findByIdAndUpdate(
+        swapId,
+        { status: 'UNMATCHED', match: null },
+        {
+          runValidators: true,
+          new: true,
+        }
+      ).exec();
+
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+
+      // Notify user of rejected match
+      const user = await UserModel.findById(swap.userId).exec();
+      if (!user) {
+        throw createHttpError(400, 'User not found');
+      }
+      await sendMatchRejected(user.email, swap);
+
+      // Find new match for the user's swap
+      getOptimalMatch(swap);
+    }
+  }
+};

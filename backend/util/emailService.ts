@@ -12,26 +12,37 @@ const transporter = nodemailer.createTransport({
 
 const link = env.FRONTEND_URL;
 
-const sendVerification = (to: string, token: string) => {
+const sendGeneric = (to: string, subject: string, html: string) => {
   const mailOptions = {
     from: 'NUSwaps',
     to,
-    subject: 'Account Verification',
-    html: `<p>Click <a href="${link}/verify/${token}">here</a> to verify your account. Link expires in 5 minutes</p>`,
+    subject,
+    html,
   };
 
   return transporter.sendMail(mailOptions);
 };
 
-const sendMatch = (to: string, swap: ISwap) => {
-  const mailOptions = {
-    from: 'NUSwaps',
-    to,
-    subject: 'NUSwaps - Match found',
-    html: `<p>We have found a match for your requested swap for ${swap.courseId}. Please accept the match <a href="${link}/dashboard">here</a> as soon as possible.</p>`,
-  };
-
-  return transporter.sendMail(mailOptions);
+export const sendVerification = (to: string, token: string) => {
+  const subject = 'Account Verification';
+  const html = `<p>Click <a href="${link}/verify/${token}">here</a> to verify your account. Link expires in 5 minutes</p>`;
+  return sendGeneric(to, subject, html);
 };
 
-export { sendVerification, sendMatch };
+export const sendMatchFound = (to: string, swap: ISwap) => {
+  const subject = 'NUSwaps - Match found';
+  const html = `<p>We have found a match for your requested swap for ${swap.courseId}. Please accept the match <a href="${link}/dashboard">here</a> as soon as possible.</p>`;
+  return sendGeneric(to, subject, html);
+};
+
+export const sendMatchRejected = (to: string, swap: ISwap) => {
+  const subject = 'NUSwaps - Match rejected';
+  const html = `Your requested swap for ${swap.courseId} has been declined by the other party. We will actively find another match for you.`;
+  return sendGeneric(to, subject, html);
+};
+
+export const sendMatchAccepted = (to: string, swap: ISwap) => {
+  const subject = 'NUSwaps - Match accepted';
+  const html = `Your requested swap for ${swap.courseId} has been accepted by all parties.`;
+  return sendGeneric(to, subject, html);
+};
