@@ -113,7 +113,10 @@ const SwapRow: React.FC<SwapRowProps> = ({
               )}
               {confirmSwap && (
                 <Grid item style={{ textAlign: 'center' }} xs>
-                  <Button onClick={() => confirmSwap.confirmSwap(row.id)}>
+                  <Button
+                    onClick={() => confirmSwap.confirmSwap(row.id)}
+                    disabled={confirmSwap.loading || rejectSwap?.loading}
+                  >
                     confirm
                   </Button>
                 </Grid>
@@ -123,6 +126,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
                   <Button
                     color="warning"
                     onClick={() => rejectSwap.rejectSwap(row.id)}
+                    disabled={confirmSwap?.loading || rejectSwap.loading}
                   >
                     reject
                   </Button>
