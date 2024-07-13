@@ -4,6 +4,7 @@ import { Module } from '../../types/modules';
 import { useModsContext } from './useModsContext';
 
 const useGetModInfo = () => {
+  // TODO: change to env vars
   const ACAD_YEAR = '2023-2024';
   const { modsDispatch } = useModsContext();
   const [error, setError] = useState<string | null>(null);
