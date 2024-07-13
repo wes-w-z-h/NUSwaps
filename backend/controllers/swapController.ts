@@ -2,7 +2,6 @@ import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 import { getOptimalMatch, rejectMatch } from '../util/match/matchService.js';
-import { SwapStatus } from '../types/api.js';
 import { MatchModel } from '../models/matchModel.js';
 
 const verifySwap = async (
@@ -46,6 +45,20 @@ const verifySwap = async (
   }
 };
 
+const verifyUnmatchedStatus = async (id: string) => {
+  await SwapModel.findById(id)
+    .exec()
+    .then((swap) => {
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+
+      if (swap.status !== 'UNMATCHED' || swap.match) {
+        throw createHttpError(400, 'Invalid swap status');
+      }
+    });
+};
+
 const verifyMatchedStatus = async (id: string) => {
   // Verify valid swap
   const currSwap = await SwapModel.findById(id)
@@ -55,8 +68,7 @@ const verifyMatchedStatus = async (id: string) => {
         throw createHttpError(404, 'Swap not found');
       }
 
-      const matchedStatus: SwapStatus = 'MATCHED';
-      if (swap.status !== matchedStatus || !swap.match) {
+      if (swap.status !== 'MATCHED' || !swap.match) {
         throw createHttpError(400, 'Invalid request to confirm / reject swap');
       }
 
@@ -106,6 +118,14 @@ export const getUserSwaps: RequestHandler = async (req, res, next) => {
 
 export const deleteSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
+
+  try {
+    await verifyUnmatchedStatus(id);
+  } catch (error) {
+    next(error);
+    return;
+  }
+
   await SwapModel.findByIdAndDelete(id)
     .exec()
     .then((data) =>
@@ -190,6 +210,7 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
 
   try {
     await verifySwap(userId, courseId, lessonType, current, request, id);
+    await verifyUnmatchedStatus(id);
     const data = await SwapModel.findByIdAndUpdate(id, req.body, {
       runValidators: true,
       new: true,
