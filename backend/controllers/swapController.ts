@@ -2,85 +2,11 @@ import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
 import { getOptimalMatch, rejectMatch } from '../util/match/matchService.js';
-import { SwapStatus } from '../types/api.js';
 import { MatchModel } from '../models/matchModel.js';
-
-const verifySwap = async (
-  userId: string,
-  courseId: string,
-  lessonType: string,
-  current: string,
-  request: string,
-  swapId?: string
-) => {
-  const existing = await SwapModel.find({
-    userId,
-    courseId,
-    lessonType,
-  }).exec();
-
-  if (
-    existing.length === 0 ||
-    (existing.length === 1 && existing[0].id === swapId)
-  ) {
-    return;
-  }
-
-  if (existing[0].current !== current) {
-    throw createHttpError(
-      400,
-      `Invalid current slot, differs from existing swap`
-    );
-  }
-
-  const existing2 = await SwapModel.findOne({
-    userId,
-    courseId,
-    lessonType,
-    current,
-    request,
-  });
-
-  if (existing2) {
-    throw createHttpError(400, 'Duplicate swaps not allowed');
-  }
-};
-
-const verifyMatchedStatus = async (id: string) => {
-  // Verify valid swap
-  const currSwap = await SwapModel.findById(id)
-    .exec()
-    .then((swap) => {
-      if (!swap) {
-        throw createHttpError(404, 'Swap not found');
-      }
-
-      const matchedStatus: SwapStatus = 'MATCHED';
-      if (swap.status !== matchedStatus || !swap.match) {
-        throw createHttpError(400, 'Invalid request to confirm / reject swap');
-      }
-
-      return swap;
-    });
-
-  // Verify valid match
-  await MatchModel.findById(currSwap.match)
-    .exec()
-    .then((match) => {
-      if (match?.status !== 'PENDING') {
-        throw createHttpError(400, 'Invalid request to confirm / reject swap');
-      }
-    });
-};
-
-export const getSwaps: RequestHandler = async (req, res, next) => {
-  await SwapModel.find({})
-    .exec()
-    .then((data) => {
-      res.status(200).json(data.map((swap) => swap.createResponse()));
-    })
-    .catch((error) => next(createHttpError(400, error.message)));
-};
+import {
+  validateSwap,
+  validateMatchedStatus,
+} from '../util/swap/validateSwap.js';
 
 export const getSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
@@ -120,7 +46,7 @@ export const confirmSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await verifyMatchedStatus(id);
+    await validateMatchedStatus(id);
 
     const confirmedSwap = await SwapModel.findByIdAndUpdate(
       id,
@@ -155,7 +81,7 @@ export const rejectSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
 
   try {
-    await verifyMatchedStatus(id);
+    await validateMatchedStatus(id);
 
     let rejectedSwap = await SwapModel.findById(id).exec();
     if (!rejectedSwap) {
@@ -189,7 +115,7 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
   const { courseId, lessonType, current, request } = req.body;
 
   try {
-    await verifySwap(userId, courseId, lessonType, current, request, id);
+    await validateSwap(userId, courseId, lessonType, current, request, id);
     const data = await SwapModel.findByIdAndUpdate(id, req.body, {
       runValidators: true,
       new: true,
@@ -212,7 +138,7 @@ export const createSwap: RequestHandler = async (req, res, next) => {
   const { current, request, courseId, lessonType } = req.body;
 
   try {
-    await verifySwap(userId, courseId, lessonType, current, request);
+    await validateSwap(userId, courseId, lessonType, current, request);
 
     const data = await SwapModel.create({
       userId,
