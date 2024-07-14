@@ -70,9 +70,18 @@ export interface IMatch {
 
 export interface IMatchMethods {
   getNewStatus(): Promise<MatchStatus>;
+  createResponse(): MatchPayload;
 }
 
 export type Match = Model<IMatch, {}, IMatchMethods>;
+
+export type MatchPayload = {
+  id: Types.ObjectId;
+  courseId: ModuleCode;
+  lessonType: string;
+  swaps: [Types.ObjectId];
+  status: MatchStatus;
+};
 
 export type APIResponse = {
   success: boolean;
