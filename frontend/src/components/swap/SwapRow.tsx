@@ -5,8 +5,10 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import { Swap } from '../../types/Swap';
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, Tooltip } from '@mui/material';
 import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 import { Module } from '../../types/modules';
@@ -55,9 +57,10 @@ const SwapRow: React.FC<SwapRowProps> = ({
   rejectSwap,
   getModsInfo,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
+  const [openMatchModal, setOpenMatchModal] = useState(false);
 
   return (
     <React.Fragment>
@@ -78,6 +81,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
           getModsInfo={getModsInfo}
         />
       )}
+      {openMatchModal && <div>Match Modal Here</div>}
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
@@ -88,16 +92,38 @@ const SwapRow: React.FC<SwapRowProps> = ({
           <IconButton
             aria-label="expand row"
             size="small"
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpenDrawer(!openDrawer)}
             color="secondary"
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            {openDrawer ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
+        </TableCell>
+        <TableCell>
+          <Tooltip title="View match details">
+            <IconButton
+              aria-label="view match"
+              size="small"
+              onClick={() => setOpenMatchModal(!openMatchModal)}
+              color="secondary"
+            >
+              {row.status !== 'UNMATCHED' && <VisibilityIcon />}
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Pending confirmation">
+            <IconButton
+              aria-label="prompt user action"
+              size="small"
+              onClick={() => setOpenDrawer(!openDrawer)}
+              color="error"
+            >
+              {row.status === 'MATCHED' && <PriorityHighRoundedIcon />}
+            </IconButton>
+          </Tooltip>
         </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={openDrawer} timeout="auto" unmountOnExit>
             <Grid container sx={{ margin: 2 }}>
               {editSwap && (
                 <Grid item style={{ textAlign: 'center' }} xs>
