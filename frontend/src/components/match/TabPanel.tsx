@@ -1,17 +1,13 @@
 import { Box, Card, CardMedia, Typography } from '@mui/material';
-import { Match } from '../../types/Match';
+import { Swap } from '../../types/Swap';
 
-type MatchSummaryPanelProps = {
-  active: number;
+type TabPanelProps = {
   index: number;
-  match: Match;
+  active: number;
+  swap: Swap;
 };
 
-const MatchSummaryPanel: React.FC<MatchSummaryPanelProps> = ({
-  active,
-  index,
-  match,
-}) => {
+const TabPanel: React.FC<TabPanelProps> = ({ index, active, swap }) => {
   return (
     <Card
       style={{ flexGrow: 1 }}
@@ -30,10 +26,10 @@ const MatchSummaryPanel: React.FC<MatchSummaryPanelProps> = ({
           <br />
           <Box textAlign={'center'}>
             <Typography id="courseId-status" variant="caption">
-              Course: {match.courseId} --- Status: {match.status}{' '}
+              Course: {swap.courseId} --- Status: {swap.status}{' '}
             </Typography>
             <Typography id="lessonType">
-              Lesson type: {match.lessonType}
+              Lesson type: {swap.lessonType}
             </Typography>
           </Box>
         </>
@@ -42,4 +38,4 @@ const MatchSummaryPanel: React.FC<MatchSummaryPanelProps> = ({
   );
 };
 
-export default MatchSummaryPanel;
+export default TabPanel;
