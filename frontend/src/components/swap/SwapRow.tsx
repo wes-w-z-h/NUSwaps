@@ -12,6 +12,10 @@ import { Button, Grid, Tooltip } from '@mui/material';
 import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 import { Module } from '../../types/modules';
+import MatchModal from '../match/MatchModal';
+import useGetMatch from '../../hooks/match/useGetMatch';
+import { Match } from '../../types/Match';
+import useGetSwap from '../../hooks/swaps/useGetSwap';
 
 // TODO: Possible to create separate components for different swap statuses
 type SwapRowProps = {
@@ -57,10 +61,28 @@ const SwapRow: React.FC<SwapRowProps> = ({
   rejectSwap,
   getModsInfo,
 }) => {
+  const { getMatch } = useGetMatch();
+  const { getSwap } = useGetSwap();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openMatchModal, setOpenMatchModal] = useState(false);
+  const [match, setMatch] = useState<Match>({} as Match);
+  const [swaps, setSwaps] = useState<Swap[]>([]);
+
+  const handleMatchClick = async () => {
+    // Get match
+    const match = await getMatch(row.id);
+    setMatch(match);
+
+    // Get swaps in match
+    const swaps = await Promise.all(
+      match.swaps.map(async (id): Promise<Swap> => getSwap(id))
+    );
+    setSwaps(swaps);
+
+    setOpenMatchModal(true);
+  };
 
   return (
     <React.Fragment>
@@ -81,7 +103,14 @@ const SwapRow: React.FC<SwapRowProps> = ({
           getModsInfo={getModsInfo}
         />
       )}
-      {openMatchModal && <div>Match Modal Here</div>}
+      {openMatchModal && (
+        <MatchModal
+          open={openMatchModal}
+          setOpen={setOpenMatchModal}
+          match={match}
+          swaps={swaps}
+        />
+      )}
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
@@ -103,7 +132,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
             <IconButton
               aria-label="view match"
               size="small"
-              onClick={() => setOpenMatchModal(!openMatchModal)}
+              onClick={handleMatchClick}
               color="secondary"
             >
               {row.status !== 'UNMATCHED' && <VisibilityIcon />}
