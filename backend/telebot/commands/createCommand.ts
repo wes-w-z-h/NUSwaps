@@ -28,9 +28,7 @@ const STATES = [
  */
 const fetchData = async (courseId: string): Promise<RawLesson[]> => {
   const { NUS_MODS_BASE_API } = env;
-  const resp = await fetch(
-    `${NUS_MODS_BASE_API}/modules/${courseId.toUpperCase()}.json`
-  );
+  const resp = await fetch(`${NUS_MODS_BASE_API}/modules/${courseId}.json`);
 
   if (!resp.ok) {
     throw createHttpError(resp.status, 'Error occured fetching mod data');
@@ -217,12 +215,15 @@ export const createHandler = async (ctx: CommandContext<CustomContext>) => {
     return;
   }
 
-  ctx.session.lessonsData = await fetchData(args[0]);
-  [ctx.session.swapState.courseId] = args;
-  ctx.session.swapState.courseId = ctx.session.swapState.courseId.toUpperCase();
+  const { swapState, state } = ctx.session;
+  const courseId = args[0].toUpperCase();
+
+  ctx.session.lessonsData = await fetchData(courseId);
+  swapState.courseId = courseId;
+
   const keyboard = generateInlineKeyboard(ctx.session);
   await ctx.reply(
-    `👇👇👇 ${STATES[ctx.session.state].split('-').join(' ')} from the list below 👇👇👇`,
+    `👇👇👇 ${STATES[state].split('-').join(' ')} from the list below 👇👇👇`,
     {
       reply_markup: keyboard,
     }
