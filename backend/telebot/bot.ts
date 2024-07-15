@@ -3,6 +3,8 @@ import env from '../util/validEnv.js';
 import { createCallback, createHandler } from './commands/createCommand.js';
 import { CustomContext, SessionData } from './types/context.js';
 import errorHandler from './middleware/errorHandler.js';
+import loginHandler from './commands/loginCommand.js';
+import checkUserExists from './middleware/verifyUser.js';
 
 // Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
@@ -23,6 +25,7 @@ const initial = (): SessionData => {
 };
 bot.use(session({ initial }));
 bot.use(errorHandler);
+bot.use(checkUserExists);
 
 // Handle the /start command.
 bot.command('start', (ctx) => ctx.reply('🟢 Welcome! Up and running! 🟢'));
@@ -41,6 +44,10 @@ bot.command('list', (ctx) => {
 
 bot.command('create', async (ctx) => {
   await createHandler(ctx);
+});
+
+bot.command('login', async (ctx) => {
+  await loginHandler(ctx);
 });
 
 bot.on('callback_query:data', (ctx) => createCallback(ctx));

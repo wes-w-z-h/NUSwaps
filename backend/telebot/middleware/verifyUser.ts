@@ -1,10 +1,10 @@
 // middleware/checkUserExists.ts
-import { CommandContext, NextFunction } from 'grammy';
+import { NextFunction } from 'grammy';
 import UserModel from '../../models/userModel.js';
 import { CustomContext } from '../types/context.js';
 
 const checkUserExists = async (
-  ctx: CommandContext<CustomContext>,
+  ctx: CustomContext,
   next: NextFunction
 ): Promise<void> => {
   // Skip middleware for /start and /help commands
@@ -22,7 +22,7 @@ const checkUserExists = async (
     return;
   }
 
-  const userExists = await UserModel.findOne({ userId });
+  const userExists = await UserModel.findOne({ telegramId: userId });
 
   if (!userExists) {
     await ctx.reply('User not found.');

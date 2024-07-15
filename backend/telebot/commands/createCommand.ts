@@ -124,7 +124,7 @@ export const createCallback = async (ctx: CustomContext) => {
   if (callbackData === 'back') {
     ctx.session.state = state - 1 < 0 ? 0 : state - 1;
   } else if (callbackData === 'submit') {
-    // console.log(swapState);
+    console.log(swapState);
     if (!userId) {
       throw createHttpError(
         400,
@@ -133,7 +133,10 @@ export const createCallback = async (ctx: CustomContext) => {
     }
     const data = await SwapModel.create({
       userId,
-      swapState,
+      courseId: swapState.courseId,
+      lessonType: swapState.lessonType,
+      current: swapState.current,
+      request: swapState.request,
     });
 
     if (!data) {
@@ -210,13 +213,14 @@ export const createHandler = async (ctx: CommandContext<CustomContext>) => {
     return;
   }
 
-  if (args[0].toLocaleLowerCase() === 'help') {
+  if (args[0].toLowerCase() === 'help') {
     await ctx.reply(HELP_TEXT);
     return;
   }
 
   const { swapState, state } = ctx.session;
   const courseId = args[0].toUpperCase();
+  console.log(ctx.session.userId);
 
   ctx.session.lessonsData = await fetchData(courseId);
   swapState.courseId = courseId;
