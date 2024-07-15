@@ -1,13 +1,14 @@
 import mongoose from 'mongoose';
 import app from './app.js';
 import env from './util/validEnv.js';
+import bot from './telebot/bot.js';
 
 const { PORT, MONGO_URI } = env;
 
 mongoose.connect(MONGO_URI).catch((error) => console.log(error));
 
 app.listen(PORT, () => console.log('listening on port:', PORT));
-
+bot.start();
 /** 
 // const server = app.listen(PORT, () => console.log('listening on port:', PORT));
 // eslint-disable-next-line global-require

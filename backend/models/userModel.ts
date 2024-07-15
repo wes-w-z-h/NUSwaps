@@ -20,6 +20,11 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
       required: true,
       // default: "",
     },
+    telegramId: {
+      type: Number,
+      unique: true,
+      required: false,
+    },
   },
   { timestamps: true } // createdAt option
 );

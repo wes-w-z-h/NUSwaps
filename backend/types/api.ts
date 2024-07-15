@@ -5,6 +5,7 @@ export interface IUser {
   _id: Types.ObjectId;
   email: string;
   password: string;
+  telegramId: number;
   createdAt: Date;
   updatedAt: Date;
   __v: string;

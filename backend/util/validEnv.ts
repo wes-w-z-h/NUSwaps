@@ -19,4 +19,6 @@ export default cleanEnv(process.env, {
   USER_ADDRESS: str(),
   APP_PASSWORD: str(),
   FRONTEND_URL: str(),
+  BOT_TOKEN: str(),
+  NUS_MODS_BASE_API: str(),
 });
