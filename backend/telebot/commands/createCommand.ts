@@ -6,6 +6,7 @@ import env from '../../util/validEnv.js';
 import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import { CustomContext, SessionData } from '../types/context.js';
+import { validateSwap } from '../../util/swap/validateSwap.js';
 
 /**
  * Array representation of the states of creating a swap
@@ -99,6 +100,7 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
 
     case 3: {
       rows.push([InlineKeyboard.text('Submit', 'submit-c')]);
+      rows.push([InlineKeyboard.text('back', 'back-c')]);
       break;
     }
 
@@ -124,19 +126,30 @@ export const createCallback = async (ctx: CustomContext) => {
   if (callbackData === 'back') {
     ctx.session.state = state - 1 < 0 ? 0 : state - 1;
   } else if (callbackData === 'submit') {
-    console.log(swapState);
+    // console.log(swapState);
     if (!userId) {
       throw createHttpError(
         400,
         'User id is missing, please login first with /login'
       );
     }
+
+    const { courseId, lessonType, current, request } = swapState;
+
+    await validateSwap(
+      userId.toString(),
+      courseId,
+      lessonType,
+      current,
+      request
+    );
+
     const data = await SwapModel.create({
       userId,
-      courseId: swapState.courseId,
-      lessonType: swapState.lessonType,
-      current: swapState.current,
-      request: swapState.request,
+      courseId,
+      lessonType,
+      current,
+      request,
     });
 
     if (!data) {
@@ -220,7 +233,7 @@ export const createHandler = async (ctx: CommandContext<CustomContext>) => {
 
   const { swapState, state } = ctx.session;
   const courseId = args[0].toUpperCase();
-  console.log(ctx.session.userId);
+  // console.log(ctx.session.userId);
 
   ctx.session.lessonsData = await fetchData(courseId);
   swapState.courseId = courseId;
