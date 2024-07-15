@@ -6,26 +6,19 @@ const errorHandler = async (ctx: CustomContext, next: NextFunction) => {
   try {
     await next();
   } catch (error) {
+    let errorMessage =
+      error instanceof Error
+        ? `${error.name} - ${error.message}`
+        : 'Unknown error occurred!';
+
     if (isHttpError(error)) {
-      if (ctx.session.state === 0) {
-        await ctx.reply(
-          `Error occured (${error.statusCode}): ${error.name} - ${error.message}`
-        );
-        return;
-      }
-      await ctx.editMessageText(
-        `Error occured (${error.statusCode}): ${error.name} - ${error.message}`
-      );
-    } else if (error instanceof Error) {
-      if (ctx.session.state === 0) {
-        await ctx.reply(`Error occured: ${error.name} - ${error.message}`);
-        return;
-      }
-      await ctx.editMessageText(
-        `Error occured: ${error.name} - ${error.message}`
-      );
+      errorMessage = `(${error.statusCode}): ${error.name} - ${error.message}`;
+    }
+
+    if (ctx.session.state === 0) {
+      await ctx.reply(`Error occurred: ${errorMessage}`);
     } else {
-      await ctx.editMessageText('Unknown error occured!');
+      await ctx.editMessageText(`Error occurred: ${errorMessage}`);
     }
   }
 };

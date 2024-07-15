@@ -54,11 +54,11 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
   const { state, swapState } = session;
   const rows: InlineKeyboardButton.CallbackButton[][] = [];
   const updateRows = (entries: string[]) => {
+    const btnsPerRow = entries.length % 2 === 0 ? 2 : 3;
     const btns = entries.map((s) => InlineKeyboard.text(s, `${s}-c`));
-    for (let i = 0; i < btns.length; i += 1) {
-      rows.push(btns.slice(i, i + 1));
+    for (let i = 0; i < btns.length; i += btnsPerRow) {
+      rows.push(btns.slice(i, i + btnsPerRow));
     }
-    rows.push([InlineKeyboard.text('Back', 'back-c')]);
   };
 
   if (!data) {
@@ -82,6 +82,7 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
         .filter((rl) => rl.lessonType === swapState.lessonType)
         .map((rl) => rl.classNo);
       updateRows(entries);
+      rows.push([InlineKeyboard.text('Back', 'back-c')]);
       break;
     }
 
@@ -95,18 +96,20 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
         )
         .map((rl) => rl.classNo);
       updateRows(entries);
+      rows.push([InlineKeyboard.text('Back', 'back-c')]);
       break;
     }
 
     case 3: {
       rows.push([InlineKeyboard.text('Submit', 'submit-c')]);
-      rows.push([InlineKeyboard.text('back', 'back-c')]);
+      rows.push([InlineKeyboard.text('Back', 'back-c')]);
       break;
     }
 
     default:
       break;
   }
+  rows.push([InlineKeyboard.text('Cancel', 'cancel-c')]);
   return InlineKeyboard.from(rows);
 };
 
@@ -125,6 +128,9 @@ export const createCallback = async (ctx: CustomContext) => {
   const { state, swapState, userId } = ctx.session;
   if (callbackData === 'back') {
     ctx.session.state = state - 1 < 0 ? 0 : state - 1;
+  } else if (callbackData === 'cancel') {
+    ctx.editMessageText('❌ Cancelled request!');
+    return;
   } else if (callbackData === 'submit') {
     // console.log(swapState);
     if (!userId) {
