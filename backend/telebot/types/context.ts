@@ -11,6 +11,7 @@ interface Swap {
 
 export interface SessionData {
   state: number;
+  page: number;
   lessonsData: RawLesson[] | null;
   userId: Types.ObjectId | null;
   swapState: Swap;

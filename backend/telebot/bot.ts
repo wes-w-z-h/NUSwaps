@@ -5,6 +5,7 @@ import { CustomContext, SessionData } from './types/context.js';
 import errorHandler from './middleware/errorHandler.js';
 import loginHandler from './commands/loginCommand.js';
 import checkUserExists from './middleware/verifyUser.js';
+import { handlePagination } from './util/generateInlineKeyboard.js';
 
 // Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
@@ -13,6 +14,7 @@ const bot = new Bot<CustomContext>(BOT_TOKEN); // <-- put your bot token between
 const initial = (): SessionData => {
   return {
     state: 0,
+    page: 0,
     userId: null,
     swapState: {
       courseId: '',
@@ -50,6 +52,9 @@ bot.command('login', async (ctx) => {
   await loginHandler(ctx);
 });
 
+bot.callbackQuery(/next-\d+/, handlePagination);
+bot.callbackQuery(/prev-\d+/, handlePagination);
+// handler for mod related btns
 bot.on('callback_query:data', (ctx) => createCallback(ctx));
 // Handle other messages.
 bot.on('message', (ctx) => ctx.reply('Unrecgonised message!'));

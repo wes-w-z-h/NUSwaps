@@ -1,12 +1,12 @@
-import { CommandContext, InlineKeyboard } from 'grammy';
+import { CommandContext } from 'grammy';
 import createHttpError from 'http-errors';
-import { InlineKeyboardButton } from 'grammy/types';
 import { Module, RawLesson } from '../../types/modules.js';
 import env from '../../util/validEnv.js';
 import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
-import { CustomContext, SessionData } from '../types/context.js';
+import { CustomContext } from '../types/context.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
+import { generateInlineKeyboard } from '../util/generateInlineKeyboard.js';
 
 /**
  * Array representation of the states of creating a swap
@@ -38,79 +38,6 @@ const fetchData = async (courseId: string): Promise<RawLesson[]> => {
   const data: Module = await resp.json();
 
   return data.semesterData[0].timetable;
-};
-
-/**
- * Function to generate the inline keyboard based on form state
- *
- * Data in inlineKeyboard is appended with -c as identifier to use callbackquery of create
- *
- * @param state - A number representing state of creation of form
- * @param data - An array of strings from the fetchData function
- * @returns InlineKeyboard - The inline keyboard sent to the user
- */
-const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
-  const data = session.lessonsData;
-  const { state, swapState } = session;
-  const rows: InlineKeyboardButton.CallbackButton[][] = [];
-  const updateRows = (entries: string[]) => {
-    const btnsPerRow = entries.length % 2 === 0 ? 2 : 3;
-    const btns = entries.map((s) => InlineKeyboard.text(s, `${s}-c`));
-    for (let i = 0; i < btns.length; i += btnsPerRow) {
-      rows.push(btns.slice(i, i + btnsPerRow));
-    }
-  };
-
-  if (!data) {
-    throw createHttpError(404, 'Lesson data not found.');
-  }
-  // console.log(state);
-  switch (state) {
-    // select-lessontype
-    case 0: {
-      const lessontypes = new Set<string>();
-      data
-        .filter((rl) => rl.lessonType !== 'Lecture')
-        .forEach((rl) => lessontypes.add(rl.lessonType));
-      updateRows([...lessontypes]);
-      break;
-    }
-
-    // back btn
-    case 1: {
-      const entries = data
-        .filter((rl) => rl.lessonType === swapState.lessonType)
-        .map((rl) => rl.classNo);
-      updateRows(entries);
-      rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      break;
-    }
-
-    // back btn plus submit btn
-    case 2: {
-      const entries = data
-        .filter(
-          (rl) =>
-            rl.lessonType === swapState.lessonType &&
-            rl.classNo !== swapState.current
-        )
-        .map((rl) => rl.classNo);
-      updateRows(entries);
-      rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      break;
-    }
-
-    case 3: {
-      rows.push([InlineKeyboard.text('Submit', 'submit-c')]);
-      rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      break;
-    }
-
-    default:
-      break;
-  }
-  rows.push([InlineKeyboard.text('Cancel', 'cancel-c')]);
-  return InlineKeyboard.from(rows);
 };
 
 /**
@@ -171,6 +98,7 @@ export const createCallback = async (ctx: CustomContext) => {
     return;
   } else {
     // console.log(ctx.session.swapState);
+    ctx.session.page = 0;
     switch (state) {
       case 0:
         swapState.lessonType = callbackData;
@@ -213,6 +141,7 @@ export const createHandler = async (ctx: CommandContext<CustomContext>) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
   ctx.session.state = 0;
+  ctx.session.page = 0;
   ctx.session.swapState = {
     courseId: '',
     lessonType: '',
@@ -245,6 +174,7 @@ export const createHandler = async (ctx: CommandContext<CustomContext>) => {
   swapState.courseId = courseId;
 
   const keyboard = generateInlineKeyboard(ctx.session);
+  // TODO: change the reply to be more legit
   await ctx.reply(
     `👇👇👇 ${STATES[state].split('-').join(' ')} from the list below 👇👇👇`,
     {
