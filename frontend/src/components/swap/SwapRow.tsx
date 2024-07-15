@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
@@ -8,7 +7,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PriorityHighRoundedIcon from '@mui/icons-material/PriorityHighRounded';
 import { Swap } from '../../types/Swap';
-import { Button, Grid, Tooltip } from '@mui/material';
+import { Tooltip } from '@mui/material';
 import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 import { Module } from '../../types/modules';
@@ -16,6 +15,8 @@ import MatchModal from '../match/MatchModal';
 import useGetMatch from '../../hooks/match/useGetMatch';
 import { Match } from '../../types/Match';
 import useGetSwap from '../../hooks/swaps/useGetSwap';
+import UnmatchedDrawer from './drawer/UnmatchedDrawer';
+import MatchedDrawer from './drawer/MatchedDrawer';
 
 // TODO: Possible to create separate components for different swap statuses
 type SwapRowProps = {
@@ -150,47 +151,21 @@ const SwapRow: React.FC<SwapRowProps> = ({
           </Tooltip>
         </TableCell>
       </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={openDrawer} timeout="auto" unmountOnExit>
-            <Grid container sx={{ margin: 2 }}>
-              {editSwap && (
-                <Grid item style={{ textAlign: 'center' }} xs>
-                  <Button onClick={() => setOpenEditModal(true)}>edit</Button>
-                </Grid>
-              )}
-              {deleteSwap && (
-                <Grid item style={{ textAlign: 'center' }} xs>
-                  <Button color="warning" onClick={() => setOpenDelModal(true)}>
-                    delete
-                  </Button>
-                </Grid>
-              )}
-              {confirmSwap && (
-                <Grid item style={{ textAlign: 'center' }} xs>
-                  <Button
-                    onClick={() => confirmSwap.confirmSwap(row.id)}
-                    disabled={confirmSwap.loading || rejectSwap?.loading}
-                  >
-                    confirm
-                  </Button>
-                </Grid>
-              )}
-              {rejectSwap && (
-                <Grid item style={{ textAlign: 'center' }} xs>
-                  <Button
-                    color="warning"
-                    onClick={() => rejectSwap.rejectSwap(row.id)}
-                    disabled={confirmSwap?.loading || rejectSwap.loading}
-                  >
-                    reject
-                  </Button>
-                </Grid>
-              )}
-            </Grid>
-          </Collapse>
-        </TableCell>
-      </TableRow>
+      {row.status === 'UNMATCHED' && (
+        <UnmatchedDrawer
+          openDrawer={openDrawer}
+          setOpenEditModal={setOpenEditModal}
+          setOpenDelModal={setOpenDelModal}
+        />
+      )}
+      {row.status === 'MATCHED' && (
+        <MatchedDrawer
+          openDrawer={openDrawer}
+          confirmSwap={confirmSwap}
+          rejectSwap={rejectSwap}
+          row={row}
+        />
+      )}
     </React.Fragment>
   );
 };
