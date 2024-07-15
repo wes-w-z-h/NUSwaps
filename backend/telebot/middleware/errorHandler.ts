@@ -7,13 +7,15 @@ const errorHandler = async (ctx: CustomContext, next: NextFunction) => {
     await next();
   } catch (error) {
     if (isHttpError(error)) {
-      await ctx.reply(
+      await ctx.editMessageText(
         `Error occured (${error.statusCode}): ${error.name} - ${error.message}`
       );
     } else if (error instanceof Error) {
-      await ctx.reply(`Error occures: ${error.name} - ${error.message}`);
+      await ctx.editMessageText(
+        `Error occures: ${error.name} - ${error.message}`
+      );
     } else {
-      await ctx.reply('Unknown error occured!');
+      await ctx.editMessageText('Unknown error occured!');
     }
   }
 };
