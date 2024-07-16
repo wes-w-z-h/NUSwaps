@@ -17,6 +17,7 @@ export interface SessionData {
   lessonsData: RawLesson[] | null;
   userId: Types.ObjectId | null;
   swapState: Swap;
+  type: string;
   cache: Map<string, InlineKeyboardButton.CallbackButton[][]>;
 }
 

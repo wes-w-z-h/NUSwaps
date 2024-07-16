@@ -1,7 +1,9 @@
 import { InlineKeyboard } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
 import createHttpError from 'http-errors';
-import { SessionData } from '../types/context.js';
+import { SessionData, Swap } from '../types/context.js';
+import { createButtons } from './createButton.js';
+import { SwapModel } from '../../models/swapModel.js';
 
 /**
  * Function to generate the inline keyboard based on form state
@@ -11,31 +13,20 @@ import { SessionData } from '../types/context.js';
  * @param session - The current ctx session
  * @returns InlineKeyboard - The inline keyboard sent to the user
  */
-const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
+const generateInlineKeyboard = async (
+  session: SessionData
+): Promise<InlineKeyboard> => {
   const data = session.lessonsData;
-  const { state, swapState, cache } = session;
+  const { state, swapState, cache, userId } = session;
 
   const maxBtnsPerPage = 14;
-  console.log(cache.keys());
+  // console.log(cache.keys());
   // gen the key for the current page
   const getKey = (): string => {
     return (
       `${session.state}-${session.swapState.lessonType}-` +
       `${session.swapState.current}-${session.page}`
     );
-  };
-
-  const createButtons = (
-    entries: string[]
-  ): InlineKeyboardButton.CallbackButton[][] => {
-    const btnsPerRow = entries.length % 2 ? 3 : 2;
-    const btns = entries.map((s) => InlineKeyboard.text(s, `create-${s}`));
-    // create new object so they dont point to the same row
-    const rows: InlineKeyboardButton.CallbackButton[][] = [];
-    for (let i = 0; i < btns.length; i += btnsPerRow) {
-      rows.push(btns.slice(i, i + btnsPerRow));
-    }
-    return rows;
   };
 
   // function to slice the array according to max threshold
@@ -51,11 +42,31 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
   if (!data) {
     throw createHttpError(404, 'Lesson data not found.');
   }
+
   const cacheKey = getKey();
   if (cache.has(cacheKey)) {
     rows = cache.get(cacheKey);
   } else {
     switch (state) {
+      case -1: {
+        const swaps = await SwapModel.find({ userId });
+        rows = createButtons(
+          swaps.map((s) => {
+            const swap: Swap = {
+              id: s.id,
+              courseId: s.courseId,
+              lessonType: s.lessonType,
+              current: s.current,
+              request: s.request,
+            };
+            return swap;
+          })
+        );
+        // TODO: change this
+        totalPages = 1;
+        break;
+      }
+
       case 0: {
         const lessontypes = new Set<string>();
         data
@@ -89,7 +100,7 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
       }
 
       case 3: {
-        rows.push([InlineKeyboard.text('Submit', 'create-submit')]);
+        rows.push([InlineKeyboard.text('Submit', `${session.type}-submit`)]);
         totalPages = 1;
         break;
       }
@@ -111,7 +122,10 @@ const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
         rows.push([InlineKeyboard.text('>>', `next-${session.page}`)]);
       }
     }
-    if (session.state !== 0) {
+    if (
+      session.state > 0 ||
+      (session.type === 'update' && session.state !== -1)
+    ) {
       rows.push([
         InlineKeyboard.text('Back', 'back'),
         InlineKeyboard.text('Cancel', 'cancel'),

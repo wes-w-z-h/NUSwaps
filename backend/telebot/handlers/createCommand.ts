@@ -1,13 +1,13 @@
 import { CommandContext } from 'grammy';
 import createHttpError from 'http-errors';
-import { Module, RawLesson } from '../../types/modules.js';
-import env from '../../util/validEnv.js';
 import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import { CustomContext } from '../types/context.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
 import generateInlineKeyboard from '../util/generateInlineKeyboard.js';
 import updateState from '../util/updateState.js';
+import { packageSwap } from '../util/swapParser.js';
+import fetchData from '../util/getModInfo.js';
 
 /**
  * Array representation of the states of creating a swap
@@ -20,26 +20,6 @@ const STATES = [
   'select-request',
   'submit-swap',
 ];
-
-/**
- * Async function to fetch the information for the specified courseId
- *
- * @param courseId - The ID of the course to fetch information for
- * @returns Promise<string[]> - A promise that resolves to an array of strings containing course information
- * @throws HttpError if the fetch operation fails
- */
-const fetchData = async (courseId: string): Promise<RawLesson[]> => {
-  const { NUS_MODS_BASE_API } = env;
-  const resp = await fetch(`${NUS_MODS_BASE_API}/modules/${courseId}.json`);
-
-  if (!resp.ok) {
-    throw createHttpError(resp.status, 'Error occured fetching mod data');
-  }
-
-  const data: Module = await resp.json();
-
-  return data.semesterData[0].timetable;
-};
 
 /**
  * Callback query handler to process button presses
@@ -57,8 +37,9 @@ export const createCallback = async (ctx: CustomContext) => {
   if (callbackData === 'submit') {
     // console.log(swapState);
     if (!userId) {
+      await ctx.answerCallbackQuery();
       throw createHttpError(
-        400,
+        401,
         'User id is missing, please login first with /login'
       );
     }
@@ -82,16 +63,14 @@ export const createCallback = async (ctx: CustomContext) => {
     });
 
     if (!data) {
+      await ctx.answerCallbackQuery();
       throw createHttpError(400, 'Unable to create swap');
     }
 
     // this can run async dont need to await
     getOptimalMatch(data);
-    await ctx.editMessageText(
-      'Swap request submitted successfully!\n' +
-        `Course id: ${data.courseId}\n${data.lessonType}\n` +
-        `Current: ${data.current}\nRequest: ${data.request}`
-    );
+    const swap = packageSwap(ctx.session.swapState, false).replace(/\+/g, '-');
+    ctx.editMessageText(`Swap request submitted successfully!\n${swap}`);
     await ctx.answerCallbackQuery();
     return;
   }
@@ -115,7 +94,7 @@ export const createCallback = async (ctx: CustomContext) => {
   }
 
   // console.log(swapState);
-  updateState(ctx, STATES);
+  await updateState(ctx, STATES);
   await ctx.answerCallbackQuery();
 };
 
@@ -127,6 +106,8 @@ export const createCallback = async (ctx: CustomContext) => {
 export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
+  // reset session states
+  ctx.session.cache.clear();
   ctx.session.state = 0;
   ctx.session.page = 0;
   ctx.session.swapState = {
@@ -135,6 +116,7 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
     current: '',
     request: '',
   };
+  ctx.session.type = 'create';
   const HELP_TEXT =
     '❗️Please login before attempting to create a swap❗️\n' +
     'Use /login\n\n' +
@@ -160,7 +142,7 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   ctx.session.lessonsData = await fetchData(courseId);
   swapState.courseId = courseId;
 
-  const keyboard = generateInlineKeyboard(ctx.session);
+  const keyboard = await generateInlineKeyboard(ctx.session);
   // TODO: change the reply to be more legit
   await ctx.reply(
     `👇👇👇 ${STATES[state].split('-').join(' ')} from the list below 👇👇👇`,

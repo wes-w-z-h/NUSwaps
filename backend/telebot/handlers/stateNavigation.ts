@@ -11,6 +11,9 @@ export const backCallback = async (ctx: CustomContext) => {
   ];
 
   switch (state) {
+    case 0:
+      ctx.session.state -= 1;
+      break;
     case 1:
       ctx.session.state -= 1;
       swapState.lessonType = '';
@@ -27,7 +30,7 @@ export const backCallback = async (ctx: CustomContext) => {
       break;
   }
 
-  updateState(ctx, STATES);
+  await updateState(ctx, STATES);
   await ctx.answerCallbackQuery();
 };
 
