@@ -1,15 +1,17 @@
 import { Bot, session } from 'grammy';
+import { InlineKeyboardButton } from 'grammy/types';
 import env from '../util/validEnv.js';
-import { createCallback, createHandler } from './commands/createCommand.js';
+import { createCallback, createCommand } from './handlers/createCommand.js';
 import { CustomContext, SessionData } from './types/context.js';
 import errorHandler from './middleware/errorHandler.js';
-import loginHandler from './commands/loginCommand.js';
+import loginCommand from './handlers/loginCommand.js';
 import checkUserExists from './middleware/verifyUser.js';
-import { handlePagination } from './util/generateInlineKeyboard.js';
+import paginationCallback from './handlers/pagination.js';
+import { backCallback, cancelCallback } from './handlers/stateNavigation.js';
 
 // Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
-const bot = new Bot<CustomContext>(BOT_TOKEN); // <-- put your bot token between the ""
+const bot = new Bot<CustomContext>(BOT_TOKEN);
 
 const initial = (): SessionData => {
   return {
@@ -23,8 +25,10 @@ const initial = (): SessionData => {
       request: '',
     },
     lessonsData: null,
+    cache: new Map<string, InlineKeyboardButton.CallbackButton[][]>(),
   };
 };
+
 bot.use(session({ initial }));
 bot.use(errorHandler);
 bot.use(checkUserExists);
@@ -45,17 +49,19 @@ bot.command('list', (ctx) => {
 });
 
 bot.command('create', async (ctx) => {
-  await createHandler(ctx);
+  await createCommand(ctx);
 });
 
 bot.command('login', async (ctx) => {
-  await loginHandler(ctx);
+  await loginCommand(ctx);
 });
 
-bot.callbackQuery(/next-\d+/, handlePagination);
-bot.callbackQuery(/prev-\d+/, handlePagination);
-// handler for mod related btns
-bot.on('callback_query:data', (ctx) => createCallback(ctx));
+bot.callbackQuery(/next-\d+/, paginationCallback(true));
+bot.callbackQuery(/prev-\d+/, paginationCallback(false));
+bot.callbackQuery('back', backCallback);
+bot.callbackQuery('cancel', cancelCallback);
+bot.callbackQuery(/^create-.*/, createCallback);
+// bot.on('callback_query:data', (ctx) => createCallback(ctx));
 // Handle other messages.
 bot.on('message', (ctx) => ctx.reply('Unrecgonised message!'));
 

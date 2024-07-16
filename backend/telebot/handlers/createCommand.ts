@@ -6,7 +6,8 @@ import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import { CustomContext } from '../types/context.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
-import { generateInlineKeyboard } from '../util/generateInlineKeyboard.js';
+import generateInlineKeyboard from '../util/generateInlineKeyboard.js';
+import updateState from '../util/updateState.js';
 
 /**
  * Array representation of the states of creating a swap
@@ -50,15 +51,10 @@ export const createCallback = async (ctx: CustomContext) => {
 
   if (!args) return;
 
-  const callbackData = args.split('-')[0];
+  const callbackData = args.split('-')[1];
 
   const { state, swapState, userId } = ctx.session;
-  if (callbackData === 'back') {
-    ctx.session.state = state - 1 < 0 ? 0 : state - 1;
-  } else if (callbackData === 'cancel') {
-    ctx.editMessageText('❌ Cancelled request!');
-    return;
-  } else if (callbackData === 'submit') {
+  if (callbackData === 'submit') {
     // console.log(swapState);
     if (!userId) {
       throw createHttpError(
@@ -89,47 +85,38 @@ export const createCallback = async (ctx: CustomContext) => {
       throw createHttpError(400, 'Unable to create swap');
     }
 
+    // this can run async dont need to await
     getOptimalMatch(data);
     await ctx.editMessageText(
       'Swap request submitted successfully!\n' +
         `Course id: ${data.courseId}\n${data.lessonType}\n` +
         `Current: ${data.current}\nRequest: ${data.request}`
     );
-    return;
-  } else {
-    // console.log(ctx.session.swapState);
-    ctx.session.page = 0;
-    switch (state) {
-      case 0:
-        swapState.lessonType = callbackData;
-        ctx.session.state = 1;
-        break;
-      case 1:
-        swapState.current = callbackData;
-        ctx.session.state = 2;
-        break;
-      case 2:
-        swapState.request = callbackData;
-        ctx.session.state = 3;
-        break;
-      default:
-        break;
-    }
-  }
-  // console.log(swapState);
-  try {
-    const keyboard = generateInlineKeyboard(ctx.session);
-    await ctx.editMessageText(
-      `👇👇👇 ${STATES[ctx.session.state].split('-').join(' ')} from the list below 👇👇👇`,
-      {
-        reply_markup: keyboard,
-      }
-    );
     await ctx.answerCallbackQuery();
-  } catch (error) {
-    const err = error as Error;
-    await ctx.answerCallbackQuery(err.message);
+    return;
   }
+  // console.log(ctx.session.swapState);
+  ctx.session.page = 0;
+  switch (state) {
+    case 0:
+      swapState.lessonType = callbackData;
+      ctx.session.state = 1;
+      break;
+    case 1:
+      swapState.current = callbackData;
+      ctx.session.state = 2;
+      break;
+    case 2:
+      swapState.request = callbackData;
+      ctx.session.state = 3;
+      break;
+    default:
+      break;
+  }
+
+  // console.log(swapState);
+  updateState(ctx, STATES);
+  await ctx.answerCallbackQuery();
 };
 
 /**
@@ -137,7 +124,7 @@ export const createCallback = async (ctx: CustomContext) => {
  *
  * @param ctx - CustomContext sent from telegram
  */
-export const createHandler = async (ctx: CommandContext<CustomContext>) => {
+export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
   ctx.session.state = 0;

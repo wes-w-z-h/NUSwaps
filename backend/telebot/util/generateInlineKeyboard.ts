@@ -1,137 +1,129 @@
 import { InlineKeyboard } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
 import createHttpError from 'http-errors';
-import { CustomContext, SessionData } from '../types/context.js';
+import { SessionData } from '../types/context.js';
 
 /**
  * Function to generate the inline keyboard based on form state
  *
  * Data in inlineKeyboard is appended with -c as identifier to use callbackquery of create
  *
- * @param session - Tje current ctx session
+ * @param session - The current ctx session
  * @returns InlineKeyboard - The inline keyboard sent to the user
  */
-export const generateInlineKeyboard = (
-  session: SessionData
-): InlineKeyboard => {
+const generateInlineKeyboard = (session: SessionData): InlineKeyboard => {
   const data = session.lessonsData;
-  const { state, swapState } = session;
+  const { state, swapState, cache } = session;
 
   const maxBtnsPerPage = 14;
+  console.log(cache.keys());
+  // gen the key for the current page
+  const getKey = (): string => {
+    return (
+      `${session.state}-${session.swapState.lessonType}-` +
+      `${session.swapState.current}-${session.page}`
+    );
+  };
+
+  const createButtons = (
+    entries: string[]
+  ): InlineKeyboardButton.CallbackButton[][] => {
+    const btnsPerRow = entries.length % 2 ? 3 : 2;
+    const btns = entries.map((s) => InlineKeyboard.text(s, `create-${s}`));
+    // create new object so they dont point to the same row
+    const rows: InlineKeyboardButton.CallbackButton[][] = [];
+    for (let i = 0; i < btns.length; i += btnsPerRow) {
+      rows.push(btns.slice(i, i + btnsPerRow));
+    }
+    return rows;
+  };
 
   // function to slice the array according to max threshold
-  // TODO: use a map or smth to cache the next page - see how
   const paginate = (entries: any[]) => {
     const start = session.page * maxBtnsPerPage;
     const end = start + maxBtnsPerPage;
     return entries.slice(start, end);
   };
 
-  const rows: InlineKeyboardButton.CallbackButton[][] = [];
+  let rows: InlineKeyboardButton.CallbackButton[][] | undefined = [];
   let totalPages = 1;
-  // function to create the rows
-  const updateRows = (entries: string[]) => {
-    // TODO: add condition so that the num per row fit nicely
-    const btnsPerRow = 2;
-
-    const btns = entries.map((s) => InlineKeyboard.text(s, `${s}-c`));
-    // const truncatedBtns = paginateEntries(btns, session.page);
-    for (let i = 0; i < btns.length; i += btnsPerRow) {
-      rows.push(btns.slice(i, i + btnsPerRow));
-    }
-  };
 
   if (!data) {
     throw createHttpError(404, 'Lesson data not found.');
   }
-  // console.log(state);
-  switch (state) {
-    // select-lessontype
-    case 0: {
-      const lessontypes = new Set<string>();
-      data
-        .filter((rl) => rl.lessonType !== 'Lecture')
-        .forEach((rl) => lessontypes.add(rl.lessonType));
-      updateRows([...lessontypes]);
-      totalPages = 1;
-      break;
+  const cacheKey = getKey();
+  if (cache.has(cacheKey)) {
+    rows = cache.get(cacheKey);
+  } else {
+    switch (state) {
+      case 0: {
+        const lessontypes = new Set<string>();
+        data
+          .filter((rl) => rl.lessonType !== 'Lecture')
+          .forEach((rl) => lessontypes.add(rl.lessonType));
+        rows = createButtons([...lessontypes]);
+        totalPages = 1;
+        break;
+      }
+
+      case 1: {
+        const entries = data
+          .filter((rl) => rl.lessonType === swapState.lessonType)
+          .map((rl) => rl.classNo);
+        rows = createButtons(paginate(entries));
+        totalPages = Math.ceil(entries.length / maxBtnsPerPage);
+        break;
+      }
+
+      case 2: {
+        const entries = data
+          .filter(
+            (rl) =>
+              rl.lessonType === swapState.lessonType &&
+              rl.classNo !== swapState.current
+          )
+          .map((rl) => rl.classNo);
+        rows = createButtons(paginate(entries));
+        totalPages = Math.ceil(entries.length / maxBtnsPerPage);
+        break;
+      }
+
+      case 3: {
+        rows.push([InlineKeyboard.text('Submit', 'create-submit')]);
+        totalPages = 1;
+        break;
+      }
+
+      default:
+        break;
     }
 
-    // back btn
-    case 1: {
-      const entries = data
-        .filter((rl) => rl.lessonType === swapState.lessonType)
-        .map((rl) => rl.classNo);
-      updateRows(paginate(entries));
-      // rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      totalPages = Math.ceil(entries.length / maxBtnsPerPage);
-      break;
+    if (totalPages > 1) {
+      if (session.page > 0 && session.page < totalPages - 1) {
+        rows.push([
+          InlineKeyboard.text('<<', `prev-${session.page}`),
+          InlineKeyboard.text('>>', `next-${session.page}`),
+        ]);
+      } else if (session.page === totalPages - 1) {
+        rows.push([InlineKeyboard.text('<<', `prev-${session.page}`)]);
+      } else {
+        // if (session.page === 0) {
+        rows.push([InlineKeyboard.text('>>', `next-${session.page}`)]);
+      }
     }
-
-    // back btn plus submit btn
-    case 2: {
-      const entries = data
-        .filter(
-          (rl) =>
-            rl.lessonType === swapState.lessonType &&
-            rl.classNo !== swapState.current
-        )
-        .map((rl) => rl.classNo);
-      updateRows(paginate(entries));
-      // rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      totalPages = Math.ceil(entries.length / maxBtnsPerPage);
-      break;
-    }
-
-    case 3: {
-      rows.push([InlineKeyboard.text('Submit', 'submit-c')]);
-      // rows.push([InlineKeyboard.text('Back', 'back-c')]);
-      totalPages = 1;
-      break;
-    }
-
-    default:
-      break;
-  }
-
-  // add the nav buttons
-  if (totalPages > 1) {
-    if (session.page > 0 && session.page < totalPages - 1) {
+    if (session.state !== 0) {
       rows.push([
-        InlineKeyboard.text('<<', `prev-${session.page}`),
-        InlineKeyboard.text('>>', `next-${session.page}`),
+        InlineKeyboard.text('Back', 'back'),
+        InlineKeyboard.text('Cancel', 'cancel'),
       ]);
-    } else if (session.page === totalPages - 1) {
-      rows.push([InlineKeyboard.text('<<', `prev-${session.page}`)]);
-    } else if (session.page === 0) {
-      rows.push([InlineKeyboard.text('>>', `next-${session.page}`)]);
+    } else {
+      rows.push([InlineKeyboard.text('Cancel', 'cancel')]);
     }
+
+    cache.set(cacheKey, rows);
   }
-  if (session.state !== 0) {
-    rows.push([
-      InlineKeyboard.text('Back', 'back-c'),
-      InlineKeyboard.text('Cancel', 'cancel-c'),
-    ]);
-  } else {
-    rows.push([InlineKeyboard.text('Cancel', 'cancel-c')]);
-  }
-  return InlineKeyboard.from(rows);
+
+  return InlineKeyboard.from(rows || []);
 };
 
-export const handlePagination = async (ctx: CustomContext) => {
-  const callbackData = ctx.callbackQuery?.data;
-  if (!callbackData) {
-    return;
-  }
-
-  if (callbackData.startsWith('next-')) {
-    ctx.session.page += 1;
-  } else if (callbackData.startsWith('prev-')) {
-    ctx.session.page -= 1;
-  } else {
-    return;
-  }
-
-  const updatedKeyboard = generateInlineKeyboard(ctx.session);
-  await ctx.editMessageReplyMarkup({ reply_markup: updatedKeyboard });
-};
+export default generateInlineKeyboard;

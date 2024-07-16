@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { CustomContext } from '../types/context.js';
 import UserModel from '../../models/userModel.js';
 
-const loginHandler = async (ctx: CustomContext) => {
+const loginCommand = async (ctx: CustomContext) => {
   const HELP_TEXT =
     '❗Email must end in @u.nus.edu\n\n' +
     'Example usage:\n' +
@@ -62,4 +62,4 @@ const loginHandler = async (ctx: CustomContext) => {
   await ctx.reply('Logged in susccessfully!');
 };
 
-export default loginHandler;
+export default loginCommand;

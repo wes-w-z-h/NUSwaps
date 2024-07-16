@@ -1,5 +1,6 @@
 import { Context, SessionFlavor } from 'grammy';
 import { Types } from 'mongoose';
+import { InlineKeyboardButton } from 'grammy/types';
 import { RawLesson } from '../../types/modules.js';
 
 interface Swap {
@@ -15,6 +16,7 @@ export interface SessionData {
   lessonsData: RawLesson[] | null;
   userId: Types.ObjectId | null;
   swapState: Swap;
+  cache: Map<string, InlineKeyboardButton.CallbackButton[][]>;
 }
 
 export type CustomContext = Context & SessionFlavor<SessionData>;
