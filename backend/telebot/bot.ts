@@ -8,6 +8,7 @@ import loginCommand from './handlers/loginCommand.js';
 import checkUserExists from './middleware/verifyUser.js';
 import paginationCallback from './handlers/pagination.js';
 import { backCallback, cancelCallback } from './handlers/stateNavigation.js';
+import listCommand from './handlers/listCommand.js';
 
 // Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
@@ -44,9 +45,7 @@ bot.command('help', (ctx) =>
   )
 );
 
-bot.command('list', (ctx) => {
-  ctx.reply('list swaps.');
-});
+bot.command('list', listCommand);
 
 bot.command('create', async (ctx) => {
   await createCommand(ctx);

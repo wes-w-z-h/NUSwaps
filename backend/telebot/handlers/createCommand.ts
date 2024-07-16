@@ -144,12 +144,12 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
     '/create help';
 
   if (args.length !== 1) {
-    await ctx.reply(HELP_TEXT);
+    ctx.reply(HELP_TEXT);
     return;
   }
 
   if (args[0].toLowerCase() === 'help') {
-    await ctx.reply(HELP_TEXT);
+    ctx.reply(HELP_TEXT);
     return;
   }
 

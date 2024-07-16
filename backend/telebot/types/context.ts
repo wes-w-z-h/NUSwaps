@@ -3,7 +3,8 @@ import { Types } from 'mongoose';
 import { InlineKeyboardButton } from 'grammy/types';
 import { RawLesson } from '../../types/modules.js';
 
-interface Swap {
+export interface Swap {
+  id?: Types.ObjectId;
   courseId: string;
   lessonType: string;
   current: string;

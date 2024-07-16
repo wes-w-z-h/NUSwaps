@@ -7,6 +7,10 @@ const checkUserExists = async (
   ctx: CustomContext,
   next: NextFunction
 ): Promise<void> => {
+  if (ctx.session.userId) {
+    await next();
+    return;
+  }
   // Skip middleware for /start and /help commands
   const userId = ctx.from?.id;
   if (
