@@ -1,7 +1,6 @@
 import createHttpError from 'http-errors';
 import { SwapModel } from '../../models/swapModel.js';
 import { MatchModel } from '../../models/matchModel.js';
-import { SwapStatus } from '../../types/api.js';
 import { Module } from '../../types/modules.js';
 
 const isInNUSMods = async (
@@ -106,8 +105,7 @@ export const validateMatchedStatus = async (id: string) => {
         throw createHttpError(404, 'Swap not found');
       }
 
-      const matchedStatus: SwapStatus = 'MATCHED';
-      if (swap.status !== matchedStatus || !swap.match) {
+      if (swap.status !== 'MATCHED' || !swap.match) {
         throw createHttpError(400, 'Invalid request to confirm / reject swap');
       }
 
@@ -120,6 +118,20 @@ export const validateMatchedStatus = async (id: string) => {
     .then((match) => {
       if (match?.status !== 'PENDING') {
         throw createHttpError(400, 'Invalid request to confirm / reject swap');
+      }
+    });
+};
+
+export const validateUnmatchedStatus = async (id: string) => {
+  await SwapModel.findById(id)
+    .exec()
+    .then((swap) => {
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+
+      if (swap.status !== 'UNMATCHED' || swap.match) {
+        throw createHttpError(400, 'Invalid swap status');
       }
     });
 };

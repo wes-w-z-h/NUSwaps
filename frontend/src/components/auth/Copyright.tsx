@@ -1,4 +1,5 @@
-import { Typography, Link } from '@mui/material';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
 
 const Copyright = () => {
   return (

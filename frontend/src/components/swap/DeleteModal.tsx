@@ -64,8 +64,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         <Fade in={open}>
           <Box sx={style} textAlign={'center'}>
             <Typography id="courseId-status" variant="caption">
-              Course: {swap.courseId} --- Status:{' '}
-              {swap.status ? 'matched' : 'pending'}
+              Course: {swap.courseId} --- Status: {swap.status}
             </Typography>
             <Typography id="lessonType">
               Lesson type: {swap.lessonType}

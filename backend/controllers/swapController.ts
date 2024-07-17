@@ -6,6 +6,7 @@ import { MatchModel } from '../models/matchModel.js';
 import {
   validateSwap,
   validateMatchedStatus,
+  validateUnmatchedStatus,
 } from '../util/swap/validateSwap.js';
 
 export const getSwap: RequestHandler = async (req, res, next) => {
@@ -32,6 +33,14 @@ export const getUserSwaps: RequestHandler = async (req, res, next) => {
 
 export const deleteSwap: RequestHandler = async (req, res, next) => {
   const { id } = req.params;
+
+  try {
+    await validateUnmatchedStatus(id);
+  } catch (error) {
+    next(error);
+    return;
+  }
+
   await SwapModel.findByIdAndDelete(id)
     .exec()
     .then((data) =>
@@ -116,6 +125,8 @@ export const updateSwap: RequestHandler = async (req, res, next) => {
 
   try {
     await validateSwap(userId, courseId, lessonType, current, request, id);
+    await validateUnmatchedStatus(id);
+
     const data = await SwapModel.findByIdAndUpdate(id, req.body, {
       runValidators: true,
       new: true,

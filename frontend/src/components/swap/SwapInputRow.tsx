@@ -194,6 +194,7 @@ const SwapInputRow: React.FC<SwapInputRowProps> = ({
             </IconButton>
           </Tooltip>
         </TableCell>
+        <TableCell></TableCell>
       </TableRow>
     </React.Fragment>
   );

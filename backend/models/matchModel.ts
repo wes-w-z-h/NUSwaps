@@ -1,6 +1,12 @@
 import { model, Schema } from 'mongoose';
 import { ModuleCode } from '../types/modules.js';
-import { IMatch, IMatchMethods, Match, MatchStatus } from '../types/api.js';
+import {
+  IMatch,
+  IMatchMethods,
+  Match,
+  MatchPayload,
+  MatchStatus,
+} from '../types/api.js';
 import { SwapModel } from './swapModel.js';
 
 const matchSchema = new Schema<IMatch, Match, IMatchMethods>(
@@ -54,6 +60,17 @@ matchSchema.method(
     return Promise.resolve('PENDING');
   }
 );
+
+matchSchema.method('createResponse', function createReponse(): MatchPayload {
+  return {
+    // eslint-disable-next-line no-underscore-dangle
+    id: this._id,
+    courseId: this.courseId,
+    lessonType: this.lessonType,
+    swaps: this.swaps,
+    status: this.status,
+  };
+});
 
 const MatchModel = model<IMatch, Match>('Match', matchSchema);
 export { MatchModel, matchSchema };
