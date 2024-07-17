@@ -1,5 +1,6 @@
-import { Tab, Tabs } from '@mui/material';
+import Tabs from '@mui/material/Tabs';
 import { Swap } from '../../types/Swap';
+import Tab from '@mui/material/Tab';
 
 type TabsProps = {
   active: number;

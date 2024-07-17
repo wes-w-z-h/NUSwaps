@@ -1,5 +1,9 @@
-import { Button, Collapse, Grid, TableCell, TableRow } from '@mui/material';
+import TableRow from '@mui/material/TableRow';
 import { Swap } from '../../../types/Swap';
+import TableCell from '@mui/material/TableCell';
+import Collapse from '@mui/material/Collapse';
+import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 
 type MatchedDrawerProps = {
   openDrawer: boolean;

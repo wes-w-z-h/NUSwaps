@@ -1,5 +1,8 @@
-import { Box, Card, CardMedia, Typography } from '@mui/material';
+import Card from '@mui/material/Card';
 import { Swap } from '../../types/Swap';
+import CardMedia from '@mui/material/CardMedia';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 type TabPanelProps = {
   index: number;

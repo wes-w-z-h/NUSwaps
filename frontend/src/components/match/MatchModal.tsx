@@ -1,11 +1,12 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { Backdrop, Modal } from '@mui/material';
 import { Match } from '../../types/Match';
 import { Swap } from '../../types/Swap';
 import MatchSummaryPanel from './MatchSummaryPanel';
 import ModalTabs from './ModalTabs';
 import TabPanel from './TabPanel';
+import Modal from '@mui/material/Modal';
+import Backdrop from '@mui/material/Backdrop';
 
 const style = {
   position: 'absolute' as const,
@@ -14,7 +15,7 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: '30%',
   height: '70%',
   bgcolor: 'background.paper',
   // border: '2px solid #000',
