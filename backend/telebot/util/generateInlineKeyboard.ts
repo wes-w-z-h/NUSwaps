@@ -58,6 +58,7 @@ const generateInlineKeyboard = async (
               lessonType: s.lessonType,
               current: s.current,
               request: s.request,
+              status: s.status,
             };
             return swap;
           })

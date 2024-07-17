@@ -9,6 +9,7 @@ export interface Swap {
   lessonType: string;
   current: string;
   request: string;
+  status: string;
 }
 
 export interface SessionData {

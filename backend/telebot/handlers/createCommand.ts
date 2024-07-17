@@ -65,7 +65,7 @@ export const createCallback = async (ctx: CustomContext) => {
     // this can run async dont need to await
     getOptimalMatch(data);
     const swap = packageSwap(ctx.session.swapState, false).replace(/\+/g, '-');
-    await ctx.editMessageText(`Swap request submitted successfully!\n${swap}`);
+    await ctx.editMessageText(`Swap request created successfully!\n${swap}`);
     await ctx.answerCallbackQuery();
     return;
   }
@@ -110,6 +110,7 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
     lessonType: '',
     current: '',
     request: '',
+    status: 'UNMATCHED',
   };
   ctx.session.type = 'create';
   const HELP_TEXT =

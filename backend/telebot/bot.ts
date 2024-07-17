@@ -25,6 +25,7 @@ const initial = (): SessionData => {
       lessonType: '',
       current: '',
       request: '',
+      status: '',
     },
     lessonsData: null,
     type: '',
@@ -77,7 +78,6 @@ bot.callbackQuery(/^update-.*/, updateCallback);
 // Handle other messages.
 bot.on('message', (ctx) => {
   ctx.reply('Unrecgonised message!');
-  throw Error('test');
 });
 
 // Global error handler
@@ -86,9 +86,9 @@ bot.catch(async (err) => {
   const e = err.error;
 
   const getErrorMessage = (error: unknown) => {
+    // eslint-disable-next-line no-console
+    console.error(error);
     if (error instanceof GrammyError) {
-      // eslint-disable-next-line no-console
-      console.error(error.description);
       return `Error in request: ${error.description}`;
     }
     if (error instanceof HttpError) {
@@ -102,17 +102,24 @@ bot.catch(async (err) => {
 
   const msg = getErrorMessage(e);
 
-  const handleReplyOrEdit = (curr_session: SessionData, message: string) => {
-    if (curr_session.type === 'create' && curr_session.state === 0) {
-      ctx.reply(message);
-    } else if (curr_session.type === 'update' && curr_session.state === -1) {
-      ctx.reply(message);
-    } else {
-      ctx.editMessageText(message);
-    }
+  const handleReplyOrEdit = async (
+    curr_session: SessionData,
+    message: string
+  ) => {
+    // TODO: if theres time find a way to edit or reply msgs properly these methods throw an error
+    // dangerous when this is the only error handler
+
+    // if (curr_session.type === 'create' && curr_session.state === 0) {
+    //   await ctx.reply(message);
+    // } else if (curr_session.type === 'update' && curr_session.state === -1) {
+    //   await ctx.reply(message);
+    // } else {
+    //   await ctx.editMessageText(message);
+    // }
+    await ctx.reply(message);
   };
 
-  handleReplyOrEdit(ctx.session, msg);
+  await handleReplyOrEdit(ctx.session, msg);
 });
 
 export default bot;

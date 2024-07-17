@@ -59,7 +59,7 @@ export const updateCallback = async (ctx: CustomContext) => {
     }
 
     const { courseId, lessonType, current, request, id } = swapState;
-
+    // console.log(swapState);
     if (!id) {
       const err = new Error('Swap id is missing');
       err.name = 'NotFoundError';
@@ -96,10 +96,27 @@ export const updateCallback = async (ctx: CustomContext) => {
     return;
   }
 
-  const { id, courseId, lessonType, current, request } = unpackSwap(
+  const { id, courseId, lessonType, current, request, status } = unpackSwap(
     callbackData,
     true
   );
+
+  // TODO: add the handler for the different statuses
+  if (status !== 'UNMATCHED') {
+    const keyboard = new InlineKeyboard().url(
+      'NUSwaps',
+      'https://nuswaps.onrender.com' // the url cannot be localhost need to be publicly accessible
+    );
+    await ctx.editMessageText(
+      `🎉 Your swap has been ${status.toLowerCase()}! 🎉\n\n` +
+        'Visit the website here for further actions!',
+      {
+        reply_markup: keyboard,
+      }
+    );
+    await ctx.answerCallbackQuery();
+    return;
+  }
 
   switch (state) {
     case -1: {
@@ -107,6 +124,7 @@ export const updateCallback = async (ctx: CustomContext) => {
       ctx.session.lessonsData = await fetchData(courseId);
       ctx.session.cache.clear();
       swapState.courseId = courseId;
+      swapState.status = status;
       ctx.session.state = 0;
       break;
     }
@@ -145,6 +163,7 @@ export const listCommand = async (ctx: CustomContext) => {
     lessonType: '',
     current: '',
     request: '',
+    status: '',
   };
 
   const HELP_TEXT =
@@ -184,6 +203,7 @@ export const listCommand = async (ctx: CustomContext) => {
       lessonType: s.lessonType,
       current: s.current,
       request: s.request,
+      status: s.status,
     };
     return swap;
   });
@@ -192,7 +212,9 @@ export const listCommand = async (ctx: CustomContext) => {
   btns.push([InlineKeyboard.text('Close', 'cancel')]);
   const keyboard = InlineKeyboard.from(btns);
   const text = '📝 Click on any request to edit it!';
+  btns.forEach((b) => console.log(b));
   await ctx.reply(text, {
     reply_markup: keyboard,
   });
+  // await ctx.reply(text);
 };
