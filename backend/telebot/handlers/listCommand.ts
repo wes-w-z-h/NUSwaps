@@ -26,6 +26,31 @@ export const updateCallback = async (ctx: CustomContext) => {
   const { state, swapState, userId } = ctx.session;
   ctx.session.page = 0;
 
+  if (callbackData === 'delete') {
+    if (!userId) {
+      const err = new Error('User id is missing');
+      err.name = 'NotFoundError';
+      throw err;
+    }
+
+    const { id } = swapState;
+
+    if (!id) {
+      const err = new Error('Swap id is missing');
+      err.name = 'NotFoundError';
+      throw err;
+    }
+
+    if (!(await SwapModel.findByIdAndDelete(id))) {
+      const err = new Error('Unable to delete swap');
+      throw err;
+    }
+
+    await ctx.editMessageText('Swap request deleted successfull!');
+    await ctx.answerCallbackQuery();
+    return;
+  }
+
   if (callbackData === 'submit') {
     if (!userId) {
       const err = new Error('User id is missing');
@@ -162,6 +187,7 @@ export const listCommand = async (ctx: CustomContext) => {
     };
     return swap;
   });
+
   const btns = createButtons(entries);
   btns.push([InlineKeyboard.text('Close', 'cancel')]);
   const keyboard = InlineKeyboard.from(btns);

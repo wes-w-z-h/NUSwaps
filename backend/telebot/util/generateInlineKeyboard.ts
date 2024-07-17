@@ -122,6 +122,11 @@ const generateInlineKeyboard = async (
         rows.push([InlineKeyboard.text('>>', `next-${session.page}`)]);
       }
     }
+
+    if (session.state === 0 && session.type === 'update') {
+      rows.push([InlineKeyboard.text('Delete', 'update-delete')]);
+    }
+
     if (
       session.state > 0 ||
       (session.type === 'update' && session.state !== -1)

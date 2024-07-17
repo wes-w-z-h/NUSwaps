@@ -88,7 +88,7 @@ export const createCallback = async (ctx: CustomContext) => {
       break;
   }
 
-  console.log(ctx.session.state);
+  // console.log(ctx.session.state);
   await updateState(ctx, STATES);
   await ctx.answerCallbackQuery();
 };
