@@ -10,7 +10,7 @@ import generateInlineKeyboard from './generateInlineKeyboard.js';
 const updateState = async (ctx: CustomContext, states: any[]) => {
   const keyboard = await generateInlineKeyboard(ctx.session);
   if (ctx.session.state !== -1) {
-    ctx.editMessageText(
+    await ctx.editMessageText(
       `👇👇👇 ${states[ctx.session.state].split('-').join(' ')} from the list below 👇👇👇`,
       {
         reply_markup: keyboard,
@@ -18,7 +18,7 @@ const updateState = async (ctx: CustomContext, states: any[]) => {
     );
   } else {
     const text = '📝 Click on any request to edit it!';
-    ctx.editMessageText(text, {
+    await ctx.editMessageText(text, {
       reply_markup: keyboard,
     });
   }

@@ -12,18 +12,19 @@ export const backCallback = async (ctx: CustomContext) => {
 
   switch (state) {
     case 0:
-      ctx.session.state -= 1;
+      ctx.session.type = 'update';
+      ctx.session.state = -1;
       break;
     case 1:
-      ctx.session.state -= 1;
+      ctx.session.state = 0;
       swapState.lessonType = '';
       break;
     case 2:
-      ctx.session.state -= 1;
+      ctx.session.state = 1;
       swapState.current = '';
       break;
     case 3:
-      ctx.session.state -= 1;
+      ctx.session.state = 2;
       swapState.request = '';
       break;
     default:
@@ -35,7 +36,7 @@ export const backCallback = async (ctx: CustomContext) => {
 };
 
 export const cancelCallback = async (ctx: CustomContext) => {
-  ctx.editMessageText('❌ Cancelled request!');
+  await ctx.editMessageText('❌ Cancelled request!');
   await ctx.answerCallbackQuery({
     text: 'Request cancelled',
   });

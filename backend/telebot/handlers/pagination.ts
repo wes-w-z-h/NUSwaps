@@ -12,7 +12,7 @@ const paginationCallback = (next: boolean) => {
     ctx.session.page += next ? 1 : -1;
 
     const updatedKeyboard = await generateInlineKeyboard(ctx.session);
-    ctx.editMessageReplyMarkup({ reply_markup: updatedKeyboard });
+    await ctx.editMessageReplyMarkup({ reply_markup: updatedKeyboard });
     await ctx.answerCallbackQuery();
   };
 };

@@ -8,7 +8,7 @@ export const packageSwap = (swap: Swap, includeId: boolean): string => {
 
 export const unpackSwap = (swapPkg: string, includeId: boolean) => {
   const args = swapPkg.split('+');
-  console.log(args);
+  // console.log(args);
   const swap: Swap = {
     courseId: '',
     lessonType: '',

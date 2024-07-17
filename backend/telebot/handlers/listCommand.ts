@@ -38,24 +38,23 @@ export const updateCallback = async (ctx: CustomContext) => {
   if (!args) return;
 
   const callbackData = args.split('-')[1];
-  console.log(callbackData);
+  // console.log(callbackData);
   const { state, swapState, userId } = ctx.session;
   ctx.session.page = 0;
 
   if (callbackData === 'submit') {
     if (!userId) {
-      await ctx.answerCallbackQuery();
-      throw createHttpError(
-        401,
-        'User id is missing, please login first with /login'
-      );
+      const err = new Error('User id is missing');
+      err.name = 'NotFoundError';
+      throw err;
     }
 
     const { courseId, lessonType, current, request, id } = swapState;
 
     if (!id) {
-      await ctx.answerCallbackQuery();
-      throw createHttpError(400, 'Swap id is missing');
+      const err = new Error('Swap id is missing');
+      err.name = 'NotFoundError';
+      throw err;
     }
 
     // console.log('callback id', id.toString());
@@ -78,13 +77,12 @@ export const updateCallback = async (ctx: CustomContext) => {
     });
 
     if (!data) {
-      await ctx.answerCallbackQuery();
       throw createHttpError(400, 'Unable to update swap');
     }
 
     getOptimalMatch(data);
     const swap = packageSwap(ctx.session.swapState, false).replace(/\+/g, '-');
-    ctx.editMessageText(`Swap request updated successfully!\n${swap}`);
+    await ctx.editMessageText(`Swap request updated successfully!\n${swap}`);
     await ctx.answerCallbackQuery();
     return;
   }

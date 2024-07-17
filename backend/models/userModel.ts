@@ -22,7 +22,6 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
     },
     telegramId: {
       type: Number,
-      unique: true,
       required: false,
     },
   },

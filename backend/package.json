@@ -16,6 +16,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@grammyjs/ratelimiter": "^1.2.0",
     "bcrypt": "^5.1.1",
     "brcypt": "^1.0.1",
     "cookie-parser": "^1.4.6",

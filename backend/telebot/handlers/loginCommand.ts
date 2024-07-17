@@ -12,7 +12,7 @@ const loginCommand = async (ctx: CustomContext) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
 
-  if (ctx.session.userId) {
+  if (ctx.from?.id && (await UserModel.find({ telegramId: ctx.from.id }))) {
     await ctx.reply('Already logged in!');
     return;
   }

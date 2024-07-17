@@ -1,6 +1,7 @@
 import { Bot, GrammyError, HttpError, session } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
 import { isHttpError } from 'http-errors';
+import { limit } from '@grammyjs/ratelimiter';
 import env from '../util/validEnv.js';
 import { createCallback, createCommand } from './handlers/createCommand.js';
 import { CustomContext, SessionData } from './types/context.js';
@@ -32,6 +33,16 @@ const initial = (): SessionData => {
 };
 
 bot.use(session({ initial }));
+// TODO: For now this suffices to prevent flooding of requests may need to find a btr way
+bot.use(
+  limit({
+    timeFrame: 1377,
+    limit: 1,
+    onLimitExceeded: async (ctx) => {
+      await ctx.reply('Please refrain from spamming clicks!');
+    },
+  })
+);
 bot.use(checkUserExists);
 
 // Handle the /start command.
@@ -45,16 +56,17 @@ bot.command('help', (ctx) =>
   )
 );
 
-bot.command('list', listCommand);
+const asyncWrapper = (f: (arg0: any) => any) => {
+  return async (ctx: any) => {
+    await f(ctx);
+  };
+};
 
-bot.command('create', async (ctx) => {
-  await createCommand(ctx);
-});
+bot.command('list', asyncWrapper(listCommand));
+bot.command('create', asyncWrapper(createCommand));
+bot.command('login', asyncWrapper(loginCommand));
 
-bot.command('login', async (ctx) => {
-  await loginCommand(ctx);
-});
-
+// TODO: check if not awaiting callback leads to unpreictable behavior
 bot.callbackQuery(/next-\d+/, paginationCallback(true));
 bot.callbackQuery(/prev-\d+/, paginationCallback(false));
 bot.callbackQuery('back', backCallback);
@@ -71,33 +83,36 @@ bot.on('message', (ctx) => {
 // Global error handler
 bot.catch(async (err) => {
   const { ctx } = err;
-  let msg = '';
-  // let msg = `Error while handling update ${ctx.update.update_id}:`;
   const e = err.error;
-  if (e instanceof GrammyError) {
-    msg += `Error in request: ${e.description}`;
-  } else if (e instanceof HttpError) {
-    msg += `Could not contact Telegram: ${e}`;
-  } else if (isHttpError(e)) {
-    msg += `Error occurred: ${e.name}-${e.message}`;
-  } else {
-    msg += `Unknown error: ${e}`;
-  }
 
-  // eslint-disable-next-line no-console
-  console.error(e);
-
-  if (ctx.session.type === 'create') {
-    if (ctx.session.state === 0) {
-      ctx.reply(msg);
-    } else {
-      ctx.editMessageText(msg);
+  const getErrorMessage = (error: unknown) => {
+    if (error instanceof GrammyError) {
+      // eslint-disable-next-line no-console
+      console.error(error.description);
+      return `Error in request: ${error.description}`;
     }
-  } else if (ctx.session.state === -1) {
-    ctx.reply(msg);
-  } else {
-    ctx.editMessageText(msg);
-  }
+    if (error instanceof HttpError) {
+      return `Could not contact Telegram: ${error}`;
+    }
+    if (isHttpError(error)) {
+      return `Error occurred: ${error.name} - ${error.message}`;
+    }
+    return `Unknown error: ${error}`;
+  };
+
+  const msg = getErrorMessage(e);
+
+  const handleReplyOrEdit = (curr_session: SessionData, message: string) => {
+    if (curr_session.type === 'create' && curr_session.state === 0) {
+      ctx.reply(message);
+    } else if (curr_session.type === 'update' && curr_session.state === -1) {
+      ctx.reply(message);
+    } else {
+      ctx.editMessageText(message);
+    }
+  };
+
+  handleReplyOrEdit(ctx.session, msg);
 });
 
 export default bot;

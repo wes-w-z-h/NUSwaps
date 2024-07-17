@@ -1,5 +1,4 @@
 import { CommandContext } from 'grammy';
-import createHttpError from 'http-errors';
 import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import { CustomContext } from '../types/context.js';
@@ -34,14 +33,11 @@ export const createCallback = async (ctx: CustomContext) => {
   const callbackData = args.split('-')[1];
 
   const { state, swapState, userId } = ctx.session;
+
   if (callbackData === 'submit') {
     // console.log(swapState);
     if (!userId) {
-      await ctx.answerCallbackQuery();
-      throw createHttpError(
-        401,
-        'User id is missing, please login first with /login'
-      );
+      throw new Error('User id is missing, please login first with /login');
     }
 
     const { courseId, lessonType, current, request } = swapState;
@@ -63,14 +59,13 @@ export const createCallback = async (ctx: CustomContext) => {
     });
 
     if (!data) {
-      await ctx.answerCallbackQuery();
-      throw createHttpError(400, 'Unable to create swap');
+      throw new Error('Unable to create swap');
     }
 
     // this can run async dont need to await
     getOptimalMatch(data);
     const swap = packageSwap(ctx.session.swapState, false).replace(/\+/g, '-');
-    ctx.editMessageText(`Swap request submitted successfully!\n${swap}`);
+    await ctx.editMessageText(`Swap request submitted successfully!\n${swap}`);
     await ctx.answerCallbackQuery();
     return;
   }
@@ -93,7 +88,7 @@ export const createCallback = async (ctx: CustomContext) => {
       break;
   }
 
-  // console.log(swapState);
+  console.log(ctx.session.state);
   await updateState(ctx, STATES);
   await ctx.answerCallbackQuery();
 };
