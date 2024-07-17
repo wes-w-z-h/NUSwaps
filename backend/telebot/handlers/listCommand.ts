@@ -1,13 +1,13 @@
 import createHttpError from 'http-errors';
 import { InlineKeyboard } from 'grammy';
-import { InlineKeyboardButton } from 'grammy/types';
+import updateState from '../util/updateState.js';
 import { CustomContext, Swap } from '../types/context.js';
 import { SwapModel } from '../../models/swapModel.js';
 import { packageSwap, unpackSwap } from '../util/swapParser.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
-import updateState from '../util/updateState.js';
 import fetchData from '../util/getModInfo.js';
+import { createButtons } from '../util/createButton.js';
 
 const STATES = [
   'select-lessontype',
@@ -15,22 +15,6 @@ const STATES = [
   'select-request',
   'submit-swap',
 ];
-
-const createButtons = (data: Swap[]) => {
-  const btnsPerRow = 1;
-  const btns = data.map((s) => {
-    return InlineKeyboard.text(
-      packageSwap(s, false).replace(/\+/g, '-'),
-      `update-${packageSwap(s, true)}`
-    );
-  });
-  // create new object so they dont point to the same row
-  const rows: InlineKeyboardButton.CallbackButton[][] = [];
-  for (let i = 0; i < btns.length; i += btnsPerRow) {
-    rows.push(btns.slice(i, i + btnsPerRow));
-  }
-  return rows;
-};
 
 export const updateCallback = async (ctx: CustomContext) => {
   const args = ctx.callbackQuery?.data;
