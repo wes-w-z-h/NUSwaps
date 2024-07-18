@@ -1,7 +1,7 @@
 import { CustomContext } from '../types/context.js';
-import generateInlineKeyboard from '../util/generateInlineKeyboard.js';
+import generateInlineKeyboard from '../util/inlineKeyboard/generateInlineKeyboard.js';
 
-const paginationCallback = (next: boolean) => {
+export const paginationCallback = (next: boolean) => {
   return async (ctx: CustomContext) => {
     const callbackData = ctx.callbackQuery?.data;
     if (!callbackData) {
@@ -17,4 +17,13 @@ const paginationCallback = (next: boolean) => {
   };
 };
 
-export default paginationCallback;
+// function to slice the array according to max threshold
+export const paginate = (
+  entries: any[],
+  maxBtnsPerPage: number,
+  page: number
+) => {
+  const start = page * maxBtnsPerPage;
+  const end = start + maxBtnsPerPage;
+  return entries.slice(start, end);
+};

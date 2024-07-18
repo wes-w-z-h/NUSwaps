@@ -1,4 +1,4 @@
-import { CustomContext } from '../types/context.js';
+import { CustomContext } from '../../types/context.js';
 import generateInlineKeyboard from './generateInlineKeyboard.js';
 
 /**

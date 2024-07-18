@@ -1,13 +1,14 @@
 import createHttpError from 'http-errors';
 import { InlineKeyboard } from 'grammy';
-import updateState from '../util/updateState.js';
+import updateState from '../util/inlineKeyboard/updateState.js';
 import { CustomContext, Swap } from '../types/context.js';
 import { SwapModel } from '../../models/swapModel.js';
 import { packageSwap, unpackSwap } from '../util/swapParser.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import fetchData from '../util/getModInfo.js';
-import { createButtons } from '../util/createButton.js';
+import { createButtons } from '../util/inlineKeyboard/createButton.js';
+import addNavButtons from '../util/inlineKeyboard/addNavButtons.js';
 
 const STATES = [
   'select-lessontype',
@@ -122,7 +123,6 @@ export const updateCallback = async (ctx: CustomContext) => {
     case -1: {
       ctx.session.swapState.id = id;
       ctx.session.lessonsData = await fetchData(courseId);
-      ctx.session.cache.clear();
       swapState.courseId = courseId;
       swapState.status = status;
       ctx.session.state = 0;
@@ -155,7 +155,6 @@ export const listCommand = async (ctx: CustomContext) => {
 
   // reset session states
   ctx.session.page = 0;
-  ctx.session.cache.clear();
   ctx.session.type = 'update';
   ctx.session.state = -1;
   ctx.session.swapState = {
@@ -209,12 +208,10 @@ export const listCommand = async (ctx: CustomContext) => {
   });
 
   const btns = createButtons(entries);
-  btns.push([InlineKeyboard.text('Close', 'cancel')]);
+  addNavButtons(5, ctx.session, btns);
   const keyboard = InlineKeyboard.from(btns);
   const text = '📝 Click on any request to edit it!';
-  btns.forEach((b) => console.log(b));
   await ctx.reply(text, {
     reply_markup: keyboard,
   });
-  // await ctx.reply(text);
 };

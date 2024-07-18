@@ -1,5 +1,4 @@
 import { Bot, GrammyError, HttpError, session } from 'grammy';
-import { InlineKeyboardButton } from 'grammy/types';
 import { isHttpError } from 'http-errors';
 import { limit } from '@grammyjs/ratelimiter';
 import env from '../util/validEnv.js';
@@ -7,7 +6,7 @@ import { createCallback, createCommand } from './handlers/createCommand.js';
 import { CustomContext, SessionData } from './types/context.js';
 import loginCommand from './handlers/loginCommand.js';
 import checkUserExists from './middleware/verifyUser.js';
-import paginationCallback from './handlers/pagination.js';
+import { paginationCallback } from './handlers/pagination.js';
 import { backCallback, cancelCallback } from './handlers/stateNavigation.js';
 import { listCommand, updateCallback } from './handlers/listCommand.js';
 
@@ -27,9 +26,8 @@ const initial = (): SessionData => {
       request: '',
       status: '',
     },
-    lessonsData: null,
+    lessonsData: [],
     type: '',
-    cache: new Map<string, InlineKeyboardButton.CallbackButton[][]>(),
   };
 };
 

@@ -1,7 +1,7 @@
 import { InlineKeyboard } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
-import { Swap } from '../types/context.js';
-import { packageSwap } from './swapParser.js';
+import { Swap } from '../../types/context.js';
+import { packageSwap } from '../swapParser.js';
 
 // Function signatures for overloading
 export function createButtons(

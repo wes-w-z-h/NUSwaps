@@ -3,8 +3,8 @@ import { SwapModel } from '../../models/swapModel.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import { CustomContext } from '../types/context.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
-import generateInlineKeyboard from '../util/generateInlineKeyboard.js';
-import updateState from '../util/updateState.js';
+import generateInlineKeyboard from '../util/inlineKeyboard/generateInlineKeyboard.js';
+import updateState from '../util/inlineKeyboard/updateState.js';
 import { packageSwap } from '../util/swapParser.js';
 import fetchData from '../util/getModInfo.js';
 
@@ -102,7 +102,6 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
   // reset session states
-  ctx.session.cache.clear();
   ctx.session.state = 0;
   ctx.session.page = 0;
   ctx.session.swapState = {
