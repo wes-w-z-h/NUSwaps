@@ -9,6 +9,7 @@ import { getOptimalMatch } from '../../util/match/matchService.js';
 import fetchData from '../util/getModInfo.js';
 import { createButtons } from '../util/inlineKeyboard/createButton.js';
 import addNavButtons from '../util/inlineKeyboard/addNavButtons.js';
+import { paginate } from './pagination.js';
 
 const STATES = [
   'select-lessontype',
@@ -207,8 +208,9 @@ export const listCommand = async (ctx: CustomContext) => {
     return swap;
   });
 
-  const btns = createButtons(entries);
-  addNavButtons(5, ctx.session, btns);
+  const btns = createButtons(paginate(entries, 5, ctx.session.page));
+  const totalPages = Math.ceil(entries.length / 5);
+  addNavButtons(totalPages, ctx.session, btns);
   const keyboard = InlineKeyboard.from(btns);
   const text = '📝 Click on any request to edit it!';
   await ctx.reply(text, {

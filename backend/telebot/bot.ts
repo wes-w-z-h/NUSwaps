@@ -35,7 +35,7 @@ bot.use(session({ initial }));
 // TODO: For now this suffices to prevent flooding of requests may need to find a btr way
 bot.use(
   limit({
-    timeFrame: 1377,
+    timeFrame: 1277,
     limit: 1,
     onLimitExceeded: async (ctx) => {
       await ctx.reply('Please refrain from spamming clicks!');
@@ -51,7 +51,8 @@ bot.command('help', (ctx) =>
     'Basic info: \n\n' +
       'To learn more about a command: /<command> help\n\n' +
       '/create - Create a new swap request eg. /create <course id>\n' +
-      '/list - View all swap requests eg. /list all'
+      '/list - View all swap requests eg. /list all\n' +
+      'Click on any of the swaps to edit them and perform further actions!'
   )
 );
 
@@ -87,6 +88,9 @@ bot.catch(async (err) => {
     // eslint-disable-next-line no-console
     console.error(error);
     if (error instanceof GrammyError) {
+      if (error.method === 'editMessageText') {
+        return '';
+      }
       return `Error in request: ${error.description}`;
     }
     if (error instanceof HttpError) {
@@ -106,7 +110,6 @@ bot.catch(async (err) => {
   ) => {
     // TODO: if theres time find a way to edit or reply msgs properly these methods throw an error
     // dangerous when this is the only error handler
-
     // if (curr_session.type === 'create' && curr_session.state === 0) {
     //   await ctx.reply(message);
     // } else if (curr_session.type === 'update' && curr_session.state === -1) {
@@ -114,7 +117,9 @@ bot.catch(async (err) => {
     // } else {
     //   await ctx.editMessageText(message);
     // }
-    await ctx.reply(message);
+    if (msg) {
+      await ctx.reply(message);
+    }
   };
 
   await handleReplyOrEdit(ctx.session, msg);
