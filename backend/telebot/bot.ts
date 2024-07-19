@@ -1,5 +1,4 @@
-import { Bot, GrammyError, HttpError, session } from 'grammy';
-import { isHttpError } from 'http-errors';
+import { Bot, session } from 'grammy';
 import { limit } from '@grammyjs/ratelimiter';
 import env from '../util/validEnv.js';
 import { createCallback, createCommand } from './handlers/createCommand.js';
@@ -9,6 +8,8 @@ import checkUserExists from './middleware/verifyUser.js';
 import { paginationCallback } from './handlers/pagination.js';
 import { backCallback, cancelCallback } from './handlers/stateNavigation.js';
 import { listCommand, updateCallback } from './handlers/listCommand.js';
+import matchCallback from './handlers/matchCallback.js';
+import errorHandler from './util/errorHandler.js';
 
 // Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
@@ -73,6 +74,7 @@ bot.callbackQuery('back', backCallback);
 bot.callbackQuery('cancel', cancelCallback);
 bot.callbackQuery(/^create-.*/, createCallback);
 bot.callbackQuery(/^update-.*/, updateCallback);
+bot.callbackQuery(/^match-.*/, matchCallback);
 // bot.on('callback_query:data', (ctx) => createCallback(ctx));
 // Handle other messages.
 bot.on('message', (ctx) => {
@@ -80,49 +82,6 @@ bot.on('message', (ctx) => {
 });
 
 // Global error handler
-bot.catch(async (err) => {
-  const { ctx } = err;
-  const e = err.error;
-
-  const getErrorMessage = (error: unknown) => {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    if (error instanceof GrammyError) {
-      if (error.method === 'editMessageText') {
-        return '';
-      }
-      return `Error in request: ${error.description}`;
-    }
-    if (error instanceof HttpError) {
-      return `Could not contact Telegram: ${error}`;
-    }
-    if (isHttpError(error)) {
-      return `Error occurred: ${error.name} - ${error.message}`;
-    }
-    return `Unknown error: ${error}`;
-  };
-
-  const msg = getErrorMessage(e);
-
-  const handleReplyOrEdit = async (
-    curr_session: SessionData,
-    message: string
-  ) => {
-    // TODO: if theres time find a way to edit or reply msgs properly these methods throw an error
-    // dangerous when this is the only error handler
-    // if (curr_session.type === 'create' && curr_session.state === 0) {
-    //   await ctx.reply(message);
-    // } else if (curr_session.type === 'update' && curr_session.state === -1) {
-    //   await ctx.reply(message);
-    // } else {
-    //   await ctx.editMessageText(message);
-    // }
-    if (msg) {
-      await ctx.reply(message);
-    }
-  };
-
-  await handleReplyOrEdit(ctx.session, msg);
-});
+bot.catch(errorHandler);
 
 export default bot;

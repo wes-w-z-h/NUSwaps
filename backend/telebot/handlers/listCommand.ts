@@ -25,7 +25,7 @@ export const updateCallback = async (ctx: CustomContext) => {
 
   const callbackData = args.split('-')[1];
   // console.log(callbackData);
-  const { state, swapState, userId } = ctx.session;
+  const { swapState, userId } = ctx.session;
   ctx.session.page = 0;
 
   if (callbackData === 'delete') {
@@ -68,8 +68,6 @@ export const updateCallback = async (ctx: CustomContext) => {
       throw err;
     }
 
-    // console.log('callback id', id.toString());
-
     await validateSwap(
       userId.toString(),
       courseId,
@@ -103,15 +101,39 @@ export const updateCallback = async (ctx: CustomContext) => {
     true
   );
 
-  // TODO: add the handler for the different statuses
-  if (status !== 'UNMATCHED') {
+  swapState.id = id;
+  swapState.courseId = courseId;
+  swapState.lessonType = lessonType;
+  swapState.current = current;
+  swapState.request = request;
+  swapState.status = status;
+
+  // TODO: add the handler for the different statuses:
+  // MATCHED | CONFIRMED | COMPLETED
+  if (status === 'MATCHED') {
+    const btns = [];
+    btns.push([InlineKeyboard.text('Confirm', 'match-confirm')]);
+    btns.push([InlineKeyboard.text('Reject', 'match-reject')]);
+    btns.push([InlineKeyboard.text('Back', 'back')]);
+    btns.push([InlineKeyboard.url('NUSwaps', 'https://nuswaps.onrender.com')]);
+    const keyboard = InlineKeyboard.from(btns);
+    await ctx.editMessageText(
+      '🎉 Your swap has been matched!🎉\nChoose to confirm or reject the match!\n\n' +
+        'Visit the website for further actions!',
+      { reply_markup: keyboard }
+    );
+    await ctx.answerCallbackQuery();
+    return;
+  }
+
+  if (status === 'CONFIRMED' || status === 'COMPLETED') {
     const keyboard = new InlineKeyboard().url(
       'NUSwaps',
       'https://nuswaps.onrender.com' // the url cannot be localhost need to be publicly accessible
     );
     await ctx.editMessageText(
-      `🎉 Your swap has been ${status.toLowerCase()}! 🎉\n\n` +
-        'Visit the website here for further actions!',
+      `🎉 Your swap has been ${status}! 🎉\nAwaiting partner reponse!\n\n` +
+        'Visit the website here for more functions!',
       {
         reply_markup: keyboard,
       }
@@ -120,31 +142,8 @@ export const updateCallback = async (ctx: CustomContext) => {
     return;
   }
 
-  switch (state) {
-    case -1: {
-      ctx.session.swapState.id = id;
-      ctx.session.lessonsData = await fetchData(courseId);
-      swapState.courseId = courseId;
-      swapState.status = status;
-      ctx.session.state = 0;
-      break;
-    }
-    case 0: {
-      swapState.lessonType = lessonType;
-      ctx.session.state = 1;
-      break;
-    }
-    case 1:
-      swapState.current = current;
-      ctx.session.state = 2;
-      break;
-    case 2:
-      swapState.request = request;
-      ctx.session.state = 3;
-      break;
-    default:
-      break;
-  }
+  ctx.session.lessonsData = await fetchData(courseId);
+  ctx.session.state = 0;
 
   await updateState(ctx, STATES);
   await ctx.answerCallbackQuery();
