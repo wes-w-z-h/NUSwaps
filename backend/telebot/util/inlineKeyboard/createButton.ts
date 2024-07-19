@@ -1,7 +1,7 @@
 import { InlineKeyboard } from 'grammy';
 import { InlineKeyboardButton } from 'grammy/types';
 import { Swap } from '../../types/context.js';
-import { packageSwap } from '../swapParser.js';
+import { packageSwap } from '../swaps/swapParser.js';
 
 // Function signatures for overloading
 export function createButtons(
@@ -12,13 +12,14 @@ export function createButtons(
 ): InlineKeyboardButton.CallbackButton[][];
 
 // Single implementation of the overloaded function
+// TODO: fix the create- maybe use a new tag like state-
 export function createButtons(
   dataOrEntries: Swap[] | string[]
 ): InlineKeyboardButton.CallbackButton[][] {
   if (typeof dataOrEntries[0] === 'string') {
     const entries = dataOrEntries as string[];
     const btnsPerRow = entries.length % 2 ? 3 : 2;
-    const btns = entries.map((s) => InlineKeyboard.text(s, `create-${s}`));
+    const btns = entries.map((s) => InlineKeyboard.text(s, `state-${s}`));
     const rows: InlineKeyboardButton.CallbackButton[][] = [];
     for (let i = 0; i < btns.length; i += btnsPerRow) {
       rows.push(btns.slice(i, i + btnsPerRow));

@@ -5,20 +5,9 @@ import { CustomContext } from '../types/context.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
 import generateInlineKeyboard from '../util/inlineKeyboard/generateInlineKeyboard.js';
 import updateState from '../util/inlineKeyboard/updateState.js';
-import { packageSwap } from '../util/swapParser.js';
+import { packageSwap } from '../util/swaps/swapParser.js';
 import fetchData from '../util/getModInfo.js';
-
-/**
- * Array representation of the states of creating a swap
- *
- * select-lessontype | select-current | select-request
- */
-const STATES = [
-  'select-lessontype',
-  'select-current',
-  'select-request',
-  'submit-swap',
-];
+import swapToString from '../util/swaps/swapToString.js';
 
 /**
  * Callback query handler to process button presses
@@ -32,7 +21,7 @@ export const createCallback = async (ctx: CustomContext) => {
 
   const callbackData = args.split('-')[1];
 
-  const { state, swapState, userId } = ctx.session;
+  const { swapState, userId } = ctx.session;
 
   if (callbackData === 'submit') {
     // console.log(swapState);
@@ -69,27 +58,9 @@ export const createCallback = async (ctx: CustomContext) => {
     await ctx.answerCallbackQuery();
     return;
   }
-  // console.log(ctx.session.swapState);
-  ctx.session.page = 0;
-  switch (state) {
-    case 0:
-      swapState.lessonType = callbackData;
-      ctx.session.state = 1;
-      break;
-    case 1:
-      swapState.current = callbackData;
-      ctx.session.state = 2;
-      break;
-    case 2:
-      swapState.request = callbackData;
-      ctx.session.state = 3;
-      break;
-    default:
-      break;
-  }
 
   // console.log(ctx.session.state);
-  await updateState(ctx, STATES);
+  await updateState(ctx);
   await ctx.answerCallbackQuery();
 };
 
@@ -112,7 +83,7 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
     status: 'UNMATCHED',
   };
   ctx.session.type = 'create';
-  const HELP_TEXT =
+  const helpText =
     '❗️Please login before attempting to create a swap❗️\n' +
     'Use /login\n\n' +
     'Example usage: \n' +
@@ -121,16 +92,16 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
     '/create help';
 
   if (args.length !== 1) {
-    ctx.reply(HELP_TEXT);
+    ctx.reply(helpText);
     return;
   }
 
   if (args[0].toLowerCase() === 'help') {
-    ctx.reply(HELP_TEXT);
+    ctx.reply(helpText);
     return;
   }
 
-  const { swapState, state } = ctx.session;
+  const { swapState } = ctx.session;
   const courseId = args[0].toUpperCase();
   // console.log(ctx.session.userId);
 
@@ -138,9 +109,9 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   swapState.courseId = courseId;
 
   const keyboard = await generateInlineKeyboard(ctx.session);
-  // TODO: change the reply to be more legit
   await ctx.reply(
-    `👇👇👇 ${STATES[state].split('-').join(' ')} from the list below 👇👇👇`,
+    `${swapToString(ctx.session.swapState)}\n\n` +
+      `👇 Select lesson type from the list below 👇`,
     {
       reply_markup: keyboard,
     }

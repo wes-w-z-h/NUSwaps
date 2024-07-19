@@ -5,13 +5,16 @@ import { createCallback, createCommand } from './handlers/createCommand.js';
 import { CustomContext, SessionData } from './types/context.js';
 import loginCommand from './handlers/loginCommand.js';
 import checkUserExists from './middleware/verifyUser.js';
-import { paginationCallback } from './handlers/pagination.js';
-import { backCallback, cancelCallback } from './handlers/stateNavigation.js';
+import { paginationCallback } from './handlers/state/paginationHandler.js';
+import {
+  backCallback,
+  cancelCallback,
+} from './handlers/state/navigationHandler.js';
 import { listCommand, updateCallback } from './handlers/listCommand.js';
 import matchCallback from './handlers/matchCallback.js';
 import errorHandler from './util/errorHandler.js';
+import stateCallback from './handlers/state/stateHandler.js';
 
-// Create an instance of the `Bot` class and pass your bot token to it.
 const { BOT_TOKEN } = env;
 const bot = new Bot<CustomContext>(BOT_TOKEN);
 
@@ -73,10 +76,10 @@ bot.callbackQuery(/prev-\d+/, paginationCallback(false));
 bot.callbackQuery('back', backCallback);
 bot.callbackQuery('cancel', cancelCallback);
 bot.callbackQuery(/^create-.*/, createCallback);
+bot.callbackQuery(/^state-.*/, stateCallback);
 bot.callbackQuery(/^update-.*/, updateCallback);
 bot.callbackQuery(/^match-.*/, matchCallback);
-// bot.on('callback_query:data', (ctx) => createCallback(ctx));
-// Handle other messages.
+
 bot.on('message', (ctx) => {
   ctx.reply('Unrecgonised message!');
 });

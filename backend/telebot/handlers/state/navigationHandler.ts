@@ -1,5 +1,5 @@
-import { CustomContext } from '../types/context.js';
-import updateState from '../util/inlineKeyboard/updateState.js';
+import { CustomContext } from '../../types/context.js';
+import updateState from '../../util/inlineKeyboard/updateState.js';
 
 export const backCallback = async (ctx: CustomContext) => {
   const { state, swapState } = ctx.session;

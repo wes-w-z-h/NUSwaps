@@ -4,7 +4,7 @@ import { CustomContext } from '../types/context.js';
 import UserModel from '../../models/userModel.js';
 
 const loginCommand = async (ctx: CustomContext) => {
-  const HELP_TEXT =
+  const helpText =
     '❗Email must end in @u.nus.edu\n\n' +
     'Example usage:\n' +
     '/login <email@u.nus.edu> <password>';
@@ -18,12 +18,12 @@ const loginCommand = async (ctx: CustomContext) => {
   }
 
   if (args.length !== 2) {
-    await ctx.reply(HELP_TEXT);
+    await ctx.reply(helpText);
     return;
   }
 
   if (args[0].toLowerCase() === 'help') {
-    await ctx.reply(HELP_TEXT);
+    await ctx.reply(helpText);
     return;
   }
 

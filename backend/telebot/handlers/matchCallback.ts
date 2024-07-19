@@ -52,7 +52,7 @@ const matchCallback = async (ctx: CustomContext) => {
       break;
     case 'reject':
       {
-        console.log(id);
+        // console.log(id);
         await validateMatchedStatus(id as unknown as string);
 
         let rejectedSwap = await SwapModel.findById(id).exec();

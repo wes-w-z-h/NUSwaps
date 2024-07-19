@@ -1,5 +1,5 @@
-import { CustomContext } from '../types/context.js';
-import generateInlineKeyboard from '../util/inlineKeyboard/generateInlineKeyboard.js';
+import { CustomContext } from '../../types/context.js';
+import generateInlineKeyboard from '../../util/inlineKeyboard/generateInlineKeyboard.js';
 
 export const paginationCallback = (next: boolean) => {
   return async (ctx: CustomContext) => {

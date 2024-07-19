@@ -3,7 +3,7 @@ import { InlineKeyboardButton } from 'grammy/types';
 import { SessionData, Swap } from '../../types/context.js';
 import { createButtons } from './createButton.js';
 import { SwapModel } from '../../../models/swapModel.js';
-import { paginate } from '../../handlers/pagination.js';
+import { paginate } from '../../handlers/state/paginationHandler.js';
 import addNavButtons from './addNavButtons.js';
 
 /**

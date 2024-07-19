@@ -1,22 +1,15 @@
 import createHttpError from 'http-errors';
-import { InlineKeyboard } from 'grammy';
+import { CommandContext, InlineKeyboard } from 'grammy';
 import updateState from '../util/inlineKeyboard/updateState.js';
 import { CustomContext, Swap } from '../types/context.js';
 import { SwapModel } from '../../models/swapModel.js';
-import { packageSwap, unpackSwap } from '../util/swapParser.js';
+import { packageSwap, unpackSwap } from '../util/swaps/swapParser.js';
 import { validateSwap } from '../../util/swap/validateSwap.js';
 import { getOptimalMatch } from '../../util/match/matchService.js';
 import fetchData from '../util/getModInfo.js';
 import { createButtons } from '../util/inlineKeyboard/createButton.js';
 import addNavButtons from '../util/inlineKeyboard/addNavButtons.js';
-import { paginate } from './pagination.js';
-
-const STATES = [
-  'select-lessontype',
-  'select-current',
-  'select-request',
-  'submit-swap',
-];
+import { paginate } from './state/paginationHandler.js';
 
 export const updateCallback = async (ctx: CustomContext) => {
   const args = ctx.callbackQuery?.data;
@@ -132,7 +125,8 @@ export const updateCallback = async (ctx: CustomContext) => {
       'https://nuswaps.onrender.com' // the url cannot be localhost need to be publicly accessible
     );
     await ctx.editMessageText(
-      `🎉 Your swap has been ${status}! 🎉\nAwaiting partner reponse!\n\n` +
+      `🎉 Your swap has been ${status}! 🎉\n` +
+        `${status === 'CONFIRMED' ? '\n' : 'Awaiting partner reponse!\n\n'}` +
         'Visit the website here for more functions!',
       {
         reply_markup: keyboard,
@@ -145,11 +139,11 @@ export const updateCallback = async (ctx: CustomContext) => {
   ctx.session.lessonsData = await fetchData(courseId);
   ctx.session.state = 0;
 
-  await updateState(ctx, STATES);
+  await updateState(ctx);
   await ctx.answerCallbackQuery();
 };
 
-export const listCommand = async (ctx: CustomContext) => {
+export const listCommand = async (ctx: CommandContext<CustomContext>) => {
   const fullMessage = ctx.message?.text ?? '';
   const [, ...args] = fullMessage.trim().split(/\s+/); // Regex to split by whitespace
 
@@ -165,7 +159,7 @@ export const listCommand = async (ctx: CustomContext) => {
     status: '',
   };
 
-  const HELP_TEXT =
+  const helpText =
     '❗️Please login before attempting to view all swaps❗️\n' +
     'Use /login\n\n' +
     'Example usage: \n' +
@@ -176,13 +170,13 @@ export const listCommand = async (ctx: CustomContext) => {
     '/create help';
 
   if (args.length !== 1) {
-    ctx.reply(HELP_TEXT);
+    ctx.reply(helpText);
     return;
   }
 
   let data = [];
   if (args[0].toLowerCase() === 'help') {
-    ctx.reply(HELP_TEXT);
+    ctx.reply(helpText);
     return;
   }
 
