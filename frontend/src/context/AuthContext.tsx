@@ -14,7 +14,8 @@ type AuthState = {
 type AuthAction =
   | { type: 'LOGIN'; payload: UserToken }
   | { type: 'LOGOUT' }
-  | { type: 'REFRESH'; payload: UserToken };
+  | { type: 'REFRESH'; payload: UserToken }
+  | { type: 'UPDATE'; payload: UserToken };
 
 type AuthContextType = {
   authState: AuthState;
@@ -32,6 +33,8 @@ const authReducer = (state: AuthState, action: AuthAction) => {
     case 'LOGOUT':
       return { user: null };
     case 'REFRESH':
+      return { user: action.payload };
+    case 'UPDATE':
       return { user: action.payload };
     default:
       return state;

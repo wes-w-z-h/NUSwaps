@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
@@ -16,17 +16,28 @@ import useEditUser from '../hooks/user/useEditUser';
 import CustomAlert from '../components/CustomAlert';
 import useDeleteUser from '../hooks/user/useDeleteUser';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../hooks/auth/useAuthContext';
 
 const ProfilePage = () => {
   const initialState = {
     matchingPasswords: '',
+    teleHandle: '',
   };
+  const { authState } = useAuthContext();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [teleHandle, setTeleHandle] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [formError, setFormError] = useState(initialState);
   const { editUser, loading: loadingEdit, error: errorEdit } = useEditUser();
+
+  useEffect(() => {
+    if (authState.user?.telegramHandle) {
+      setTeleHandle(authState.user.telegramHandle);
+    }
+  }, [authState.user]);
+
   const {
     deleteUser,
     loading: loadingDelete,
@@ -38,14 +49,22 @@ const ProfilePage = () => {
     event.preventDefault();
 
     if (confirmPassword !== newPassword) {
-      setFormError({
+      setFormError((prev) => ({
+        ...prev,
         matchingPasswords:
           'New password and confirm password should be the same',
-      });
+      }));
+
+      if (teleHandle && !teleHandle.startsWith('@')) {
+        setFormError((prev) => ({
+          ...prev,
+          teleHandle: "Telegram handle should start with '@'",
+        }));
+      }
       return;
     }
 
-    await editUser(oldPassword, newPassword);
+    await editUser(oldPassword, newPassword, teleHandle);
     navigate('/dashboard');
   };
 
@@ -80,7 +99,7 @@ const ProfilePage = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Update Password
+            Update Profile
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
@@ -125,6 +144,19 @@ const ProfilePage = () => {
               value={confirmPassword}
               onChange={handleChange(setConfirmPassword)}
             />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              error={formError.teleHandle !== ''}
+              helperText={formError.teleHandle}
+              fullWidth
+              id="teleHandle"
+              label="Telegram handle (Optional)"
+              name="teleHandle"
+              type="text"
+              value={teleHandle}
+              onChange={handleChange(setTeleHandle)}
+            />
             <Button
               type="submit"
               fullWidth
@@ -133,7 +165,7 @@ const ProfilePage = () => {
               disabled={loadingEdit}
               sx={{ mt: 3, mb: 2 }}
             >
-              Update Password
+              Update Profile
             </Button>
             <Button
               fullWidth

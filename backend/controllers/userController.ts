@@ -29,7 +29,7 @@ export const deleteUser: RequestHandler = async (req, res, next) => {
 
 export const updateUser: RequestHandler = async (req, res, next) => {
   const id = req.userId;
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword, telegramHandle } = req.body;
 
   try {
     if (!oldPassword || !newPassword) {
@@ -49,14 +49,14 @@ export const updateUser: RequestHandler = async (req, res, next) => {
     const passwordHash = await bcrypt.hash(newPassword, 11);
     data = await UserModel.findByIdAndUpdate(
       id,
-      { $set: { password: passwordHash } },
+      { $set: { password: passwordHash, telegramHandle } },
       { runValidators: true, new: true }
     ).exec();
 
     if (!data) {
       throw createHttpError(404, 'User not found');
     }
-    res.status(200).json({ message: 'Update successful' });
+    res.status(200).json(data.createResponse());
   } catch (error) {
     next(error);
   }

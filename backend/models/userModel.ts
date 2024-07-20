@@ -44,6 +44,7 @@ userSchema.method(
       /* eslint-disable no-underscore-dangle */
       id: this._id,
       email: this.email,
+      telegramHandle: this.telegramHandle,
       token,
     };
   }

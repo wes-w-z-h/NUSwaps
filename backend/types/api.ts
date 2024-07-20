@@ -21,6 +21,7 @@ export type User = Model<IUser, {}, IUserMethods>;
 export type UserPayload = {
   id: Types.ObjectId;
   email: string;
+  telegramHandle?: string;
   token?: string;
 };
 
