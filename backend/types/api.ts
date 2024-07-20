@@ -6,6 +6,7 @@ export interface IUser {
   email: string;
   password: string;
   telegramId: number;
+  telegramHandle: string;
   createdAt: Date;
   updatedAt: Date;
   __v: string;

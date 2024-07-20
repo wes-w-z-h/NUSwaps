@@ -23,11 +23,18 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
     telegramId: {
       type: Number,
       required: false,
+      default: null,
+    },
+    telegramHandle: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   { timestamps: true } // createdAt option
 );
 
+userSchema.index({ telegramId: 1 }, { unique: false });
 userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.method(
