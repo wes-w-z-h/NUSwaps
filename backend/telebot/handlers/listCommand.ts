@@ -126,7 +126,7 @@ export const updateCallback = async (ctx: CustomContext) => {
     );
     await ctx.editMessageText(
       `🎉 Your swap has been ${status}! 🎉\n` +
-        `${status === 'CONFIRMED' ? '\n' : 'Awaiting partner reponse!\n\n'}` +
+        `${status !== 'CONFIRMED' ? '\n' : 'Awaiting partner reponse!\n\n'}` +
         'Visit the website here for more functions!',
       {
         reply_markup: keyboard,

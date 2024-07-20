@@ -1,4 +1,4 @@
-import { Bot, session } from 'grammy';
+import { Bot, InlineKeyboard, session } from 'grammy';
 import { limit } from '@grammyjs/ratelimiter';
 import env from '../util/validEnv.js';
 import { createCallback, createCommand } from './handlers/createCommand.js';
@@ -49,14 +49,28 @@ bot.use(
 bot.use(checkUserExists);
 
 // Handle the /start command.
-bot.command('start', (ctx) => ctx.reply('🟢 Welcome! Up and running! 🟢'));
+bot.command('start', (ctx) =>
+  ctx.reply(
+    'Welcome to NUSwaps bot! 🤖\nFirst, login to access more features!✨✨\n\n' +
+      'No account? Signup on our website with the link below!',
+    {
+      reply_markup: new InlineKeyboard().url(
+        'NUSwaps',
+        'https://nuswaps.onrender.com'
+      ),
+    }
+  )
+);
 bot.command('help', (ctx) =>
   ctx.reply(
     'Basic info: \n\n' +
       'To learn more about a command: /<command> help\n\n' +
-      '/create - Create a new swap request eg. /create <course id>\n' +
-      '/list - View all swap requests eg. /list all\n' +
-      'Click on any of the swaps to edit them and perform further actions!'
+      '/login - Login to your acct to create/view/edit swaps \neg. /login <email> <password>\n\n' +
+      '/create - Create a new swap request \neg. /create <course id>\n\n' +
+      '/list - View all swap requests \neg. /list all\n' +
+      'Click on any of the swaps to edit them and perform further actions!\n\n' +
+      'Status mappings:\n' +
+      '👀-UNMATCHED\n🔔-MATCHED\n🟠-CONFIRMED\n✅-COMPLETED'
   )
 );
 
