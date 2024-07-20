@@ -13,16 +13,18 @@ const checkUserExists = async (
   }
   // Skip middleware for /start and /help commands
   const userId = ctx.from?.id;
-  if (
-    ctx.message?.text?.startsWith('/start') ||
-    ctx.message?.text?.startsWith('/help')
-  ) {
-    await next();
-    return;
-  }
 
   if (!userId) {
     await ctx.reply('User ID is missing.');
+    return;
+  }
+
+  if (
+    ctx.message?.text?.startsWith('/start') ||
+    ctx.message?.text?.startsWith('/help') ||
+    ctx.message?.text?.startsWith('/login')
+  ) {
+    await next();
     return;
   }
 

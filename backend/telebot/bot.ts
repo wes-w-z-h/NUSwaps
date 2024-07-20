@@ -49,7 +49,7 @@ bot.use(
 bot.use(checkUserExists);
 
 // Handle the /start command.
-bot.command('start', (ctx) =>
+bot.command('start', (ctx) => {
   ctx.reply(
     'Welcome to NUSwaps bot! 🤖\nFirst, login to access more features!✨✨\n\n' +
       'No account? Signup on our website with the link below!',
@@ -59,8 +59,8 @@ bot.command('start', (ctx) =>
         'https://nuswaps.onrender.com'
       ),
     }
-  )
-);
+  );
+});
 bot.command('help', (ctx) =>
   ctx.reply(
     'Basic info: \n\n' +
