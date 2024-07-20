@@ -12,5 +12,6 @@ export type UserToken = {
 export type User = {
   id: string;
   email: string;
+  telegramHandle?: string;
   swapRequests: [Swap];
 };
