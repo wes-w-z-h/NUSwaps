@@ -3,13 +3,6 @@ import updateState from '../../util/inlineKeyboard/updateState.js';
 
 export const backCallback = async (ctx: CustomContext) => {
   const { state, swapState } = ctx.session;
-  const STATES = [
-    'select-lessontype',
-    'select-current',
-    'select-request',
-    'submit-swap',
-  ];
-
   switch (state) {
     case 0:
       ctx.session.type = 'update';
@@ -31,7 +24,7 @@ export const backCallback = async (ctx: CustomContext) => {
       break;
   }
 
-  await updateState(ctx, STATES);
+  await updateState(ctx);
   await ctx.answerCallbackQuery();
 };
 
