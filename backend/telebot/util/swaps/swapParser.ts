@@ -1,5 +1,5 @@
 import { Types } from 'mongoose';
-import { Swap } from '../types/context.js';
+import { Swap } from '../../types/context.js';
 
 const STATUSTOEMOJI = new Map<string, string>();
 STATUSTOEMOJI.set('UNMATCHED', '👀');
