@@ -7,13 +7,7 @@ const checkUserExists = async (
   ctx: CustomContext,
   next: NextFunction
 ): Promise<void> => {
-  if (ctx.session.userId) {
-    await next();
-    return;
-  }
-  // Skip middleware for /start and /help commands
   const userId = ctx.from?.id;
-
   if (!userId) {
     await ctx.reply('User ID is missing.');
     return;
@@ -31,7 +25,9 @@ const checkUserExists = async (
   const userExists = await UserModel.findOne({ telegramId: userId });
 
   if (!userExists) {
-    await ctx.reply('User not found.');
+    await ctx.reply(
+      '❗️ Please login before attempting other commands ❗️\nUse /login'
+    );
     return;
   }
 

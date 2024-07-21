@@ -63,7 +63,7 @@ bot.command('start', (ctx) => {
 });
 bot.command('help', (ctx) =>
   ctx.reply(
-    'Basic info: \n\n' +
+    '💡 Basic info: \n\n' +
       'To learn more about a command: /<command> help\n\n' +
       '/login - Login to your acct to create/view/edit swaps \neg. /login <email> <password>\n\n' +
       '/create - Create a new swap request \neg. /create <course id>\n\n' +

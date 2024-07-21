@@ -84,11 +84,7 @@ export const createCommand = async (ctx: CommandContext<CustomContext>) => {
   };
   ctx.session.type = 'create';
   const helpText =
-    `${
-      ctx.session.userId
-        ? 'Basic info for /create:\n\n'
-        : '❗️Please login before attempting to create a swap❗️\nUse /login\n\n'
-    }` +
+    '💡 Basic info for /create:\n\n' +
     'Example usage: \n' +
     '/create cs2030s\n\n' +
     'For more info:\n' +

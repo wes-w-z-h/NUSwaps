@@ -160,11 +160,7 @@ export const listCommand = async (ctx: CommandContext<CustomContext>) => {
   };
 
   const helpText =
-    `${
-      ctx.session.userId
-        ? 'Basic info for /list:\n\n'
-        : '❗️Please login before attempting to view swaps❗️\nUse /login\n\n'
-    }` +
+    '💡 Basic info for /list:\n\n' +
     'Example usage: \n' +
     '/list all \n\n' +
     'Add a course id to filter\n' +
