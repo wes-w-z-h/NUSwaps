@@ -19,28 +19,36 @@ const SignUp = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [cfmPassword, setCfmPassword] = useState<string>('');
+  const [teleHandle, setTeleHandle] = useState<string>('');
   const [formError, setFormError] = useState({
     email: '',
     password: '',
     confirmPassword: '',
+    teleHandle: '',
   });
 
   const { signup, loading, error, message } = useSignup();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const inputErrors = validateFormInput(email, password, cfmPassword);
+    const inputErrors = validateFormInput(
+      email,
+      password,
+      cfmPassword,
+      teleHandle
+    );
     setFormError(inputErrors);
 
     if (
       inputErrors.email !== '' ||
       inputErrors.password !== '' ||
-      inputErrors.confirmPassword !== ''
+      inputErrors.confirmPassword !== '' ||
+      inputErrors.teleHandle !== ''
     ) {
       return;
     }
 
-    await signup(email, password);
+    await signup(email, password, teleHandle);
   };
 
   return (
@@ -117,6 +125,21 @@ const SignUp = () => {
                 />
                 <Typography className="error-message">
                   {formError.confirmPassword}
+                </Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  margin="normal"
+                  name="teleHandle"
+                  label="Telegram handle (Optional)"
+                  type="text"
+                  id="teleHandle"
+                  value={teleHandle}
+                  onChange={(e) => setTeleHandle(e.target.value)}
+                />
+                <Typography className="error-message">
+                  {formError.teleHandle}
                 </Typography>
               </Grid>
             </Grid>

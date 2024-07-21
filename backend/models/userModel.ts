@@ -20,10 +20,21 @@ const userSchema = new Schema<IUser, User, IUserMethods>(
       required: true,
       // default: "",
     },
+    telegramId: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    telegramHandle: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   { timestamps: true } // createdAt option
 );
 
+userSchema.index({ telegramId: 1 }, { unique: false });
 userSchema.index({ email: 1 }, { unique: true });
 
 userSchema.method(
@@ -33,6 +44,7 @@ userSchema.method(
       /* eslint-disable no-underscore-dangle */
       id: this._id,
       email: this.email,
+      telegramHandle: this.telegramHandle,
       token,
     };
   }

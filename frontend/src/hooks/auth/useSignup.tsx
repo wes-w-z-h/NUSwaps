@@ -7,7 +7,11 @@ export const useSignup = () => {
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const signup = async (email: string, password: string) => {
+  const signup = async (
+    email: string,
+    password: string,
+    teleHandle?: string
+  ) => {
     setLoading(true);
     setError(null);
     setMessage(null);
@@ -15,6 +19,7 @@ export const useSignup = () => {
     const data = {
       email: email,
       password: password,
+      telegramHandle: teleHandle,
     };
 
     await axiosPrivate
