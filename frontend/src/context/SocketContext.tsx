@@ -86,6 +86,7 @@ export const SocketContextProvider: React.FC<{ children: ReactNode }> = ({
         payload: JSON.parse(user),
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

@@ -11,7 +11,7 @@ const Dashboard = () => {
   return (
     <>
       <div className="dashboard">
-        <MatchToast /> // TODO: Find a better place to put this component
+        <MatchToast /> {/* TODO: Find a better place to put this component */}
         {error && <CustomAlert message={error} />}
         {modErr && <CustomAlert message={modErr} />}
         <SwapTable />
