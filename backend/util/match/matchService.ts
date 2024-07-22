@@ -5,6 +5,7 @@ import { sendMatchFound, sendMatchRejected } from '../emailService.js';
 import UserModel from '../../models/userModel.js';
 import { ISwap } from '../../types/api.js';
 import { MatchModel } from '../../models/matchModel.js';
+import io from '../../server.js';
 
 /**
  * Finds the optimal swaps with all unmatched swap requests
@@ -45,6 +46,8 @@ export const getOptimalMatch = async (newSwap: ISwap) => {
     await sendMatchFound(user.email, swap);
 
     // TODO: Emit event in socket
+    io.to(swap.userId.toString()).emit('match', match);
+    console.log('io emit match event to room', swap.userId.toString());
   }
 };
 

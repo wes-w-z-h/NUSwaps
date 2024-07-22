@@ -8,28 +8,13 @@ import {
   Routes,
   Navigate,
 } from 'react-router-dom';
-// import { io } from 'socket.io-client';
 import { useAuthContext } from './hooks/auth/useAuthContext.tsx';
 import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
-// import { useEffect } from 'react';
 
 const App = () => {
-  /** TODO: Implement web socket
-  useEffect(() => {
-    const socket = io('http://localhost:4000');
-    socket.on('connect', () => {
-      console.log('here');
-      socket.emit('ping');
-
-      socket.on('pong', (data) => {
-        console.log(data);
-      });
-    });
-  }, []);
-  */
   const { authState } = useAuthContext();
   return (
     <Router>
