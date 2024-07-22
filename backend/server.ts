@@ -16,7 +16,6 @@ const io = new Server(server, {
 
 io.on('connection', (socket) => {
   console.log('Connection established to ', socket.id);
-  // console.log('io', io.sockets.sockets);
 
   socket.on('ping', () => {
     socket.emit('pong', 'pongggg');
@@ -34,8 +33,4 @@ io.on('connection', (socket) => {
   });
 });
 
-setInterval(() => {
-  console.log(io.sockets.sockets.keys());
-  io.emit('pong', 'hehehehhe');
-}, 5000);
 export default io;

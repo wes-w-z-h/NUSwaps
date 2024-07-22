@@ -34,11 +34,49 @@ const connectSocket = (user: UserToken) => {
       console.log(data);
     });
 
-    ws.on('match', (match) => {
-      console.log('Match found', match);
+    ws.on('match-found', (swap) => {
+      console.log('Match found', swap);
 
       toast.success(
-        `🦄 Match found for ${match.courseId}-${match.lessonType}!`,
+        `🎉🎉🎉 Match found for ${swap.courseId}-${swap.lessonType}!`,
+        {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+          transition: Bounce,
+        }
+      );
+    });
+
+    ws.on('match-accepted', (swap) => {
+      console.log('Match accepted', swap);
+
+      toast.success(
+        ` 🎉🎉🎉 Match for ${swap.courseId}-${swap.lessonType} has been accepted by all parties!`,
+        {
+          position: 'top-center',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: 'light',
+          transition: Bounce,
+        }
+      );
+    });
+
+    ws.on('match-rejected', (swap) => {
+      console.log('Match rejected', swap);
+
+      toast.warn(
+        `Your match for ${swap.courseId}-${swap.lessonType} has been rejected`,
         {
           position: 'top-center',
           autoClose: 5000,

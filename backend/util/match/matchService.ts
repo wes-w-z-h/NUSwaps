@@ -1,9 +1,13 @@
 import createHttpError from 'http-errors';
 import { SwapModel } from '../../models/swapModel.js';
 import greedyMatch from './matchAlgo.js';
-import { sendMatchFound, sendMatchRejected } from '../emailService.js';
+import {
+  sendMatchAccepted,
+  sendMatchFound,
+  sendMatchRejected,
+} from '../emailService.js';
 import UserModel from '../../models/userModel.js';
-import { ISwap } from '../../types/api.js';
+import { IMatch, ISwap } from '../../types/api.js';
 import { MatchModel } from '../../models/matchModel.js';
 import io from '../../server.js';
 
@@ -45,9 +49,7 @@ export const getOptimalMatch = async (newSwap: ISwap) => {
 
     await sendMatchFound(user.email, swap);
 
-    // TODO: Emit event in socket
-    io.to(swap.userId.toString()).emit('match', match);
-    console.log('io emit match event to room', swap.userId.toString());
+    io.to(swap.userId.toString()).emit('match-found', swap);
   }
 };
 
@@ -91,15 +93,70 @@ export const rejectMatch = async (rejectedSwap: ISwap) => {
         throw createHttpError(404, 'Swap not found');
       }
 
-      // Notify user of rejected match
+      // Notify user of rejected match via email
       const user = await UserModel.findById(swap.userId).exec();
       if (!user) {
         throw createHttpError(400, 'User not found');
       }
       await sendMatchRejected(user.email, swap);
 
+      // Notify user of rejected match via toast
+      io.to(swap.userId.toString()).emit('match-rejected', swap);
+
       // Find new match for the user's swap
       getOptimalMatch(swap);
     }
   }
+};
+
+/**
+ * Updates the status of the match to be ACCEPTED and other swaps in the match
+ * Sends an email notification to users in the match
+ * Trigger notification to logged in users on web application
+ * @param match Match that has been accepted
+ */
+export const acceptMatch = async (match: IMatch) => {
+  const swapIds = await MatchModel.findByIdAndUpdate(match, {
+    status: 'ACCEPTED',
+  })
+    .exec()
+    .then((acceptedMatch) => {
+      if (!acceptedMatch) {
+        throw createHttpError('404', 'Match not found');
+      }
+
+      return acceptedMatch.swaps;
+    });
+
+  if (!swapIds) {
+    throw createHttpError(400, 'Unable to accept match');
+  }
+
+  await Promise.all(
+    swapIds.map(async (swapId): Promise<void> => {
+      // Update swap status to 'COMPLETED'
+      const swap = await SwapModel.findByIdAndUpdate(
+        swapId,
+        { status: 'COMPLETED' },
+        {
+          runValidators: true,
+          new: true,
+        }
+      ).exec();
+
+      if (!swap) {
+        throw createHttpError(404, 'Swap not found');
+      }
+
+      // Notify user of completed match via email
+      const user = await UserModel.findById(swap.userId).exec();
+      if (!user) {
+        throw createHttpError(400, 'User not found');
+      }
+      await sendMatchAccepted(user.email, swap);
+
+      // Notify user of rejected match via toast
+      io.to(swap.userId.toString()).emit('match-accepted', swap);
+    })
+  );
 };
