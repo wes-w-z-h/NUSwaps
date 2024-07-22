@@ -75,38 +75,39 @@ export const rejectMatch = async (rejectedSwap: ISwap) => {
     throw createHttpError(400, 'Unable to reject swap');
   }
 
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const swapId of swapIds) {
-    // eslint-disable-next-line no-underscore-dangle
-    if (swapId.toString() !== rejectedSwap._id.toString()) {
-      // Update swap status to 'UNMATCHED'
-      const swap = await SwapModel.findByIdAndUpdate(
-        swapId,
-        { status: 'UNMATCHED', match: null },
-        {
-          runValidators: true,
-          new: true,
+  await Promise.all(
+    swapIds.map(async (swapId): Promise<void> => {
+      // eslint-disable-next-line no-underscore-dangle
+      if (swapId.toString() !== rejectedSwap._id.toString()) {
+        // Update swap status to 'UNMATCHED'
+        const swap = await SwapModel.findByIdAndUpdate(
+          swapId,
+          { status: 'UNMATCHED', match: null },
+          {
+            runValidators: true,
+            new: true,
+          }
+        ).exec();
+
+        if (!swap) {
+          throw createHttpError(404, 'Swap not found');
         }
-      ).exec();
 
-      if (!swap) {
-        throw createHttpError(404, 'Swap not found');
+        // Notify user of rejected match via email
+        const user = await UserModel.findById(swap.userId).exec();
+        if (!user) {
+          throw createHttpError(400, 'User not found');
+        }
+        await sendMatchRejected(user.email, swap);
+
+        // Notify user of rejected match via toast
+        io.to(swap.userId.toString()).emit('match-rejected', swap);
+
+        // Find new match for the user's swap
+        getOptimalMatch(swap);
       }
-
-      // Notify user of rejected match via email
-      const user = await UserModel.findById(swap.userId).exec();
-      if (!user) {
-        throw createHttpError(400, 'User not found');
-      }
-      await sendMatchRejected(user.email, swap);
-
-      // Notify user of rejected match via toast
-      io.to(swap.userId.toString()).emit('match-rejected', swap);
-
-      // Find new match for the user's swap
-      getOptimalMatch(swap);
-    }
-  }
+    })
+  );
 };
 
 /**
