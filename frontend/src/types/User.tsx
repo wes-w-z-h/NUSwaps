@@ -15,3 +15,9 @@ export type User = {
   telegramHandle?: string;
   swapRequests: [Swap];
 };
+
+export type UserDetail = {
+  id: string;
+  email: string;
+  telegramHandle: string;
+};

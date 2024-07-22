@@ -1,6 +1,7 @@
 import Tabs from '@mui/material/Tabs';
 import { Swap } from '../../types/Swap';
 import Tab from '@mui/material/Tab';
+import { useAuthContext } from '../../hooks/auth/useAuthContext';
 
 type TabsProps = {
   active: number;
@@ -16,6 +17,7 @@ const getCommonProps = (index: number) => {
 };
 
 const ModalTabs: React.FC<TabsProps> = ({ active, setActive, swaps }) => {
+  const { authState } = useAuthContext();
   const handleChange = (_event: React.SyntheticEvent, newActive: number) => {
     setActive(newActive);
   };
@@ -33,7 +35,7 @@ const ModalTabs: React.FC<TabsProps> = ({ active, setActive, swaps }) => {
       {/* TODO: Change style based on swapStatus */}
       {swaps.map((_swap, index) => (
         <Tab
-          label={`Swap ${index + 1}`}
+          label={`${_swap?.userId === authState.user?.id ? 'My swap' : 'Partner swap'}`}
           {...getCommonProps(index + 1)}
           key={index + 1}
         />
