@@ -16,6 +16,7 @@ import { Match } from '../../types/Match';
 import UnmatchedDrawer from './drawer/UnmatchedDrawer';
 import MatchedDrawer from './drawer/MatchedDrawer';
 import { UserDetail } from '../../types/User';
+import DetailsModal from './DetailsModal';
 
 // TODO: Possible to create separate components for different swap statuses
 type SwapRowProps = {
@@ -77,6 +78,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openMatchModal, setOpenMatchModal] = useState(false);
+  const [openDetailsModal, setOpenDetailsModal] = useState(false);
 
   return (
     <React.Fragment>
@@ -104,6 +106,12 @@ const SwapRow: React.FC<SwapRowProps> = ({
         getMatchObj={getMatch}
         getMatchPartnerObj={getMatchPartners}
       />
+      <DetailsModal
+        open={openDetailsModal}
+        setOpen={setOpenDetailsModal}
+        swap={row}
+        getModsInfo={getModsInfo}
+      />
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
@@ -126,10 +134,14 @@ const SwapRow: React.FC<SwapRowProps> = ({
               aria-label="view match"
               size="small"
               disabled={getMatch.loading}
-              onClick={() => setOpenMatchModal(!openMatchModal)}
+              onClick={() =>
+                row.status === 'UNMATCHED'
+                  ? setOpenDetailsModal(!openDetailsModal)
+                  : setOpenMatchModal(!openMatchModal)
+              }
               color="secondary"
             >
-              {row.status !== 'UNMATCHED' && <VisibilityIcon />}
+              <VisibilityIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Pending confirmation">
