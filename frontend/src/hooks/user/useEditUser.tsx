@@ -28,7 +28,7 @@ const useEditUser = () => {
       .patch(`/users/edit`, data)
       .then((data) => {
         localStorage.setItem('user', JSON.stringify(data.data));
-        authDispatch({ type: 'UPDATE', payload: data.data });
+        authDispatch({ type: 'UPDATE', payload: data.data.telegramHandle });
       })
       .catch((error) => {
         if (error.response?.status === 403) {
