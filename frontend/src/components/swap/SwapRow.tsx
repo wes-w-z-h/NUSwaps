@@ -12,11 +12,11 @@ import DeleteModal from './DeleteModal';
 import EditModal from './EditModal';
 import { Module } from '../../types/modules';
 import MatchModal from '../match/MatchModal';
-import useGetMatch from '../../hooks/match/useGetMatch';
 import { Match } from '../../types/Match';
-import useGetSwap from '../../hooks/swaps/useGetSwap';
 import UnmatchedDrawer from './drawer/UnmatchedDrawer';
 import MatchedDrawer from './drawer/MatchedDrawer';
+import { PartnerDetail } from '../../types/User';
+import DetailsModal from './DetailsModal';
 
 // TODO: Possible to create separate components for different swap statuses
 type SwapRowProps = {
@@ -52,6 +52,21 @@ type SwapRowProps = {
     getModInfo: (courseId: string) => Promise<Module | undefined>;
     loading: boolean;
   };
+  getMatch: {
+    getMatch: (id: string) => Promise<Match>;
+    error: string | null;
+    loading: boolean;
+  };
+  getMatchPartners: {
+    getMatchPartners: (swaps: string[]) => Promise<PartnerDetail[]>;
+    error: string | null;
+    loading: boolean;
+  };
+  getSwap: {
+    getSwap: (id: string) => Promise<Swap>;
+    error: string | null;
+    loading: boolean;
+  };
 };
 
 const SwapRow: React.FC<SwapRowProps> = ({
@@ -61,29 +76,15 @@ const SwapRow: React.FC<SwapRowProps> = ({
   confirmSwap,
   rejectSwap,
   getModsInfo,
+  getMatch,
+  getMatchPartners,
+  getSwap,
 }) => {
-  const { getMatch } = useGetMatch();
-  const { getSwap } = useGetSwap();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [openMatchModal, setOpenMatchModal] = useState(false);
-  const [match, setMatch] = useState<Match>({} as Match);
-  const [swaps, setSwaps] = useState<Swap[]>([]);
-
-  const handleMatchClick = async () => {
-    // Get match
-    const match = await getMatch(row.id);
-    setMatch(match);
-
-    // Get swaps in match
-    const swaps = await Promise.all(
-      match.swaps.map(async (id): Promise<Swap> => getSwap(id))
-    );
-    setSwaps(swaps);
-
-    setOpenMatchModal(true);
-  };
+  const [openDetailsModal, setOpenDetailsModal] = useState(false);
 
   return (
     <React.Fragment>
@@ -104,14 +105,21 @@ const SwapRow: React.FC<SwapRowProps> = ({
           getModsInfo={getModsInfo}
         />
       )}
-      {openMatchModal && (
-        <MatchModal
-          open={openMatchModal}
-          setOpen={setOpenMatchModal}
-          match={match}
-          swaps={swaps}
-        />
-      )}
+      <MatchModal
+        open={openMatchModal}
+        setOpen={setOpenMatchModal}
+        swap={row}
+        getMatchObj={getMatch}
+        getMatchPartnerObj={getMatchPartners}
+        getSwapObj={getSwap}
+        getModsInfo={getModsInfo}
+      />
+      <DetailsModal
+        open={openDetailsModal}
+        setOpen={setOpenDetailsModal}
+        swap={row}
+        getModsInfo={getModsInfo}
+      />
       <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
         <TableCell>{row.courseId}</TableCell>
         <TableCell>{row.lessonType}</TableCell>
@@ -133,10 +141,15 @@ const SwapRow: React.FC<SwapRowProps> = ({
             <IconButton
               aria-label="view match"
               size="small"
-              onClick={handleMatchClick}
+              disabled={getMatch.loading}
+              onClick={() =>
+                row.status === 'UNMATCHED'
+                  ? setOpenDetailsModal(!openDetailsModal)
+                  : setOpenMatchModal(!openMatchModal)
+              }
               color="secondary"
             >
-              {row.status !== 'UNMATCHED' && <VisibilityIcon />}
+              <VisibilityIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="Pending confirmation">

@@ -14,9 +14,19 @@ const useGetMatch = () => {
     setLoading(true);
     setError(null);
 
-    const match: Match = await axiosPrivate
-      .get(`/matches/${id}`)
-      .then((res) => res.data)
+    let match: Match = {
+      id: '',
+      courseId: '',
+      lessonType: '',
+      status: 'PENDING',
+      swaps: [''],
+    };
+
+    await axiosPrivate
+      .get<Match>(`/matches/${id}`)
+      .then((res) => {
+        match = res.data;
+      })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
         if (error.response?.status === 403) {

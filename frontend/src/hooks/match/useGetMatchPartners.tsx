@@ -2,31 +2,24 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
 import { useLogout } from '../auth/useLogout';
-import { Swap } from '../../types/Swap';
+import { PartnerDetail } from '../../types/User';
 
-const useGetSwap = () => {
+const useGetMatchPartners = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { logout } = useLogout();
   const axiosPrivate = useAxiosPrivate();
 
-  const getSwap = async (id: string) => {
+  const getMatchPartners = async (swapIds: string[]) => {
     setLoading(true);
     setError(null);
-    let swap = {
-      id: '',
-      userId: '',
-      courseId: '',
-      lessonType: '',
-      current: '',
-      request: '',
-      status: 'UNMATCHED',
-    };
+
+    let details: PartnerDetail[] = [];
 
     await axiosPrivate
-      .get<Swap>(`/swaps/${id}`)
+      .post<PartnerDetail[]>(`/matches/partners`, { swapIds })
       .then((res) => {
-        swap = res.data;
+        details = res.data;
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
@@ -39,12 +32,11 @@ const useGetSwap = () => {
         setError(error.message + message);
       });
     setLoading(false);
-    console.log(swap);
-
-    return swap;
+    console.log(details);
+    return details;
   };
 
-  return { getSwap, loading, error };
+  return { getMatchPartners, loading, error };
 };
 
-export default useGetSwap;
+export default useGetMatchPartners;
