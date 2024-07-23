@@ -63,10 +63,9 @@ const DetailsModal: React.FC<MatchModalProps> = ({
       { label: 'Day', value: modDetails?.day },
       { label: 'Start Time', value: modDetails?.startTime },
       { label: 'End Time', value: modDetails?.endTime },
-      { label: 'COVID Zone', value: modDetails?.covidZone },
-      { label: 'Size', value: modDetails?.size },
       { label: 'Lesson Type', value: modDetails?.lessonType },
       { label: 'Venue', value: modDetails?.venue },
+      { label: 'Size', value: modDetails?.size },
     ];
 
     setFields(fields);

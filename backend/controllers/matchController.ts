@@ -42,14 +42,33 @@ export const getMatchPartners: RequestHandler = async (req, res, next) => {
       throw createHttpError(400, 'Incomplete request body');
     }
 
-    // console.log(swapIds);;
-    const data = await SwapModel.find({ _id: { $in: swapIds } });
-    // console.log(data);
-    const userIds = data.map((s) => s.userId);
+    // Find swaps based on swapIds
+    const swaps = await SwapModel.find({ _id: { $in: swapIds } });
+
+    const swapIdToUserIdMap = new Map();
+    swaps.forEach((swap) => {
+      // eslint-disable-next-line no-underscore-dangle
+      swapIdToUserIdMap.set(swap._id.toString(), swap.userId.toString());
+    });
+
+    const userIds = Array.from(new Set(swaps.map((swap) => swap.userId)));
     const users = await UserModel.find({ _id: { $in: userIds } }).select(
       'email telegramHandle'
     );
-    res.status(200).json(users);
+
+    const userIdToUserDetailsMap = new Map();
+    users.forEach((user) => {
+      // eslint-disable-next-line no-underscore-dangle
+      userIdToUserDetailsMap.set(user._id.toString(), user);
+    });
+
+    // Arrange users according to the order of swapIds
+    const arrangedUsers = swapIds.map((swapId: { toString: () => any }) => {
+      const userId = swapIdToUserIdMap.get(swapId.toString());
+      return userIdToUserDetailsMap.get(userId);
+    });
+
+    res.status(200).json(arrangedUsers);
   } catch (error) {
     next(error);
   }

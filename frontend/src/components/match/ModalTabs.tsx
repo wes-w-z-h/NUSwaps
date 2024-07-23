@@ -33,13 +33,15 @@ const ModalTabs: React.FC<TabsProps> = ({ active, setActive, swaps }) => {
     >
       <Tab label="MATCH SUMMARY" {...getCommonProps(0)} />
       {/* TODO: Change style based on swapStatus */}
-      {swaps.map((_swap, index) => (
-        <Tab
-          label={`${_swap?.userId === authState.user?.id ? 'My swap' : 'Partner swap'}`}
-          {...getCommonProps(index + 1)}
-          key={index + 1}
-        />
-      ))}
+      {swaps.map((_swap, index) => {
+        return (
+          <Tab
+            label={`${_swap.userId === authState.user?.id ? 'My swap' : 'Partner swap'}`}
+            {...getCommonProps(index + 1)}
+            key={index + 1}
+          />
+        );
+      })}
     </Tabs>
   );
 };

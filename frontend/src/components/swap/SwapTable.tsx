@@ -21,6 +21,7 @@ import useConfirmSwap from '../../hooks/swaps/useConfirmSwap';
 import { useRejectSwap } from '../../hooks/swaps/useRejectSwap';
 import useGetMatch from '../../hooks/match/useGetMatch';
 import useGetMatchPartners from '../../hooks/match/useGetMatchPartners';
+import useGetSwap from '../../hooks/swaps/useGetSwap';
 
 const SwapTable: React.FC = () => {
   const { swapsState } = useSwapsContext();
@@ -33,6 +34,7 @@ const SwapTable: React.FC = () => {
   const getModsInfo = useGetModsInfo();
   const getMatch = useGetMatch();
   const getMatchPartners = useGetMatchPartners();
+  const getSwap = useGetSwap();
 
   return (
     <>
@@ -43,6 +45,7 @@ const SwapTable: React.FC = () => {
       {confirmSwap.error && <CustomAlert message={confirmSwap.error} />}
       {rejectSwap.error && <CustomAlert message={rejectSwap.error} />}
       {getMatch.error && <CustomAlert message={getMatch.error} />}
+      {getSwap.error && <CustomAlert message={getSwap.error} />}
       {getMatchPartners.error && (
         <CustomAlert message={getMatchPartners.error} />
       )}
@@ -86,6 +89,7 @@ const SwapTable: React.FC = () => {
                 rejectSwap={swap.status === 'MATCHED' ? rejectSwap : null}
                 getMatch={getMatch}
                 getMatchPartners={getMatchPartners}
+                getSwap={getSwap}
               />
             ))}
           </TableBody>

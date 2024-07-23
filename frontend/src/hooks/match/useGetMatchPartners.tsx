@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
 import { useLogout } from '../auth/useLogout';
-import { UserDetail } from '../../types/User';
+import { PartnerDetail } from '../../types/User';
 
 const useGetMatchPartners = () => {
   const [error, setError] = useState<string | null>(null);
@@ -14,10 +14,10 @@ const useGetMatchPartners = () => {
     setLoading(true);
     setError(null);
 
-    let details: UserDetail[] = [];
+    let details: PartnerDetail[] = [];
 
     await axiosPrivate
-      .post<UserDetail[]>(`/matches/partners`, { swapIds })
+      .post<PartnerDetail[]>(`/matches/partners`, { swapIds })
       .then((res) => {
         details = res.data;
       })

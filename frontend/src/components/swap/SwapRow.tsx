@@ -15,7 +15,7 @@ import MatchModal from '../match/MatchModal';
 import { Match } from '../../types/Match';
 import UnmatchedDrawer from './drawer/UnmatchedDrawer';
 import MatchedDrawer from './drawer/MatchedDrawer';
-import { UserDetail } from '../../types/User';
+import { PartnerDetail } from '../../types/User';
 import DetailsModal from './DetailsModal';
 
 // TODO: Possible to create separate components for different swap statuses
@@ -58,7 +58,12 @@ type SwapRowProps = {
     loading: boolean;
   };
   getMatchPartners: {
-    getMatchPartners: (swaps: string[]) => Promise<UserDetail[]>;
+    getMatchPartners: (swaps: string[]) => Promise<PartnerDetail[]>;
+    error: string | null;
+    loading: boolean;
+  };
+  getSwap: {
+    getSwap: (id: string) => Promise<Swap>;
     error: string | null;
     loading: boolean;
   };
@@ -73,6 +78,7 @@ const SwapRow: React.FC<SwapRowProps> = ({
   getModsInfo,
   getMatch,
   getMatchPartners,
+  getSwap,
 }) => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openDelModal, setOpenDelModal] = useState(false);
@@ -105,6 +111,8 @@ const SwapRow: React.FC<SwapRowProps> = ({
         swap={row}
         getMatchObj={getMatch}
         getMatchPartnerObj={getMatchPartners}
+        getSwapObj={getSwap}
+        getModsInfo={getModsInfo}
       />
       <DetailsModal
         open={openDetailsModal}

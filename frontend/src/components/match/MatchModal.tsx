@@ -7,9 +7,9 @@ import ModalTabs from './ModalTabs';
 import TabPanel from './TabPanel';
 import Modal from '@mui/material/Modal';
 import Backdrop from '@mui/material/Backdrop';
-import useGetSwap from '../../hooks/swaps/useGetSwap';
 import { useEffect, useState } from 'react';
-import { UserDetail } from '../../types/User';
+import { PartnerDetail } from '../../types/User';
+import { Module } from '../../types/modules';
 
 const style = {
   position: 'absolute' as const,
@@ -37,7 +37,17 @@ type MatchModalProps = {
     loading: boolean;
   };
   getMatchPartnerObj: {
-    getMatchPartners: (swaps: string[]) => Promise<UserDetail[]>;
+    getMatchPartners: (swaps: string[]) => Promise<PartnerDetail[]>;
+    error: string | null;
+    loading: boolean;
+  };
+  getSwapObj: {
+    getSwap: (id: string) => Promise<Swap>;
+    error: string | null;
+    loading: boolean;
+  };
+  getModsInfo: {
+    getModInfo: (courseId: string) => Promise<Module | undefined>;
     error: string | null;
     loading: boolean;
   };
@@ -49,14 +59,14 @@ const MatchModal: React.FC<MatchModalProps> = ({
   swap,
   getMatchObj,
   getMatchPartnerObj,
+  getSwapObj,
+  getModsInfo,
 }) => {
   const [active, setActive] = useState(0);
-  const { getSwap } = useGetSwap();
   const [match, setMatch] = useState<Match>({} as Match);
   const [matchedSwaps, setMatchedSwaps] = useState<Swap[]>([]);
-  const [userDetails, setUserDetails] = useState<UserDetail[]>([]);
+  const [partnerDetails, setPartnerDetails] = useState<PartnerDetail[]>([]);
 
-  // console.log('match', match);
   const handleClose = () => setOpen(false);
   const getMatchInfo = async () => {
     // Get match
@@ -65,15 +75,12 @@ const MatchModal: React.FC<MatchModalProps> = ({
 
     // Get swaps in match
     const matchedSwaps = await Promise.all(
-      match.swaps.map(async (id): Promise<Swap> => await getSwap(id))
+      match.swaps.map(async (id): Promise<Swap> => await getSwapObj.getSwap(id))
     );
     setMatchedSwaps(matchedSwaps);
     const swapIds = matchedSwaps.map((s) => s?.id);
-    // console.log('matched swaps', matchedSwaps);
-    // console.log('swap ids', swapIds);
-    const userDetails = await getMatchPartnerObj.getMatchPartners(swapIds);
-    setUserDetails(userDetails);
-    // console.log(userDetails);
+    const partnerDetails = await getMatchPartnerObj.getMatchPartners(swapIds);
+    setPartnerDetails(partnerDetails);
   };
 
   useEffect(() => {
@@ -111,13 +118,14 @@ const MatchModal: React.FC<MatchModalProps> = ({
           {matchedSwaps.map((swap, index) => (
             <TabPanel
               active={active}
-              userDetail={
-                index < userDetails.length
-                  ? userDetails[index]
+              partnerDetail={
+                index < partnerDetails.length
+                  ? partnerDetails[index]
                   : { id: '', email: '', telegramHandle: '' } // should not reach here but jic
               }
               index={index + 1}
               swap={swap}
+              getModsInfo={getModsInfo}
               key={index + 1}
             />
           ))}

@@ -16,7 +16,7 @@ export type User = {
   swapRequests: [Swap];
 };
 
-export type UserDetail = {
+export type PartnerDetail = {
   id: string;
   email: string;
   telegramHandle: string;
