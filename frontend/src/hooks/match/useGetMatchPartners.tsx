@@ -32,7 +32,6 @@ const useGetMatchPartners = () => {
         setError(error.message + message);
       });
     setLoading(false);
-    console.log(details);
     return details;
   };
 

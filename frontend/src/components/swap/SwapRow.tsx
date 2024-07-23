@@ -137,7 +137,13 @@ const SwapRow: React.FC<SwapRowProps> = ({
           </IconButton>
         </TableCell>
         <TableCell>
-          <Tooltip title="View match details">
+          <Tooltip
+            title={
+              row.status === 'MATCHED'
+                ? 'View match details'
+                : 'View swap details'
+            }
+          >
             <IconButton
               aria-label="view match"
               size="small"

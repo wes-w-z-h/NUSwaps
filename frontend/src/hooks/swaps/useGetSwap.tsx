@@ -39,7 +39,6 @@ const useGetSwap = () => {
         setError(error.message + message);
       });
     setLoading(false);
-    console.log(swap);
 
     return swap;
   };
