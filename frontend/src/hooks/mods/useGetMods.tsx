@@ -2,18 +2,16 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { ModuleCondensed } from '../../types/modules';
 import { useModsContext } from './useModsContext';
+import { NUS_MODS_BASE_API } from '../../util/ModEnv';
 
 const useGetMods = () => {
-  const ACAD_YEAR = '2023-2024';
   const { modsDispatch } = useModsContext();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getMods = async () => {
       await axios
-        .get<ModuleCondensed[]>(
-          `https://api.nusmods.com/v2/${ACAD_YEAR}/moduleList.json`
-        )
+        .get<ModuleCondensed[]>(`${NUS_MODS_BASE_API}/moduleList.json`)
         .then((data) => {
           const payload = data.data.map((x) => x.moduleCode);
           localStorage.setItem('moduleCodes', JSON.stringify(payload));

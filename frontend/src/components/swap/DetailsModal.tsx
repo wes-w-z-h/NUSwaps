@@ -9,6 +9,7 @@ import { Module } from '../../types/modules';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Divider from '@mui/material/Divider'; // Import Divider
+import { SEMESTER } from '../../util/ModEnv';
 
 const style = {
   position: 'absolute' as const,
@@ -54,7 +55,7 @@ const DetailsModal: React.FC<MatchModalProps> = ({
       mod = await getModsInfo.getModInfo(swap.courseId);
     }
     if (!mod) return;
-    const modDetails = mod.semesterData[0].timetable.find(
+    const modDetails = mod.semesterData[SEMESTER - 1].timetable.find(
       (l) => l.lessonType === swap.lessonType && l.classNo === swap.current
     );
 

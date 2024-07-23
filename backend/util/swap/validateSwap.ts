@@ -2,6 +2,7 @@ import createHttpError from 'http-errors';
 import { SwapModel } from '../../models/swapModel.js';
 import { MatchModel } from '../../models/matchModel.js';
 import { Module } from '../../types/modules.js';
+import env from '../validEnv.js';
 
 const isInNUSMods = async (
   courseId: string,
@@ -9,10 +10,9 @@ const isInNUSMods = async (
   current: string,
   request: string
 ): Promise<void> => {
-  // TODO: change to env vars
-  const ACAD_YEAR = '2023-2024';
+  const { NUS_MODS_BASE_API, SEMESTER } = env;
   const resp = await fetch(
-    `https://api.nusmods.com/v2/${ACAD_YEAR}/modules/${courseId.toUpperCase()}.json`
+    `${NUS_MODS_BASE_API}/modules/${courseId.toUpperCase()}.json`
   );
 
   // courseId doesnt exist in NUSMods api
@@ -21,7 +21,7 @@ const isInNUSMods = async (
   }
   const data: Module = await resp.json();
 
-  const lessons = data.semesterData[0].timetable;
+  const lessons = data.semesterData[SEMESTER - 1].timetable;
 
   let currExists = false;
   let reqExists = false;

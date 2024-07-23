@@ -8,6 +8,7 @@ import { Module } from '../../types/modules';
 import { useModsContext } from '../../hooks/mods/useModsContext';
 import { SetStateAction, useEffect, useState } from 'react';
 import Divider from '@mui/material/Divider';
+import { SEMESTER } from '../../util/ModEnv';
 
 type TabPanelProps = {
   index: number;
@@ -46,7 +47,7 @@ const TabPanel: React.FC<TabPanelProps> = ({
       mod = await getModsInfo.getModInfo(swap.courseId);
     }
     if (!mod) return;
-    const modDetails = mod.semesterData[0].timetable.find(
+    const modDetails = mod.semesterData[SEMESTER - 1].timetable.find(
       (l) => l.lessonType === swap.lessonType && l.classNo === classNo
     );
 
