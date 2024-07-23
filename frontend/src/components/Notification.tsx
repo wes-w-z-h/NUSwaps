@@ -1,7 +1,7 @@
 import { Bounce, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const MatchToast = () => {
+const Notification = () => {
   return (
     <ToastContainer
       position="top-center"
@@ -20,4 +20,4 @@ const MatchToast = () => {
   );
 };
 
-export { MatchToast };
+export { Notification };

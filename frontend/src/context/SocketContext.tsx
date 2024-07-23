@@ -5,9 +5,9 @@ import {
   useEffect,
   Dispatch,
 } from 'react';
-import { Bounce, toast } from 'react-toastify';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import { UserToken } from '../types/User';
+import { connectSocket } from '../util/socketio';
 
 type SocketState = Socket | null;
 
@@ -23,80 +23,6 @@ type SocketContextType = {
 export const SocketContext = createContext<SocketContextType>(
   {} as SocketContextType
 );
-
-const connectSocket = (user: UserToken) => {
-  const ws = io('http://localhost:4000');
-  ws.on('connect', () => {
-    console.log('here');
-    ws.emit('ping');
-
-    ws.on('pong', (data) => {
-      console.log(data);
-    });
-
-    ws.on('match-found', (swap) => {
-      console.log('Match found', swap);
-
-      toast.success(
-        `🎉🎉🎉 Match found for ${swap.courseId}-${swap.lessonType}!`,
-        {
-          position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        }
-      );
-    });
-
-    ws.on('match-accepted', (swap) => {
-      console.log('Match accepted', swap);
-
-      toast.success(
-        ` 🎉🎉🎉 Match for ${swap.courseId}-${swap.lessonType} has been accepted by all parties!`,
-        {
-          position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        }
-      );
-    });
-
-    ws.on('match-rejected', (swap) => {
-      console.log('Match rejected', swap);
-
-      toast.warn(
-        `Your match for ${swap.courseId}-${swap.lessonType} has been rejected`,
-        {
-          position: 'top-center',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: 'light',
-          transition: Bounce,
-        }
-      );
-    });
-  });
-
-  console.log(ws);
-  ws?.emit('user-data', user);
-
-  return ws;
-};
 
 const socketReducer = (state: SocketState, action: SocketAction) => {
   switch (action.type) {
