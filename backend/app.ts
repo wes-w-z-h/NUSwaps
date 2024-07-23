@@ -20,6 +20,9 @@ const loadMiddleware = () => {
   app.use('/api/users', userRouter);
   app.use('/api/swaps', swapRouter);
   app.use('/api/matches', matchRouter);
+  app.get('/keep-alive', (req, res) => {
+    res.status(200).json({ message: 'OK' });
+  });
 };
 
 loadMiddleware();
