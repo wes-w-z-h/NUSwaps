@@ -6,6 +6,7 @@ import { useAuthContext } from '../auth/useAuthContext';
 const useEditUser = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | null>(null);
   const axiosPrivate = useAxiosPrivate();
   const { authDispatch } = useAuthContext();
   const { logout } = useLogout();
@@ -17,6 +18,7 @@ const useEditUser = () => {
   ) => {
     setLoading(true);
     setError(null);
+    setMessage(null);
 
     const data = {
       oldPassword: oldPassword,
@@ -29,6 +31,7 @@ const useEditUser = () => {
       .then((data) => {
         localStorage.setItem('user', JSON.stringify(data.data));
         authDispatch({ type: 'UPDATE', payload: data.data.telegramHandle });
+        setMessage('Profile updated successfully!');
       })
       .catch((error) => {
         if (error.response?.status === 403) {
@@ -42,7 +45,7 @@ const useEditUser = () => {
 
     setLoading(false);
   };
-  return { editUser, loading, error };
+  return { editUser, loading, error, message };
 };
 
 export default useEditUser;

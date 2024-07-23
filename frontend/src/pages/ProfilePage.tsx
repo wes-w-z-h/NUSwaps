@@ -29,7 +29,12 @@ const ProfilePage = () => {
   const [teleHandle, setTeleHandle] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [formError, setFormError] = useState(initialState);
-  const { editUser, loading: loadingEdit, error: errorEdit } = useEditUser();
+  const {
+    editUser,
+    loading: loadingEdit,
+    error: errorEdit,
+    message: messageEdit,
+  } = useEditUser();
 
   useEffect(() => {
     if (authState.user?.telegramHandle) {
@@ -89,6 +94,7 @@ const ProfilePage = () => {
     <Container component="main" maxWidth="xs">
       {errorEdit && <CustomAlert message={errorEdit} />}
       {errorDelete && <CustomAlert message={errorDelete} />}
+      {messageEdit && <CustomAlert message={messageEdit} severity="info" />}
       <Paper elevation={3} style={{ padding: 20, marginTop: 50 }}>
         <Box display="flex" flexDirection="column" alignItems="center">
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
