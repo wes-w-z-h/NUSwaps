@@ -15,21 +15,12 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  console.log('Connection established to ', socket.id);
-
-  socket.on('ping', () => {
-    socket.emit('pong', 'pongggg');
-  });
-
   socket.on('user-data', (userData) => {
     socket.join(userData.id);
-    socket.emit('pong', `user joined room ${userData.id}`);
-    console.log('user joined room', userData.id);
   });
 
   socket.on('disconnect-user', () => {
     socket.disconnect(true);
-    console.log('Disconnected', socket.id);
   });
 });
 

@@ -13,12 +13,14 @@ import Verification from './pages/Verification.tsx';
 import Dashboard from './pages/Dashboard.tsx';
 import ProfilePage from './pages/ProfilePage.tsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.tsx';
+import { Notification } from './components/Notification.tsx';
 
 const App = () => {
   const { authState } = useAuthContext();
   return (
     <Router>
       <Navbar />
+      <Notification />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/verify/:token" element={<Verification />} />
