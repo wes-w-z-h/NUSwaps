@@ -15,7 +15,6 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import useEditUser from '../hooks/user/useEditUser';
 import CustomAlert from '../components/CustomAlert';
 import useDeleteUser from '../hooks/user/useDeleteUser';
-import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/auth/useAuthContext';
 
 const ProfilePage = () => {
@@ -43,7 +42,6 @@ const ProfilePage = () => {
     loading: loadingDelete,
     error: errorDelete,
   } = useDeleteUser();
-  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
