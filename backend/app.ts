@@ -21,7 +21,7 @@ const loadMiddleware = () => {
   app.use('/api/swaps', swapRouter);
   app.use('/api/matches', matchRouter);
   app.get('/keep-alive', (req, res) => {
-    res.status(200).json({ message: 'OK' });
+    res.status(204).send();
   });
 };
 
