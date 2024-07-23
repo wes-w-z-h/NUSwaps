@@ -13,7 +13,7 @@ const useGetSwap = () => {
   const getSwap = async (id: string) => {
     setLoading(true);
     setError(null);
-    let swap = {
+    let swap: Swap = {
       id: '',
       userId: '',
       courseId: '',
