@@ -65,13 +65,11 @@ const ProfilePage = () => {
     }
 
     await editUser(oldPassword, newPassword, teleHandle);
-    navigate('/dashboard');
   };
 
   const handleDeleteAccount = async () => {
     deleteUser();
     setOpenDialog(false);
-    navigate('/');
   };
 
   const handleChange = (setter: React.Dispatch<SetStateAction<string>>) => {
@@ -162,7 +160,7 @@ const ProfilePage = () => {
               fullWidth
               variant="contained"
               color="primary"
-              disabled={loadingEdit}
+              disabled={loadingEdit || loadingDelete}
               sx={{ mt: 3, mb: 2 }}
             >
               Update Profile
@@ -171,7 +169,7 @@ const ProfilePage = () => {
               fullWidth
               variant="outlined"
               color="error"
-              disabled={loadingDelete}
+              disabled={loadingDelete || loadingEdit}
               sx={{ mt: 1 }}
               onClick={handleClickOpen}
             >
@@ -198,6 +196,7 @@ const ProfilePage = () => {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
+          {}
           <Button onClick={handleDeleteAccount} color="error" autoFocus>
             Delete
           </Button>
