@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
 import { UserToken } from '../types/User';
 import { Bounce, toast, ToastOptions } from 'react-toastify';
-
-const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+import { BASE_URL } from './ModEnv';
 
 const toastOptions: ToastOptions = {
   position: 'top-center',

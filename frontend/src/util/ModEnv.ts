@@ -13,4 +13,9 @@ const NUS_MODS_BASE_API = import.meta.env.VITE_NUS_MODS_BASE_API;
  */
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-export { SEMESTER, NUS_MODS_BASE_API, BACKEND_URL };
+/**
+ * Base url not for api
+ */
+const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
+
+export { SEMESTER, NUS_MODS_BASE_API, BACKEND_URL, BASE_URL };
