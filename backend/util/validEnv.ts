@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import { cleanEnv } from 'envalid';
-import { port, str } from 'envalid/dist/validators.js';
+import { num, port, str } from 'envalid/dist/validators.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -21,4 +21,5 @@ export default cleanEnv(process.env, {
   FRONTEND_URL: str(),
   BOT_TOKEN: str(),
   NUS_MODS_BASE_API: str(),
+  SEMESTER: num(),
 });

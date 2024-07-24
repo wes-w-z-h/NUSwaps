@@ -1,5 +1,6 @@
 import React, { SetStateAction, useEffect } from 'react';
 import { Module } from '../../types/modules';
+import { SEMESTER } from '../../util/ModEnv';
 
 const useUpdateInputs = (
   states: {
@@ -32,7 +33,7 @@ const useUpdateInputs = (
   // when the mod changes -> change the lessonType
   useEffect(() => {
     if (mod) {
-      const lts = mod.semesterData[0].timetable
+      const lts = mod.semesterData[SEMESTER - 1].timetable
         .map((v) => v.lessonType)
         .filter((v) => v !== 'Lecture');
       // console.log('mod effect');
@@ -47,7 +48,7 @@ const useUpdateInputs = (
   // when the lessonType changes -> change the current and request
   useEffect(() => {
     if (mod) {
-      const options = mod?.semesterData[0].timetable
+      const options = mod?.semesterData[SEMESTER - 1].timetable
         .filter((v) => v.lessonType === lessonType)
         .map((v) => v.classNo);
       // console.log('lessonType effect', lessonType);

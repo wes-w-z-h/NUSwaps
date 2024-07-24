@@ -10,7 +10,7 @@ import env from '../../util/validEnv.js';
  * @throws HttpError if the fetch operation fails
  */
 const fetchData = async (courseId: string): Promise<RawLesson[]> => {
-  const { NUS_MODS_BASE_API } = env;
+  const { NUS_MODS_BASE_API, SEMESTER } = env;
   const resp = await fetch(`${NUS_MODS_BASE_API}/modules/${courseId}.json`);
 
   if (!resp.ok) {
@@ -20,7 +20,7 @@ const fetchData = async (courseId: string): Promise<RawLesson[]> => {
   const data: Module = await resp.json();
   // console.log(data.semesterData[0].timetable);
 
-  return data.semesterData[0].timetable;
+  return data.semesterData[SEMESTER - 1].timetable;
 };
 
 export default fetchData;

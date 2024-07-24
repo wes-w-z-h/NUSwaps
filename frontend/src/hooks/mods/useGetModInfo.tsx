@@ -2,10 +2,9 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Module } from '../../types/modules';
 import { useModsContext } from './useModsContext';
+import { NUS_MODS_BASE_API } from '../../util/ModEnv';
 
 const useGetModInfo = () => {
-  // TODO: change to env vars
-  const ACAD_YEAR = '2023-2024';
   const { modsDispatch } = useModsContext();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -16,7 +15,7 @@ const useGetModInfo = () => {
     const getMod = async () => {
       try {
         const data = await axios.get<Module>(
-          `https://api.nusmods.com/v2/${ACAD_YEAR}/modules/${courseId}.json`
+          `${NUS_MODS_BASE_API}/modules/${courseId}.json`
         );
         const mod = data.data;
         modsDispatch({ type: 'SET_MOD_INFO', payload: mod });
