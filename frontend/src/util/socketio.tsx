@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import { UserToken } from '../types/User';
 import { Bounce, toast, ToastOptions } from 'react-toastify';
 
-const BASE_BACKEND_URL = import.meta.env.VITE_BASE_BACKEND_URL;
+const BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
 
 const toastOptions: ToastOptions = {
   position: 'top-center',
@@ -17,7 +17,7 @@ const toastOptions: ToastOptions = {
 };
 
 export const connectSocket = (user: UserToken) => {
-  const ws = io(BASE_BACKEND_URL);
+  const ws = io(BASE_URL);
   ws.on('connect', () => {
     ws?.emit('user-data', user);
 
