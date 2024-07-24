@@ -7,8 +7,11 @@ const matchRouter = express.Router();
 // TODO: Uncomment this after testing
 // verify auth for all routes below
 // matchRouter.use(verifyAuth);
-
 matchRouter.get('/', MatchController.getAllMatches);
+
+matchRouter.use(verifyAuth);
+
+matchRouter.post('/partners', MatchController.getMatchPartners);
 
 matchRouter.get('/:id', MatchController.getMatch);
 

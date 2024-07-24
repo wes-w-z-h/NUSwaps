@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
 import { useLogout } from '../auth/useLogout';
+import { Swap } from '../../types/Swap';
 
 const useGetSwap = () => {
   const [error, setError] = useState<string | null>(null);
@@ -12,10 +13,21 @@ const useGetSwap = () => {
   const getSwap = async (id: string) => {
     setLoading(true);
     setError(null);
+    let swap: Swap = {
+      id: '',
+      userId: '',
+      courseId: '',
+      lessonType: '',
+      current: '',
+      request: '',
+      status: 'UNMATCHED',
+    };
 
-    const swap = await axiosPrivate
-      .get(`/swaps/${id}`)
-      .then((res) => res.data)
+    await axiosPrivate
+      .get<Swap>(`/swaps/${id}`)
+      .then((res) => {
+        swap = res.data;
+      })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
         if (error.response?.status === 403) {
@@ -27,7 +39,6 @@ const useGetSwap = () => {
         setError(error.message + message);
       });
     setLoading(false);
-    console.log(swap);
 
     return swap;
   };

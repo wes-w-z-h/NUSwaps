@@ -2,30 +2,24 @@ import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useAxiosPrivate } from '../api/useAxiosPrivate';
 import { useLogout } from '../auth/useLogout';
-import { Match } from '../../types/Match';
+import { PartnerDetail } from '../../types/User';
 
-const useGetMatch = () => {
+const useGetMatchPartners = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { logout } = useLogout();
   const axiosPrivate = useAxiosPrivate();
 
-  const getMatch = async (id: string) => {
+  const getMatchPartners = async (swapIds: string[]) => {
     setLoading(true);
     setError(null);
 
-    let match: Match = {
-      id: '',
-      courseId: '',
-      lessonType: '',
-      status: 'PENDING',
-      swaps: [''],
-    };
+    let details: PartnerDetail[] = [];
 
     await axiosPrivate
-      .get<Match>(`/matches/${id}`)
+      .post<PartnerDetail[]>(`/matches/partners`, { swapIds })
       .then((res) => {
-        match = res.data;
+        details = res.data;
       })
       .catch((error: AxiosError<{ error: string }>) => {
         console.log(error);
@@ -38,11 +32,10 @@ const useGetMatch = () => {
         setError(error.message + message);
       });
     setLoading(false);
-
-    return match;
+    return details;
   };
 
-  return { getMatch, loading, error };
+  return { getMatchPartners, loading, error };
 };
 
-export default useGetMatch;
+export default useGetMatchPartners;
