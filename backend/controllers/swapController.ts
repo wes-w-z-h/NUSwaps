@@ -1,7 +1,11 @@
 import { RequestHandler } from 'express';
 import createHttpError, { isHttpError } from 'http-errors';
 import { SwapModel } from '../models/swapModel.js';
-import { getOptimalMatch, rejectMatch } from '../util/match/matchService.js';
+import {
+  acceptMatch,
+  getOptimalMatch,
+  rejectMatch,
+} from '../util/match/matchService.js';
 import { MatchModel } from '../models/matchModel.js';
 import {
   validateSwap,
@@ -76,9 +80,10 @@ export const confirmSwap: RequestHandler = async (req, res, next) => {
     }
     const newStatus = await match.getNewStatus();
 
-    await MatchModel.findByIdAndUpdate(confirmedSwap.match, {
-      status: newStatus,
-    }).exec();
+    // Notify users if match has been confirmed by all parties
+    if (newStatus === 'ACCEPTED') {
+      await acceptMatch(match);
+    }
 
     res.status(200).json(confirmedSwap.createResponse());
   } catch (error) {

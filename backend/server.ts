@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { Server } from 'socket.io';
 import app from './app.js';
 import env from './util/validEnv.js';
 import bot from './telebot/bot.js';
@@ -7,29 +8,26 @@ const { PORT, MONGO_URI } = env;
 
 mongoose.connect(MONGO_URI).catch((error) => console.log(error));
 
-app.listen(PORT, () => console.log('listening on port:', PORT));
+const server = app.listen(PORT, () => console.log('listening on port:', PORT));
+
+// initialise telebot
 bot.start();
-/** 
-// const server = app.listen(PORT, () => console.log('listening on port:', PORT));
-// eslint-disable-next-line global-require
-const io = require('socket.io')(server, {
+
+// initialise socketio
+const io = new Server(server, {
   cors: {
-    origin:
-      CURR_ENV === 'DEVELOPMENT'
-        ? env.FRONTEND_URL_LOCAL
-        : env.FRONTEND_URL_PROD,
+    origin: '*',
   },
 });
 
-io.on('connection', (socket: any) => {
-  // console.log('Connection established to ', socket);
-
-  socket.on('ping', () => {
-    socket.emit('pong', 'pongggg');
+io.on('connection', (socket) => {
+  socket.on('user-data', (userData) => {
+    socket.join(userData.id);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Disconnected');
+  socket.on('disconnect-user', () => {
+    socket.disconnect(true);
   });
 });
-*/
+
+export default io;
