@@ -1,47 +1,60 @@
-import { ReactNode, createContext, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
+import {
+  ReactNode,
+  createContext,
+  useReducer,
+  useEffect,
+  Dispatch,
+} from 'react';
+import { Socket } from 'socket.io-client';
+import { UserToken } from '../types/User';
+import { connectSocket } from '../util/socketio';
 
 type SocketState = Socket | null;
 
+type SocketAction =
+  | { type: 'CONNECT'; payload: UserToken }
+  | { type: 'DISCONNECT' };
+
 type SocketContextType = {
-  socket: SocketState;
-  connectSocket: () => void;
-  disconnectSocket: () => void;
+  socketState: SocketState;
+  socketDispatch: Dispatch<SocketAction>;
 };
 
 export const SocketContext = createContext<SocketContextType>(
   {} as SocketContextType
 );
 
+const socketReducer = (state: SocketState, action: SocketAction) => {
+  switch (action.type) {
+    case 'CONNECT':
+      return connectSocket(action.payload);
+    case 'DISCONNECT':
+      state?.emit('disconnect-user');
+      return null;
+    default:
+      return state;
+  }
+};
+
 export const SocketContextProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  // TODO: Persist state after refresh
-  const [socket, setSocket] = useState<SocketState>(null);
+  const [socketState, socketDispatch] = useReducer(socketReducer, null);
 
-  const connectSocket = () => {
-    const ws = io('http://localhost:4000');
-    ws.on('connect', () => {
-      console.log('here');
-      ws.emit('ping');
+  useEffect(() => {
+    const user = localStorage.getItem('user');
 
-      ws.on('pong', (data) => {
-        console.log(data);
+    if (user !== null && socketState === null) {
+      socketDispatch({
+        type: 'CONNECT',
+        payload: JSON.parse(user),
       });
-
-      ws.on('match', (swap) => {
-        console.log(swap);
-      });
-    });
-    setSocket(ws);
-  };
-
-  const disconnectSocket = () => {
-    setSocket(null);
-  };
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, connectSocket, disconnectSocket }}>
+    <SocketContext.Provider value={{ socketState, socketDispatch }}>
       {children}
     </SocketContext.Provider>
   );

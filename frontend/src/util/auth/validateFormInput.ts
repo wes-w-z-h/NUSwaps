@@ -29,7 +29,6 @@ const validateFormInput = (
       'Password and Confirm Password should be the same';
   }
   // check whether got @
-  console.log(teleHandle, teleHandle?.startsWith('@'));
   if (teleHandle && !teleHandle.startsWith('@')) {
     inputErrors.teleHandle = "Telegram handle should start with '@'";
   }

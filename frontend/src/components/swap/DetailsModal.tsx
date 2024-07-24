@@ -55,6 +55,7 @@ const DetailsModal: React.FC<MatchModalProps> = ({
       mod = await getModsInfo.getModInfo(swap.courseId);
     }
     if (!mod) return;
+    
     const modDetails = mod.semesterData[SEMESTER - 1].timetable.find(
       (l) => l.lessonType === swap.lessonType && l.classNo === swap.current
     );
