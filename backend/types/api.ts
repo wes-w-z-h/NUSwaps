@@ -5,6 +5,8 @@ export interface IUser {
   _id: Types.ObjectId;
   email: string;
   password: string;
+  telegramId: number;
+  telegramHandle: string;
   createdAt: Date;
   updatedAt: Date;
   __v: string;
@@ -19,6 +21,7 @@ export type User = Model<IUser, {}, IUserMethods>;
 export type UserPayload = {
   id: Types.ObjectId;
   email: string;
+  telegramHandle?: string;
   token?: string;
 };
 

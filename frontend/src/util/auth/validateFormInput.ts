@@ -1,13 +1,15 @@
 const validateFormInput = (
   email: string,
   password: string,
-  cfmPassword?: string
+  cfmPassword?: string,
+  teleHandle?: string
 ) => {
   // Initialise object to track errors
   const inputErrors = {
     email: '',
     password: '',
     confirmPassword: '',
+    teleHandle: '',
   };
 
   // Check empty email or password
@@ -25,6 +27,11 @@ const validateFormInput = (
   if (cfmPassword && password !== cfmPassword) {
     inputErrors.confirmPassword =
       'Password and Confirm Password should be the same';
+  }
+  // check whether got @
+  console.log(teleHandle, teleHandle?.startsWith('@'));
+  if (teleHandle && !teleHandle.startsWith('@')) {
+    inputErrors.teleHandle = "Telegram handle should start with '@'";
   }
 
   return inputErrors;

@@ -89,7 +89,7 @@ export const refresh: RequestHandler = async (req, res, next) => {
 };
 
 export const signup: RequestHandler = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, telegramHandle } = req.body;
   try {
     if (!email || !password) {
       throw createHttpError(400, 'Invalid request: missing field(s)');
@@ -110,7 +110,8 @@ export const signup: RequestHandler = async (req, res, next) => {
       );
     }
 
-    await sendVerification(email, createToken({ email, passwordHash }));
+    const payload = { email, passwordHash, telegramHandle };
+    await sendVerification(email, createToken(payload));
 
     res.status(201).json({ message: 'Verification email sent' });
   } catch (error) {
@@ -123,9 +124,15 @@ export const verifyUser: RequestHandler = async (req, res) => {
 
   try {
     const decoded = (jwt.verify(token, env.JWT_KEY) as JwtPayload).id;
-    const { email, passwordHash } = decoded;
+    const { email, passwordHash, telegramHandle } = decoded;
 
-    const data = await UserModel.create({ email, password: passwordHash });
+    const data = telegramHandle
+      ? await UserModel.create({
+          email,
+          password: passwordHash,
+          telegramHandle,
+        })
+      : await UserModel.create({ email, password: passwordHash });
 
     if (!data) {
       res
