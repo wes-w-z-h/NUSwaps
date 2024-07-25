@@ -7,68 +7,80 @@ import { AuthContext } from '../../context/AuthContext';
 import { mockUserTokenObj } from '../mocks/User';
 import { UserToken } from '../../types/User';
 import ProfilePage from '../../pages/ProfilePage';
+import useEditUser from '../../hooks/user/useEditUser';
+import useDeleteUser from '../../hooks/user/useDeleteUser';
 
-const mockEditUser = vi.fn();
+// Mock Data
 const mockLoading = false;
-const mockError = null;
-const mockMessage = null;
-vi.mock('../../hooks/user/useEditUser', () => {
-  return {
-    default: () => ({
-      editUser: mockEditUser,
-      loading: mockLoading,
-      error: mockError,
-      message: mockMessage,
-    }),
-  };
-});
-
-const mockAuthContext: {
-  authState: {
-    user: null | UserToken;
-  };
-  // authDispatch is not important for this test suite
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  authDispatch: any;
-} = {
-  authState: { user: null },
+const mockMessage: null | string = null;
+const mockError: null | string = null;
+const mockEditUser =
+  vi.fn<
+    (
+      oldPassword: string,
+      newPassword: string,
+      teleHandle: string
+    ) => Promise<void>
+  >();
+const mockAuthContext = {
+  authState: { user: null as UserToken | null },
   authDispatch: vi.fn(),
 };
+const mockDeleteUser = vi.fn<() => Promise<void>>();
 
-const updateFields = (a: string, b: string, c: string, d?: string) => {
+// Mock Hook
+vi.mock('../../hooks/user/useEditUser');
+vi.mock('../../hooks/user/useDeleteUser');
+
+const updateFields = (
+  currentPassword: string,
+  newPassword: string,
+  confirmNewPassword: string,
+  telegramHandle?: string
+) => {
   fireEvent.change(screen.getByLabelText(/^Current Password/), {
-    target: { value: a },
+    target: { value: currentPassword },
   });
   fireEvent.change(screen.getByLabelText(/^New Password/), {
-    target: { value: b },
+    target: { value: newPassword },
   });
   fireEvent.change(screen.getByLabelText(/^Confirm New Password/), {
-    target: { value: c },
+    target: { value: confirmNewPassword },
   });
-  if (d) {
+  if (telegramHandle) {
     fireEvent.change(screen.getByLabelText(/^Telegram handle/), {
-      target: { value: d },
+      target: { value: telegramHandle },
     });
   }
 };
 
-// Custom render function to include AuthContext and BrowserRouter
 const customRender = (ui: React.ReactElement) => {
-  mockAuthContext.authState.user = mockUserTokenObj;
   return render(
     <AuthContext.Provider value={mockAuthContext}>{ui}</AuthContext.Provider>,
     { wrapper: BrowserRouter }
   );
 };
 
-describe('Profile page', () => {
+describe('ProfilePage', () => {
+  mockAuthContext.authState.user = mockUserTokenObj;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useEditUser).mockReturnValue({
+      editUser: mockEditUser,
+      loading: mockLoading,
+      error: mockError,
+      message: mockMessage,
+    });
+    vi.mocked(useDeleteUser).mockReturnValue({
+      deleteUser: mockDeleteUser,
+      loading: false,
+      error: null,
+    });
   });
 
   it('renders the form with all the fields', () => {
     customRender(<ProfilePage />);
-    // screen.debug();
     expect(screen.getByLabelText(/^Current Password/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^New Password/)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Confirm New Password/)).toBeInTheDocument();
@@ -82,8 +94,8 @@ describe('Profile page', () => {
 
   it('updates the value on change', () => {
     customRender(<ProfilePage />);
-    updateFields('new', 'new', 'new', '@new');
-    expect(screen.getByLabelText(/^Current Password/)).toHaveValue('new');
+    updateFields('current', 'new', 'new', '@new');
+    expect(screen.getByLabelText(/^Current Password/)).toHaveValue('current');
     expect(screen.getByLabelText(/^New Password/)).toHaveValue('new');
     expect(screen.getByLabelText(/^Confirm New Password/)).toHaveValue('new');
     expect(screen.getByLabelText(/^Telegram handle/)).toHaveValue('@new');
@@ -93,10 +105,11 @@ describe('Profile page', () => {
     customRender(<ProfilePage />);
     updateFields('123', 'new', '12345');
     fireEvent.click(screen.getByRole('button', { name: 'Update Profile' }));
-    // edit not called on form error
+
+    // editUser should not be called on form error
     expect(mockEditUser).not.toHaveBeenCalled();
 
-    // two helper text for the new pw and cnfm pw text box
+    // Validate error message for mismatched passwords
     await waitFor(
       () => {
         expect(
@@ -109,10 +122,36 @@ describe('Profile page', () => {
     );
   });
 
-  it('edit user function called on button press', () => {
+  it('calls editUser function on button press', async () => {
     customRender(<ProfilePage />);
     updateFields('123', '123', '123', '@abc');
     fireEvent.click(screen.getByRole('button', { name: 'Update Profile' }));
-    expect(mockEditUser).toHaveBeenCalled();
+
+    expect(mockEditUser).toHaveBeenCalledOnce();
+  });
+
+  it('renders alert on message or error', () => {
+    vi.mocked(useEditUser).mockReturnValue({
+      editUser: mockEditUser,
+      loading: mockLoading,
+      error: 'test-error',
+      message: 'test-message',
+    });
+
+    customRender(<ProfilePage />);
+    expect(screen.getByText('test-error')).toBeInTheDocument();
+    expect(screen.getByText('test-message')).toBeInTheDocument();
+  });
+
+  it('renders delete dialog when delete acct button clicked', () => {
+    customRender(<ProfilePage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    // screen.debug();
+    expect(
+      screen.getByText(
+        'Are you sure you want to delete your account? This action is irreversible.'
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
   });
 });
