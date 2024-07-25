@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
@@ -13,15 +13,9 @@ vi.mock('../../hooks/auth/useLogout', () => ({
   useLogout: () => ({ logout: mockLogout }),
 }));
 
-const mockAuthContext: {
-  authState: {
-    user: null | UserToken;
-  };
-  // authDispatch is not important for this test suite
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  authDispatch: any;
-} = {
-  authState: { user: null },
+// Mock AuthContext
+const mockAuthContext = {
+  authState: { user: null as UserToken | null },
   authDispatch: vi.fn(),
 };
 
@@ -35,8 +29,11 @@ const customRender = (ui: React.ReactElement) => {
 
 describe('Navbar Component', () => {
   beforeEach(() => {
-    mockAuthContext.authState.user = null;
     vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    mockAuthContext.authState.user = null;
   });
 
   it('renders two app bars', () => {
