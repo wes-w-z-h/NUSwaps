@@ -61,7 +61,7 @@ const customRender = (ui: React.ReactElement) => {
   );
 };
 
-describe('ProfilePage', () => {
+describe('Profile Page', () => {
   mockAuthContext.authState.user = mockUserTokenObj;
 
   beforeEach(() => {
@@ -122,12 +122,11 @@ describe('ProfilePage', () => {
     );
   });
 
-  it('calls editUser function on button press', async () => {
+  it('calls editUser function on with correct params on button press', async () => {
     customRender(<ProfilePage />);
     updateFields('123', '123', '123', '@abc');
     fireEvent.click(screen.getByRole('button', { name: 'Update Profile' }));
-
-    expect(mockEditUser).toHaveBeenCalledOnce();
+    expect(mockEditUser).toHaveBeenCalledWith('123', '123', '@abc');
   });
 
   it('renders alert on message or error', () => {
@@ -143,7 +142,7 @@ describe('ProfilePage', () => {
     expect(screen.getByText('test-message')).toBeInTheDocument();
   });
 
-  it('renders delete dialog when delete acct button clicked', () => {
+  it('renders delete dialog when delete acct button clicked & calls hook when delete clicked', () => {
     customRender(<ProfilePage />);
     fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
     // screen.debug();
@@ -152,6 +151,10 @@ describe('ProfilePage', () => {
         'Are you sure you want to delete your account? This action is irreversible.'
       )
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    const deleteBtn = screen.getByRole('button', { name: 'Delete' });
+    expect(deleteBtn).toBeInTheDocument();
+
+    fireEvent.click(deleteBtn);
+    expect(mockDeleteUser).toHaveBeenCalledOnce();
   });
 });
