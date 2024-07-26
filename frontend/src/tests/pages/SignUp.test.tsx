@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen } from '@testing-library/react';
-import React from 'react';
+import { fireEvent, render, renderHook, screen } from '@testing-library/react';
+import React, { act } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import SignUp from '../../pages/SignUp';
@@ -11,7 +11,6 @@ const mockSignup =
   vi.fn<
     (email: string, password: string, teleHandle?: string) => Promise<void>
   >();
-
 vi.mock('../../hooks/auth/useSignup');
 
 const updateFields = (
@@ -112,14 +111,43 @@ describe('Signup page', () => {
     expect(mockSignup).toHaveBeenCalledWith('test@u.nus.edu', '123', '@test');
   });
 
-  it('renders error alert on error', () => {
+  it('renders error alert on error & message on success', () => {
     vi.mocked(useSignup).mockReturnValue({
       signup: mockSignup,
       loading: false,
       error: 'test-error',
-      message: '',
+      message: 'test-success',
     });
     customRender(<SignUp />);
     expect(screen.getByText('test-error')).toBeInTheDocument();
+    expect(screen.getByText('test-success')).toBeInTheDocument();
+  });
+});
+
+const actualUseSignup = await vi.importActual<
+  typeof import('../../hooks/auth/useSignup')
+>('../../hooks/auth/useSignup');
+
+describe('useSignup hook', async () => {
+  it('initializes with default values', () => {
+    const { result } = renderHook(actualUseSignup.useSignup);
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.message).toBeNull();
+  });
+
+  it('sets message on successful signup', async () => {
+    const { result } = renderHook(actualUseSignup.useSignup);
+
+    await act(async () => {
+      await result.current.signup('test@u.nus.edu', 'password', '@handle');
+    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(result.current.message).toBe(
+      'Verification email sent to test@u.nus.edu'
+    );
   });
 });
