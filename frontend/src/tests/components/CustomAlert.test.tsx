@@ -19,7 +19,6 @@ describe('CustomAlert component', () => {
     expect(screen.queryByText('test alert')).not.toBeNull();
     const closeBtn = screen.getByRole('button', { name: 'Close' });
     fireEvent.click(closeBtn);
-    screen.debug();
     expect(screen.queryByText('test alert')).not.toBeVisible();
   });
 });

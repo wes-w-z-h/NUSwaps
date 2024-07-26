@@ -1,14 +1,23 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from '@testing-library/react';
+import React, { ReactNode } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { mockUserTokenObj } from '../mocks/User';
 import { UserToken } from '../../types/User';
 import ProfilePage from '../../pages/ProfilePage';
 import useEditUser from '../../hooks/user/useEditUser';
 import useDeleteUser from '../../hooks/user/useDeleteUser';
+import { standardUser, TELEGRAMHANDLE } from '../mocks/user/UserApiRes';
+import { http, HttpResponse } from 'msw';
+import { server } from '../mocks/msw/node';
 
 // Mock Data
 const mockLoading = false;
@@ -62,7 +71,7 @@ const customRender = (ui: React.ReactElement) => {
 };
 
 describe('Profile Page', () => {
-  mockAuthContext.authState.user = mockUserTokenObj;
+  mockAuthContext.authState.user = standardUser;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -156,5 +165,100 @@ describe('Profile Page', () => {
 
     fireEvent.click(deleteBtn);
     expect(mockDeleteUser).toHaveBeenCalledOnce();
+  });
+});
+
+describe('useEditUser hook', async () => {
+  const actualUseEditUser = await vi.importActual<
+    typeof import('../../hooks/user/useEditUser')
+  >('../../hooks/user/useEditUser');
+
+  const wrapper: React.FC<{ children: ReactNode }> = ({ children }) => (
+    <BrowserRouter>
+      <AuthContext.Provider value={mockAuthContext}>
+        {children}
+      </AuthContext.Provider>
+    </BrowserRouter>
+  );
+
+  it('initialises with default values', () => {
+    const { result } = renderHook(actualUseEditUser.default, {
+      wrapper: wrapper,
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.message).toBeNull();
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('sets message on successful edit', async () => {
+    const { result } = renderHook(actualUseEditUser.default, {
+      wrapper: wrapper,
+    });
+
+    await act(async () => {
+      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+    });
+
+    expect(result.current.message).toBe('Profile updated successfully!');
+  });
+
+  it('sets loading to true during edit process', async () => {
+    server.use(
+      http.post('/user/edit', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        return HttpResponse.json(standardUser);
+      })
+    );
+
+    const { result } = renderHook(actualUseEditUser.default, {
+      wrapper: wrapper,
+    });
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.editUser('123', '123', TELEGRAMHANDLE);
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('resets error before next update', async () => {
+    server.use(
+      http.patch('/users/edit', () => {
+        return HttpResponse.json({ error: 'test-error' }, { status: 400 });
+      })
+    );
+
+    const { result } = renderHook(actualUseEditUser.default, {
+      wrapper: wrapper,
+    });
+
+    await act(async () => {
+      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+    });
+    console.log(result.current.message);
+
+    expect(result.current.error).toBe(
+      'Request failed with status code 400, test-error'
+    );
+
+    server.use(
+      http.patch('/users/edit', () => {
+        return HttpResponse.json(standardUser);
+      })
+    );
+
+    await act(async () => {
+      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+    });
+
+    expect(result.current.error).toBeNull();
   });
 });

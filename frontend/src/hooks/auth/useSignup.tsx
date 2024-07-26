@@ -29,7 +29,7 @@ export const useSignup = () => {
         setMessage(msg);
       })
       .catch((error: AxiosError<{ error: string }>) => {
-        console.log(error);
+        // console.log(error);
         const message = error.response?.data
           ? `, ${error.response.data.error}`
           : '';

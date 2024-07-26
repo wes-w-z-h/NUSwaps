@@ -1,10 +1,19 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, renderHook, screen } from '@testing-library/react';
-import React, { act } from 'react';
+import {
+  act,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from '@testing-library/react';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import SignUp from '../../pages/SignUp';
 import { useSignup } from '../../hooks/auth/useSignup';
+import { server } from '../mocks/msw/node';
+import { http, HttpResponse } from 'msw';
+import { EMAIL, TELEGRAMHANDLE } from '../mocks/user/UserApiRes';
 
 // Mock Data
 const mockSignup =
@@ -68,7 +77,7 @@ describe('Signup page', () => {
       name: 'Already have an account? Sign in',
     });
     fireEvent.click(link);
-    expect(window.location.pathname).toBe('/login');
+    expect(location.pathname).toBe('/login');
   });
 
   it('updates the form values when changed', () => {
@@ -77,16 +86,16 @@ describe('Signup page', () => {
     const pwInput = screen.getByLabelText(/^Password/);
     const cfmPwInput = screen.getByLabelText(/^Confirm Password/);
     const teleHandleInput = screen.getByLabelText(/^Telegram handle/);
-    updateFields('123', 'test@u.nus.edu', '123', '@test');
-    expect(emailInput).toHaveValue('test@u.nus.edu');
+    updateFields('123', EMAIL, '123', TELEGRAMHANDLE);
+    expect(emailInput).toHaveValue(EMAIL);
     expect(pwInput).toHaveValue('123');
     expect(cfmPwInput).toHaveValue('123');
-    expect(teleHandleInput).toHaveValue('@test');
+    expect(teleHandleInput).toHaveValue(TELEGRAMHANDLE);
   });
 
   it('renders error text when email domain is wrong', () => {
     customRender(<SignUp />);
-    updateFields('123', 'test@123.com', '123', '@test');
+    updateFields('123', 'test@123.com', '123', TELEGRAMHANDLE);
     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
     expect(
       screen.getByText('Email should end with @u.nus.edu')
@@ -106,9 +115,9 @@ describe('Signup page', () => {
 
   it('calls the signup function with correct params when sign in btn is clicked', () => {
     customRender(<SignUp />);
-    updateFields('123', 'test@u.nus.edu', '123', '@test');
+    updateFields('123', EMAIL, '123', TELEGRAMHANDLE);
     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
-    expect(mockSignup).toHaveBeenCalledWith('test@u.nus.edu', '123', '@test');
+    expect(mockSignup).toHaveBeenCalledWith(EMAIL, '123', TELEGRAMHANDLE);
   });
 
   it('renders error alert on error & message on success', () => {
@@ -124,12 +133,12 @@ describe('Signup page', () => {
   });
 });
 
-const actualUseSignup = await vi.importActual<
-  typeof import('../../hooks/auth/useSignup')
->('../../hooks/auth/useSignup');
-
 describe('useSignup hook', async () => {
-  it('initializes with default values', () => {
+  const actualUseSignup = await vi.importActual<
+    typeof import('../../hooks/auth/useSignup')
+  >('../../hooks/auth/useSignup');
+
+  it('initialises with default values', () => {
     const { result } = renderHook(actualUseSignup.useSignup);
 
     expect(result.current.loading).toBe(false);
@@ -141,13 +150,72 @@ describe('useSignup hook', async () => {
     const { result } = renderHook(actualUseSignup.useSignup);
 
     await act(async () => {
-      await result.current.signup('test@u.nus.edu', 'password', '@handle');
+      await result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
     });
 
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
     expect(result.current.message).toBe(
       'Verification email sent to test@u.nus.edu'
+    );
+  });
+
+  it('sets loading to true during signup process', async () => {
+    server.use(
+      http.post('/auth/signup', async () => {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        return HttpResponse.json({ messsage: 'Verification email sent' });
+      })
+    );
+
+    const { result } = renderHook(actualUseSignup.useSignup);
+
+    let promise: Promise<void>;
+    act(() => {
+      promise = result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      await promise;
+    });
+
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('resets error and message before new signup attempt', async () => {
+    const { result } = renderHook(actualUseSignup.useSignup);
+
+    server.use(
+      http.post('/auth/signup', () => {
+        return HttpResponse.error();
+      })
+    );
+
+    await act(async () => {
+      await result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
+    });
+
+    expect(result.current.error).toBeTruthy();
+
+    server.use(
+      http.post('/auth/signup', () => {
+        return HttpResponse.json({ message: 'Verification email sent' });
+      })
+    );
+
+    await act(async () => {
+      await result.current.signup(
+        'test2@u.nus.edu',
+        'password',
+        TELEGRAMHANDLE
+      );
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.message).toBe(
+      'Verification email sent to test2@u.nus.edu'
     );
   });
 });
