@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { UserToken } from '../../../types/User';
-import { standardUser } from '../user/UserApiRes';
+import { mockUser } from '../user/UserApiRes';
 
 export const handlers = [
   http.post('/auth/signup', () => {
@@ -10,14 +10,14 @@ export const handlers = [
   }),
 
   http.post('/auth/login', () => {
-    return HttpResponse.json<UserToken>(standardUser);
+    return HttpResponse.json<UserToken>(mockUser);
   }),
 
   http.patch('/users/edit', () => {
-    return HttpResponse.json<UserToken>(standardUser);
+    return HttpResponse.json<UserToken>(mockUser);
   }),
 
   http.delete('/users/delete', () => {
-    return HttpResponse.json<UserToken>(standardUser);
+    return HttpResponse.json<UserToken>(mockUser);
   }),
 ];

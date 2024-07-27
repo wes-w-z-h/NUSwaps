@@ -11,9 +11,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import SignUp from '../../pages/SignUp';
 import { useSignup } from '../../hooks/auth/useSignup';
-import { server } from '../mocks/msw/node';
+import { server } from '../mocks/service/node';
 import { http, HttpResponse } from 'msw';
-import { EMAIL, TELEGRAMHANDLE } from '../mocks/user/UserApiRes';
+import { mockEmail, mockTeleHandle } from '../mocks/user/UserApiRes';
 
 // Mock Data
 const mockSignup =
@@ -86,16 +86,16 @@ describe('Signup page', () => {
     const pwInput = screen.getByLabelText(/^Password/);
     const cfmPwInput = screen.getByLabelText(/^Confirm Password/);
     const teleHandleInput = screen.getByLabelText(/^Telegram handle/);
-    updateFields('123', EMAIL, '123', TELEGRAMHANDLE);
-    expect(emailInput).toHaveValue(EMAIL);
+    updateFields('123', mockEmail, '123', mockTeleHandle);
+    expect(emailInput).toHaveValue(mockEmail);
     expect(pwInput).toHaveValue('123');
     expect(cfmPwInput).toHaveValue('123');
-    expect(teleHandleInput).toHaveValue(TELEGRAMHANDLE);
+    expect(teleHandleInput).toHaveValue(mockTeleHandle);
   });
 
   it('renders error text when email domain is wrong', () => {
     customRender(<SignUp />);
-    updateFields('123', 'test@123.com', '123', TELEGRAMHANDLE);
+    updateFields('123', 'test@123.com', '123', mockTeleHandle);
     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
     expect(
       screen.getByText('Email should end with @u.nus.edu')
@@ -115,9 +115,9 @@ describe('Signup page', () => {
 
   it('calls the signup function with correct params when sign in btn is clicked', () => {
     customRender(<SignUp />);
-    updateFields('123', EMAIL, '123', TELEGRAMHANDLE);
+    updateFields('123', mockEmail, '123', mockTeleHandle);
     fireEvent.click(screen.getByRole('button', { name: 'Sign Up' }));
-    expect(mockSignup).toHaveBeenCalledWith(EMAIL, '123', TELEGRAMHANDLE);
+    expect(mockSignup).toHaveBeenCalledWith(mockEmail, '123', mockTeleHandle);
   });
 
   it('renders error alert on error & message on success', () => {
@@ -150,7 +150,7 @@ describe('useSignup hook', async () => {
     const { result } = renderHook(actualUseSignup.useSignup);
 
     await act(async () => {
-      await result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
+      await result.current.signup(mockEmail, 'password', mockTeleHandle);
     });
 
     expect(result.current.loading).toBe(false);
@@ -172,7 +172,7 @@ describe('useSignup hook', async () => {
 
     let promise: Promise<void>;
     act(() => {
-      promise = result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
+      promise = result.current.signup(mockEmail, 'password', mockTeleHandle);
     });
 
     expect(result.current.loading).toBe(true);
@@ -194,7 +194,7 @@ describe('useSignup hook', async () => {
     );
 
     await act(async () => {
-      await result.current.signup(EMAIL, 'password', TELEGRAMHANDLE);
+      await result.current.signup(mockEmail, 'password', mockTeleHandle);
     });
 
     expect(result.current.error).toBeTruthy();
@@ -209,7 +209,7 @@ describe('useSignup hook', async () => {
       await result.current.signup(
         'test2@u.nus.edu',
         'password',
-        TELEGRAMHANDLE
+        mockTeleHandle
       );
     });
 

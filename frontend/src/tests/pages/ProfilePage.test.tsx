@@ -15,9 +15,9 @@ import { UserToken } from '../../types/User';
 import ProfilePage from '../../pages/ProfilePage';
 import useEditUser from '../../hooks/user/useEditUser';
 import useDeleteUser from '../../hooks/user/useDeleteUser';
-import { standardUser, TELEGRAMHANDLE } from '../mocks/user/UserApiRes';
+import { mockUser, mockTeleHandle } from '../mocks/user/UserApiRes';
 import { http, HttpResponse } from 'msw';
-import { server } from '../mocks/msw/node';
+import { server } from '../mocks/service/node';
 
 // Mock Data
 const mockLoading = false;
@@ -71,7 +71,7 @@ const customRender = (ui: React.ReactElement) => {
 };
 
 describe('Profile Page', () => {
-  mockAuthContext.authState.user = standardUser;
+  mockAuthContext.authState.user = mockUser;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -197,7 +197,7 @@ describe('useEditUser hook', async () => {
     });
 
     await act(async () => {
-      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+      await result.current.editUser('123', '123', mockTeleHandle);
     });
 
     expect(result.current.message).toBe('Profile updated successfully!');
@@ -207,7 +207,7 @@ describe('useEditUser hook', async () => {
     server.use(
       http.post('/user/edit', async () => {
         await new Promise((resolve) => setTimeout(resolve, 200));
-        return HttpResponse.json(standardUser);
+        return HttpResponse.json(mockUser);
       })
     );
 
@@ -217,7 +217,7 @@ describe('useEditUser hook', async () => {
 
     let promise: Promise<void>;
     act(() => {
-      promise = result.current.editUser('123', '123', TELEGRAMHANDLE);
+      promise = result.current.editUser('123', '123', mockTeleHandle);
     });
 
     expect(result.current.loading).toBe(true);
@@ -241,7 +241,7 @@ describe('useEditUser hook', async () => {
     });
 
     await act(async () => {
-      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+      await result.current.editUser('123', '123', mockTeleHandle);
     });
     console.log(result.current.message);
 
@@ -251,12 +251,12 @@ describe('useEditUser hook', async () => {
 
     server.use(
       http.patch('/users/edit', () => {
-        return HttpResponse.json(standardUser);
+        return HttpResponse.json(mockUser);
       })
     );
 
     await act(async () => {
-      await result.current.editUser('123', '123', TELEGRAMHANDLE);
+      await result.current.editUser('123', '123', mockTeleHandle);
     });
 
     expect(result.current.error).toBeNull();

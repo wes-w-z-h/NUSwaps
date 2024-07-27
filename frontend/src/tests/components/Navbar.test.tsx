@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { UserToken } from '../../types/User';
-import { standardUser } from '../mocks/user/UserApiRes';
+import { mockUser } from '../mocks/user/UserApiRes';
 
 const mockLogout = vi.fn();
 vi.mock('../../hooks/auth/useLogout', () => ({
@@ -49,7 +49,7 @@ describe('Navbar Component', () => {
   });
 
   it('shows profile, logout, and dashboard when user is authenticated', () => {
-    mockAuthContext.authState.user = standardUser;
+    mockAuthContext.authState.user = mockUser;
     customRender(<Navbar />);
     expect(screen.queryByText('Profile')).not.toBeNull();
     expect(screen.queryByText('Logout')).not.toBeNull();
@@ -57,14 +57,14 @@ describe('Navbar Component', () => {
   });
 
   it('navigates to profile page when profile button is clicked', () => {
-    mockAuthContext.authState.user = standardUser;
+    mockAuthContext.authState.user = mockUser;
     customRender(<Navbar />);
     fireEvent.click(screen.getByText('Profile'));
     expect(location.pathname).toBe('/profile');
   });
 
   it('calls logout function and navigates to home when logout is clicked', () => {
-    mockAuthContext.authState.user = standardUser;
+    mockAuthContext.authState.user = mockUser;
     customRender(<Navbar />);
     fireEvent.click(screen.getByText('Logout'));
     expect(mockLogout).toHaveBeenCalled();

@@ -15,8 +15,8 @@ import { useAuthContext } from '../../hooks/auth/useAuthContext';
 import { UserToken } from '../../types/User';
 import { useSocketContext } from '../../hooks/useSocketContext';
 import { Socket } from 'socket.io-client';
-import { EMAIL, standardUser } from '../mocks/user/UserApiRes';
-import { server } from '../mocks/msw/node';
+import { mockEmail, mockUser } from '../mocks/user/UserApiRes';
+import { server } from '../mocks/service/node';
 import { http, HttpResponse } from 'msw';
 
 // Mock Data
@@ -73,8 +73,8 @@ describe('Login Page', () => {
     customRender(<Login />);
     const emailInput = screen.getByLabelText(/^Email/);
     const pwInput = screen.getByLabelText(/^Password/);
-    updateFields('123', EMAIL);
-    expect(emailInput).toHaveValue(EMAIL);
+    updateFields('123', mockEmail);
+    expect(emailInput).toHaveValue(mockEmail);
     expect(pwInput).toHaveValue('123');
   });
 
@@ -99,9 +99,9 @@ describe('Login Page', () => {
 
   it('calls the login function with correct params when sign in btn is clicked', () => {
     customRender(<Login />);
-    updateFields('123', EMAIL);
+    updateFields('123', mockEmail);
     fireEvent.click(screen.getByRole('button', { name: 'Sign In' }));
-    expect(mockLogin).toHaveBeenCalledWith(EMAIL, '123');
+    expect(mockLogin).toHaveBeenCalledWith(mockEmail, '123');
   });
 
   it('renders error alert on error', () => {
@@ -147,18 +147,18 @@ describe('useLogin hook', async () => {
     });
 
     await act(async () => {
-      await result.current.login(EMAIL, '123');
+      await result.current.login(mockEmail, '123');
     });
 
     const user = JSON.parse(localStorage.getItem('user') as string);
-    expect(user).toStrictEqual(standardUser);
+    expect(user).toStrictEqual(mockUser);
     expect(mockAuthDispatch).toHaveBeenCalledWith({
       type: 'LOGIN',
-      payload: standardUser,
+      payload: mockUser,
     });
     expect(mockSocketDispatch).toHaveBeenCalledWith({
       type: 'CONNECT',
-      payload: standardUser,
+      payload: mockUser,
     });
     expect(location.pathname).toBe('/dashboard');
   });
@@ -167,7 +167,7 @@ describe('useLogin hook', async () => {
     server.use(
       http.post('/auth/login', async () => {
         await new Promise((resolve) => setTimeout(resolve, 200));
-        return HttpResponse.json(standardUser);
+        return HttpResponse.json(mockUser);
       })
     );
 
@@ -177,7 +177,7 @@ describe('useLogin hook', async () => {
 
     let promise: Promise<void>;
     act(() => {
-      promise = result.current.login(EMAIL, '123');
+      promise = result.current.login(mockEmail, '123');
     });
 
     expect(result.current.loading).toBe(true);
@@ -201,7 +201,7 @@ describe('useLogin hook', async () => {
     });
 
     await act(async () => {
-      await result.current.login(EMAIL, '123');
+      await result.current.login(mockEmail, '123');
     });
 
     expect(result.current.error).toBe(
@@ -209,12 +209,12 @@ describe('useLogin hook', async () => {
     );
     server.use(
       http.post('/auth/login', () => {
-        return HttpResponse.json(standardUser);
+        return HttpResponse.json(mockUser);
       })
     );
 
     await act(async () => {
-      await result.current.login(EMAIL, '123');
+      await result.current.login(mockEmail, '123');
     });
 
     expect(result.current.error).toBeNull();
