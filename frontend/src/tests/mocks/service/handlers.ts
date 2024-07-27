@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { UserToken } from '../../../types/User';
-import { mockUser } from '../user/UserApiRes';
+import { mockUser } from '../UserApiRes';
+import { mockUnmatchedSwap } from '../SwapApiRes';
+import { Swap } from '../../../types/Swap';
 
 export const handlers = [
   http.post('/auth/signup', () => {
@@ -19,5 +21,13 @@ export const handlers = [
 
   http.delete('/users/delete', () => {
     return HttpResponse.json<UserToken>(mockUser);
+  }),
+
+  http.get('/undefined/modules/CS1010X.json', () => {
+    return HttpResponse.json();
+  }),
+
+  http.post('/swaps', () => {
+    return HttpResponse.json<Swap>(mockUnmatchedSwap);
   }),
 ];

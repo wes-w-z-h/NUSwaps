@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import Navbar from '../../components/Navbar';
 import { UserToken } from '../../types/User';
-import { mockUser } from '../mocks/user/UserApiRes';
+import { mockUser } from '../mocks/UserApiRes';
 
 const mockLogout = vi.fn();
 vi.mock('../../hooks/auth/useLogout', () => ({

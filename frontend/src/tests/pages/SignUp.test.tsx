@@ -13,7 +13,7 @@ import SignUp from '../../pages/SignUp';
 import { useSignup } from '../../hooks/auth/useSignup';
 import { server } from '../mocks/service/node';
 import { http, HttpResponse } from 'msw';
-import { mockEmail, mockTeleHandle } from '../mocks/user/UserApiRes';
+import { mockEmail, mockTeleHandle } from '../mocks/UserApiRes';
 
 // Mock Data
 const mockSignup =

@@ -15,7 +15,7 @@ import { UserToken } from '../../types/User';
 import ProfilePage from '../../pages/ProfilePage';
 import useEditUser from '../../hooks/user/useEditUser';
 import useDeleteUser from '../../hooks/user/useDeleteUser';
-import { mockUser, mockTeleHandle } from '../mocks/user/UserApiRes';
+import { mockUser, mockTeleHandle } from '../mocks/UserApiRes';
 import { http, HttpResponse } from 'msw';
 import { server } from '../mocks/service/node';
 
@@ -243,7 +243,6 @@ describe('useEditUser hook', async () => {
     await act(async () => {
       await result.current.editUser('123', '123', mockTeleHandle);
     });
-    console.log(result.current.message);
 
     expect(result.current.error).toBe(
       'Request failed with status code 400, test-error'

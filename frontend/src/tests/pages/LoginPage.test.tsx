@@ -15,7 +15,7 @@ import { useAuthContext } from '../../hooks/auth/useAuthContext';
 import { UserToken } from '../../types/User';
 import { useSocketContext } from '../../hooks/useSocketContext';
 import { Socket } from 'socket.io-client';
-import { mockEmail, mockUser } from '../mocks/user/UserApiRes';
+import { mockEmail, mockUser } from '../mocks/UserApiRes';
 import { server } from '../mocks/service/node';
 import { http, HttpResponse } from 'msw';
 
@@ -69,6 +69,7 @@ describe('Login Page', () => {
     fireEvent.click(link);
     expect(location.pathname).toBe('/signup');
   });
+
   it('updates the form values when changed', () => {
     customRender(<Login />);
     const emailInput = screen.getByLabelText(/^Email/);
@@ -141,7 +142,7 @@ describe('useLogin hook', async () => {
     expect(result.current.loading).toBe(false);
   });
 
-  it('sets local storage & calls dispatchi & redirects', async () => {
+  it('sets local storage & calls dispatch & redirects', async () => {
     const { result } = renderHook(actualUseLogin.useLogin, {
       wrapper: BrowserRouter,
     });
