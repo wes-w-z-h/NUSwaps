@@ -3,8 +3,8 @@ import { mockId } from './UserApiRes';
 
 export const mockCourseId = 'CS1010X';
 export const mockLessonType = 'Recitation';
-export const mockCurrent = '01';
-export const mockRequest = '02';
+export const mockCurrent = '1';
+export const mockRequest = '2';
 
 export const mockUnmatchedSwap: Swap = {
   id: '123',

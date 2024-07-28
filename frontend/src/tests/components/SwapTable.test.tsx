@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -8,20 +14,24 @@ import { UserToken } from '../../types/User';
 import { useSocketContext } from '../../hooks/useSocketContext';
 import { mockUser } from '../mocks/UserApiRes';
 import SwapTable from '../../components/swap/SwapTable';
-import { AuthContext } from '../../context/AuthContext';
 import { useSwapsContext } from '../../hooks/swaps/useSwapsContext';
-import { SwapsContext } from '../../context/SwapsContext';
 import { mockSwapArr } from '../mocks/SwapApiRes';
-import { ModsContexts } from '../../context/ModsContext';
-import { useModsContext } from '../../hooks/mods/useModsContext';
-import { useAddSwap } from '../../hooks/swaps/useAddSwap';
 import { mockCS1010X } from '../mocks/ModApiRes';
-import { Module } from '../../types/modules';
 
 // Mock Data
 const mockAuthDispatch = vi.fn();
 const mockSocketDispatch = vi.fn();
 const mockSwapsDispatch = vi.fn();
+const mockEditSwap =
+  vi.fn<
+    (
+      id: string,
+      courseId: string,
+      lessonType: string,
+      current: string,
+      request: string
+    ) => Promise<void>
+  >();
 
 const mockAuthContext = {
   authState: { user: mockUser as UserToken | null },
@@ -31,32 +41,33 @@ const mockSwapsContext = {
   swapsState: { swaps: mockSwapArr },
   swapsDispatch: mockSwapsDispatch,
 };
-const mockModsContext = {
-  modsState: {
-    mods: [mockCS1010X] as Module[],
-    moduleCodes: ['CS1010X'],
-  },
-  modsDispatch: vi.fn(),
-};
 
 vi.mock('../../hooks/auth/useAuthContext');
 vi.mock('../../hooks/useSocketContext');
 vi.mock('../../hooks/swaps/useSwapsContext');
-vi.mock('../../hooks/mods/useModsContext');
-vi.mock('../../hooks/swaps/useAddSwap');
+vi.mock('../../hooks/swaps/useEditSwap', () => {
+  return {
+    default: () => ({
+      editSwap: mockEditSwap,
+      loading: false,
+      error: null,
+    }),
+  };
+});
+vi.mock('../../hooks/mods/useModsContext', () => {
+  return {
+    useModsContext: () => ({
+      modsState: {
+        moduleCodes: ['CS2030S', 'CS1010X'],
+        mods: [mockCS1010X],
+      },
+      modsDispatch: vi.fn(),
+    }),
+  };
+});
 
 const customRender = (ui: React.ReactElement) => {
-  return render(
-    <BrowserRouter>
-      <AuthContext.Provider value={mockAuthContext}>
-        <SwapsContext.Provider value={mockSwapsContext}>
-          <ModsContexts.Provider value={mockModsContext}>
-            {ui}
-          </ModsContexts.Provider>
-        </SwapsContext.Provider>
-      </AuthContext.Provider>
-    </BrowserRouter>
-  );
+  return render(<BrowserRouter>{ui}</BrowserRouter>);
 };
 
 describe('Swap table', () => {
@@ -68,20 +79,6 @@ describe('Swap table', () => {
       socketDispatch: mockSocketDispatch,
     });
     vi.mocked(useSwapsContext).mockReturnValue(mockSwapsContext);
-    vi.mocked(useModsContext).mockReturnValue(mockModsContext);
-    vi.mocked(useAddSwap).mockReturnValue({
-      addSwap:
-        vi.fn<
-          (
-            courseId: string,
-            lessonType: string,
-            current: string,
-            request: string
-          ) => Promise<void>
-        >(),
-      loading: false,
-      error: null,
-    });
   });
 
   it('renders the headers', () => {
@@ -144,7 +141,7 @@ describe('Swap table', () => {
   it('renders confirmed status drawer with correct buttons', () => {
     customRender(<SwapTable />);
     const confirmedRow = screen.getByRole('row', {
-      name: 'CS1010X Recitation 01 02 CONFIRMED',
+      name: 'CS1010X Recitation 1 2 CONFIRMED',
     });
     const confirmedRowBtn = within(confirmedRow).getByRole('button', {
       name: 'expand row',
@@ -161,7 +158,7 @@ describe('Swap table', () => {
   it('renders matched status drawer with correct buttons', () => {
     customRender(<SwapTable />);
     const matchedRow = screen.getByRole('row', {
-      name: 'CS1010X Recitation 01 02 MATCHED',
+      name: 'CS1010X Recitation 1 2 MATCHED',
     });
     const matchedRowBtn = within(matchedRow).getByRole('button', {
       name: 'expand row',
@@ -177,7 +174,7 @@ describe('Swap table', () => {
   it('renders unmatched status drawer with correct buttons', () => {
     customRender(<SwapTable />);
     const unmatchedRow = screen.getByRole('row', {
-      name: 'CS1010X Recitation 01 02 UNMATCHED',
+      name: 'CS1010X Recitation 1 2 UNMATCHED',
     });
     const unmatchedRowBtn = within(unmatchedRow).getByRole('button', {
       name: 'expand row',
@@ -188,5 +185,82 @@ describe('Swap table', () => {
     expect(screen.getByRole('button', { name: 'edit' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
     // end of unmatched row test
+  });
+});
+
+describe('Edit swap modal', () => {
+  const openModal = () => {
+    const unmatchedRow = screen.getByRole('row', {
+      name: 'CS1010X Recitation 1 2 UNMATCHED',
+    });
+    fireEvent.click(
+      within(unmatchedRow).getByRole('button', { name: 'expand row' })
+    );
+    const editBtn = screen.getByRole('button', { name: 'edit' });
+    fireEvent.click(editBtn);
+  };
+
+  it('renders on button press', () => {
+    customRender(<SwapTable />);
+    openModal();
+    expect(screen.getByRole('button', { name: 'Confirm change' }));
+  });
+
+  it('renders all input fields correctly', () => {
+    customRender(<SwapTable />);
+    openModal();
+    // screen.debug(screen.getByText('Edit swap'));
+    const courseIdInput = screen.getByRole('combobox', { name: 'Course Id' });
+    const lessonTypeInput = screen.getByRole('combobox', {
+      name: 'Lesson Type',
+    });
+    const currentInput = screen.getByRole('combobox', { name: 'Current' });
+    const requestInput = screen.getByRole('combobox', { name: 'Request' });
+    // screen.debug();
+    expect(courseIdInput).toHaveValue('CS1010X');
+    expect(lessonTypeInput).toHaveValue('Recitation');
+    expect(currentInput).toHaveValue('1');
+    expect(requestInput).toHaveValue('2');
+  });
+
+  it('changes value according to user clicks & calls edit swap with correct params', async () => {
+    customRender(<SwapTable />);
+    openModal();
+
+    const courseIdInput = screen.getByRole('combobox', { name: 'Course Id' });
+    const lessonTypeInput = screen.getByRole('combobox', {
+      name: 'Lesson Type',
+    });
+    const currentInput = screen.getByRole('combobox', { name: 'Current' });
+    const requestInput = screen.getByRole('combobox', { name: 'Request' });
+
+    fireEvent.mouseDown(courseIdInput);
+    fireEvent.click(screen.getByRole('option', { name: 'CS1010X' }));
+
+    fireEvent.mouseDown(lessonTypeInput);
+    fireEvent.click(screen.getByRole('option', { name: 'Tutorial' }));
+
+    fireEvent.mouseDown(currentInput);
+    fireEvent.click(screen.getByRole('option', { name: '01' }));
+
+    fireEvent.mouseDown(requestInput);
+    fireEvent.click(screen.getByRole('option', { name: '03' }));
+
+    expect(courseIdInput).toHaveValue('CS1010X');
+    expect(lessonTypeInput).toHaveValue('Tutorial');
+    expect(currentInput).toHaveValue('01');
+    expect(requestInput).toHaveValue('03');
+
+    await waitFor(() => {
+      fireEvent.click(screen.getByRole('button', { name: 'Confirm change' }));
+    });
+
+    expect(mockEditSwap).toHaveBeenCalledWith(
+      '123',
+      'CS1010X',
+      'Tutorial',
+      '01',
+      '03'
+    );
   });
 });

@@ -121,7 +121,7 @@ describe('SwapInputRow', () => {
    * for that hook instead of a mocked function to fully simulate changing of the
    * inputs by a user
    */
-  it('calls addSwap when Add button is clicked with valid inputs', async () => {
+  it('changes value according to user clicks & calls addSwap with correct params', async () => {
     customRender(<Wrapper />);
     fireEvent.click(screen.getByRole('button', { name: 'Open SwapInputRow' }));
 
