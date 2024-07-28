@@ -4,7 +4,7 @@ export type UserToken = {
   id: string;
   email: string;
   telegramHandle?: string;
-  swapRequests: [Swap];
+  swapRequests: Swap[];
   token: string;
 };
 
@@ -13,7 +13,7 @@ export type User = {
   id: string;
   email: string;
   telegramHandle?: string;
-  swapRequests: [Swap];
+  swapRequests: Swap[];
 };
 
 export type PartnerDetail = {

@@ -4,6 +4,7 @@ import TableCell from '@mui/material/TableCell';
 import Collapse from '@mui/material/Collapse';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
+import React from 'react';
 
 type MatchedDrawerProps = {
   openDrawer: boolean;
