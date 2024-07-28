@@ -13,7 +13,6 @@ const stateToString = (state: number) => {
  * Function to update the inline keyboard based on the current state
  *
  * @param ctx - CustomContext from telegram
- * @param states - Any array of possible states
  */
 const updateState = async (ctx: CustomContext) => {
   const keyboard = await generateInlineKeyboard(ctx.session);
