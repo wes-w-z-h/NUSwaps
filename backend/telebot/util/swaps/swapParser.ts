@@ -11,7 +11,7 @@ const EMOJITOSTATUS = new Map<string, string>();
 EMOJITOSTATUS.set('👀', 'UNMATCHED');
 EMOJITOSTATUS.set('🔔', 'MATCHED');
 EMOJITOSTATUS.set('🟠', 'CONFIRMED');
-EMOJITOSTATUS.set('✅', 'COMLETED');
+EMOJITOSTATUS.set('✅', 'COMPLETED');
 
 export const packageSwap = (swap: Swap, includeId: boolean): string => {
   const swapStr = `${swap.courseId}+${swap.lessonType.slice(0, 3)}+${swap.current}+${swap.request}+${STATUSTOEMOJI.get(swap.status)}`;
