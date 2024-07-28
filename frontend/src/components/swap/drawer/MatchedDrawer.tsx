@@ -33,12 +33,16 @@ const MatchedDrawer: React.FC<MatchedDrawerProps> = ({
         <Collapse in={openDrawer} timeout="auto" unmountOnExit>
           <Grid container sx={{ margin: 2 }}>
             <Grid item style={{ textAlign: 'center' }} xs>
-              <Button onClick={() => confirmSwap?.confirmSwap(row.id)}>
+              <Button
+                disabled={confirmSwap?.loading || rejectSwap?.loading}
+                onClick={() => confirmSwap?.confirmSwap(row.id)}
+              >
                 confirm
               </Button>
             </Grid>
             <Grid item style={{ textAlign: 'center' }} xs>
               <Button
+                disabled={confirmSwap?.loading || rejectSwap?.loading}
                 color="warning"
                 onClick={() => rejectSwap?.rejectSwap(row.id)}
               >
